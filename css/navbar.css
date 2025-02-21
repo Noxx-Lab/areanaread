@@ -1,0 +1,96 @@
+
+/* Estilização da Navbar */
+.navbar {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Adiciona uma sombra para separação */
+    justify-content: space-between;
+    align-items: center;
+    background-color: #7F7095; /* Cor semelhante à da imagem */
+    padding: 10px 20px;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    padding-top: 125px; /* Ajusta a altura para evitar sobreposição */ 
+}
+
+/* Espaçamento entre a navbar e a capa */
+.manga-container {
+    margin-top: 30px; /* Adiciona espaço entre a navbar e a capa */
+}
+
+
+/* Logo e Links à Esquerda */
+.nav-left {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    width: 55px;
+    margin-right: 15px;
+}
+
+.nav-left a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    margin-right: 20px;
+}
+
+/* Campo de Pesquisa ao Centro */
+.nav-center {
+    display: flex;
+    align-items: center;
+}
+
+.search-bar {
+    width: 250px;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    outline: none;
+}
+
+.search-button {
+    padding: 8px 15px;
+    margin-left: 10px;
+    border: 2px solid #000; 
+    border-radius: 6px;
+    background-color: #8174A0;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.search-button:hover {
+    background-color: #6f638d;
+}
+
+
+/* Botões à Direita */
+.nav-right {
+    display: flex;
+    gap: 10px;
+}
+
+.nav-btn {
+    background-color: #8174A0;
+    color: white;
+    padding: 8px 12px;
+    border: 2px solid #000;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}  
+
+
+.nav-btn:hover {
+    background-color:#6f638d;
+}

@@ -1,0 +1,71 @@
+/* Estilo geral */
+body {
+    background-color: #121212;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    padding-top: 100px; /* Ajuste para evitar sobreposição com a navbar */
+}
+
+/* Container da lista de mangás */
+.lista-container {
+    max-width: 90%;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #1c1c1c;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.1);
+}
+
+/* Título da lista */
+.titulo-lista {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: #ffc107;
+    margin-bottom: 20px;
+}
+
+/* Grid dos mangás */
+.manga-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Tamanho reduzido */
+    gap: 15px;
+    justify-content: center;
+}
+
+/* Cartão de mangá */
+.manga-card {
+    background-color: #222;
+    padding: 10px;
+    border-radius: 10px;
+    text-align: center;
+    transition: transform 0.3s ease-in-out;
+    box-shadow: 0px 4px 6px rgba(255, 255, 255, 0.1);
+}
+
+.manga-card:hover {
+    transform: scale(1.05);
+}
+
+/* Imagem do mangá */
+.manga-card img {
+    width: 70%;
+    height: auto;
+    border-radius: 10px;
+}
+
+/* Nome do mangá */
+.manga-card h3 {
+    font-size: 14px;
+    color: #ffc107;
+    margin-top: 8px;
+}
+
+/* Informações do mangá */
+.manga-card p {
+    font-size: 12px;
+    color: #bbb;
+    margin: 3px 0;
+}

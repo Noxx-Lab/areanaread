@@ -1,0 +1,106 @@
+/* Reset básico para remover margens, espaçamentos e ajustar box model */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Estilização do corpo da página */
+body {
+    font-family: Arial, sans-serif; 
+    background-color: #1a1a1a; 
+    display: flex; 
+    justify-content: center;
+    align-items: center; 
+    height: 100vh;
+}
+
+/* Container que envolve o formulário de login */
+.login-container {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+    width: 100%; 
+    max-width: 400px; 
+    text-align: center; 
+}
+
+/* Estilização do título no formulário */
+.login-form h2 {
+    font-size: 24px; 
+    margin-bottom: 20px; 
+}
+
+/* Grupos de entrada (input) */
+.input-group {
+    margin-bottom: 15px; /* Espaço entre os campos */
+    text-align: left; /* Alinha o texto à esquerda */
+}
+
+.input-group label {
+    display: block; 
+    margin-bottom: 5px; 
+    font-size: 14px; 
+}
+
+.input-group input {
+    width: 100%; 
+    padding: 10px; 
+    border: 1px solid #ccc;
+    border-radius: 5px; 
+    font-size: 14px; 
+}
+
+/* Botão "Entrar" */
+.btn-login {
+    width: 100%; 
+    padding: 10px; 
+    background-color: #8174A0; 
+    color: #fff; 
+    font-size: 16px; 
+    border: none; 
+    border-radius: 5px; 
+    margin-bottom: 10px; 
+    cursor: pointer; 
+    transition: background-color 0.3s; 
+}
+
+.btn-login:hover {
+    background-color: #8174a0e1; 
+}
+
+/* Botão "Criar conta" */
+.btn-signup {
+    width: 100%; 
+    padding: 10px; 
+    background-color: #4b3c61; 
+    color: #fff; 
+    font-size: 16px; 
+    border: none; 
+    border-radius: 5px; 
+    cursor: pointer;
+    transition: background-color 0.3s; 
+}
+
+.btn-signup:hover {
+    background-color: #3c3054; 
+}
+
+/* Links para recuperação de senha e voltar */
+.links {
+    margin-top: 15px; 
+}
+
+.links a {
+    display: block; 
+    color: #555; 
+    font-size: 14px; 
+    margin-bottom: 5px; 
+    text-decoration: none; 
+    transition: color 0.3s;
+}
+
+.links a:hover {
+    color: #000;
+}

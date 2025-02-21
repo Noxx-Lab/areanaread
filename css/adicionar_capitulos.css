@@ -1,0 +1,173 @@
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+/* Fundo escuro */
+body {
+    background-color: #111;
+    color: #fff;
+    padding: 20px;
+    padding-top: 95px;
+    display: flex;
+    justify-content: center;
+}
+
+/* Container principal */
+.capitulos-container {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    justify-content: center;
+    max-width: 1100px; /* Aumentei o tamanho máximo */
+    margin: 20px auto;
+    background-color: #222;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+}
+
+/* Seção de informações do mangá */
+.manga-info {
+    width: 25%;
+    text-align: center;
+}
+
+.manga-info img {
+    width: 100%;
+    max-width: 280px; /* Aumentei o tamanho da capa */
+    border-radius: 10px;
+}
+
+.manga-info h3 {
+    font-size: 20px;
+    color: #ffd700;
+    margin-top: 10px;
+}
+
+.manga-info p {
+    font-size: 14px;
+    color: #bbb;
+    margin: 5px 0;
+}
+
+/* Container para capítulos disponíveis */
+.capitulos-list {
+    width: 50%;
+    max-height: 230px; /* Aumentei a altura */
+    overflow-y: auto;
+    background-color: #222;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+/* Adicionar scrollbar estilizada */
+.capitulos-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.capitulos-list::-webkit-scrollbar-thumb {
+    background: #ffd700;
+    border-radius: 5px;
+}
+
+.capitulos-list h3 {
+    color: #ffd700;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+/* Grade de capítulos */
+.capitulos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+}
+
+/* Estilo de cada capítulo */
+.capitulo-card {
+    background-color: #333;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    border: 2px solid #ffd700;
+}
+
+.capitulo-card strong {
+    display: block;
+    color: #ffd700;
+}
+
+.capitulo-card p {
+    font-size: 12px;
+    color: #ccc;
+}
+
+/* Container do formulário de adicionar capítulo */
+.capitulo-form {
+    width: 50%;
+    max-height: 400px; /* Mesma altura do container de capítulos */
+    background-color: #222;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+/* Título */
+.capitulo-form h2 {
+    font-size: 22px;
+    font-weight: bold;
+    color: #ffd700;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Mensagens de sucesso e erro */
+.mensagem {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.sucesso {
+    color: #00ff00;
+}
+
+.erro {
+    color: #ff3333;
+}
+
+/* Inputs e selects */
+.capitulo-form input,
+.capitulo-form select {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    background-color: #333;
+    color: #fff;
+    border: 2px solid #ffd700;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+/* Botão de Adicionar */
+.capitulo-form button {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    background-color: #ffd700;
+    color: #111;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.capitulo-form button:hover {
+    background-color: #ffbb00;
+}

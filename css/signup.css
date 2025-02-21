@@ -1,0 +1,92 @@
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Corpo */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #0f0f23; /* Fundo escuro */
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Altura da página inteira */
+}
+
+/* Container do formulário de cadastro */
+.signup-container {
+    background-color: #fff; /* Fundo branco */
+    padding: 30px;   /* Espaçamento interno */
+    border-radius: 10px; /* Cantos arredondados */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra */
+    width: 100%;
+    max-width: 400px; /* Largura máxima */
+    text-align: center; /* Centraliza o texto */
+}
+
+/* Título do formulário */
+.signup-form h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333; /* Cor do texto */
+}
+
+/* Grupos de entrada */
+.input-group {
+    margin-bottom: 15px;
+    text-align: left; /* Alinha o texto à esquerda */
+}
+
+.input-group label {
+    display: block; /* Faz o rótulo ocupar uma linha inteira */
+    margin-bottom: 5px; /* Espaço entre o rótulo e o campo */
+    font-size: 14px;
+    color: #555; /* Cor do texto */
+}
+
+.input-group input {
+    width: 100%; /* Largura total */
+    padding: 10px; /* Espaçamento interno */
+    border: 1px solid #ccc; /* Borda cinza */
+    border-radius: 5px; /* Cantos arredondados */
+    font-size: 14px;
+}
+
+
+/* Botão de registro */
+.btn-signup {
+    width: 100%; /* Largura total */
+    padding: 10px;
+    background-color: #4b3c61; /* Cor roxa */
+    color: #fff; /* Cor do texto branca */
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s; /* Transição suave no hover */
+}
+
+.btn-signup:hover {
+    background-color: #3c3054; /* Fundo mais escuro no hover */
+}
+
+/* Links */
+.links {
+    margin-top: 15px;
+}
+
+.links a {
+    display: block; /* Faz o link ocupar uma linha inteira */
+    color: #555;
+    font-size: 14px;
+    margin-bottom: 5px;
+    text-decoration: none;
+    transition: color 0.3s; /* Transição suave no hover */
+}
+
+.links a:hover {
+    color: #000; /* Cor preta no hover */
+}

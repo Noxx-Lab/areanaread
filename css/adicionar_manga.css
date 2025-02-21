@@ -1,0 +1,112 @@
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+/* Fundo escuro */
+body {
+    background-color: #111;
+    color: #fff;
+    padding-top: 125px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* Container do formulário */
+.upload-container {
+    max-width: 600px;
+    background-color: #222;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    text-align: center;
+}
+
+/* Título */
+.upload-container h2 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ffd700;
+    margin-bottom: 20px;
+}
+
+* Mensagem de erro e sucesso */
+.mensagem {
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.sucesso {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.erro {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+
+/* Estilização dos campos de input */
+input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    background-color: #333;
+    color: #fff;
+    border: 2px solid #ffd700;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+/* Ajuste do textarea */
+textarea {
+    height: 100px;
+    resize: none;
+}
+
+/* Botão de Upload */
+.upload-btn {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    background-color: #ffd700;
+    color: #111;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 10px;
+}
+
+.upload-btn:hover {
+    background-color: #ffbb00;
+}
+
+/* Botão personalizado para escolher arquivos */
+.custom-file-upload {
+    display: block;
+    background-color: #444;
+    color: #ffd700;
+    padding: 10px;
+    text-align: center;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    border: 2px dashed #ffd700;
+}
+
+.custom-file-upload:hover {
+    background-color: #555;
+}
+
+/* Esconde o input de arquivos */
+#file-upload {
+    display: none;
+}

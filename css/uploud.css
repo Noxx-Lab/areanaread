@@ -1,0 +1,182 @@
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+/* Fundo escuro */
+body {
+    background-color: #111;
+    color: #fff;
+    padding: 20px;
+    padding-top: 95px;
+}
+
+/* Container para alinhar os botões */
+.button-group {
+    display: flex;
+    justify-content: center; /* Centraliza os botões */
+    gap: 10px; /* Espaço entre os botões */
+    margin-bottom: 15px;
+}
+
+/* Estilo unificado para os botões */
+.add-manga, .add-capitulo {
+    flex: 1; /* Ambos ocupam o mesmo espaço */
+    max-width: 250px; /* Define um tamanho máximo */
+    text-align: center;
+    padding: 12px 15px;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+/* Botão Ativo */
+.add-manga {
+    background-color: #ffc107;
+    color: #111;
+    border: 2px solid #ffd700;
+}
+
+.add-manga:hover {
+    background-color: #ffbb00;
+}
+
+/* Botão Inicialmente Desativado */
+.add-capitulo {
+    background-color: #555;
+    color: #888;
+    border: 2px solid #777;
+    cursor: not-allowed;
+}
+
+/* Botão Ativo */
+.add-capitulo.enabled {
+    background-color: #ffc107;
+    color: #111;
+    border: 2px solid #ffd700;
+    cursor: pointer;
+}
+
+.add-capitulo.enabled:hover {
+    background-color: #ffbb00;
+}
+
+
+
+
+/* Container do Upload */
+.upload-container {
+    max-width: 600px;
+    margin: 20px auto;
+    background-color: #222;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+/* Título */
+.upload-container h2 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ffd700;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+/* Seção de seleção de mangás */
+.manga-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+/* Card dos mangás */
+.manga-card {
+    background-color: #333;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    transition: transform 0.3s ease-in-out;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+.manga-card:hover {
+    transform: scale(1.05);
+    border-color: #ffd700;
+}
+
+.manga-card img {
+    width: 80px;
+    height: 110px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.manga-card span {
+    display: block;
+    margin-top: 5px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* Personalizando o Select (aparência anterior) */
+select {
+    width: 100%;
+    height: 45px; /* Mantém o tamanho normal */
+    font-size: 16px;
+    font-weight: bold;
+    background-color: #222;
+    color: #fff;
+    border: 2px solid #ffd700;
+    border-radius: 5px;
+    padding: 8px;
+    cursor: pointer;
+    appearance: none; /* Remove o estilo padrão do navegador */
+}
+
+/* Botão de Upload */
+.upload-btn {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    background-color: #ffd700;
+    color: #111;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.upload-btn:hover {
+    background-color: #ffbb00;
+}
+
+/* Botão personalizado para escolher arquivos */
+.custom-file-upload {
+    display: block;
+    background-color: #444;
+    color: #ffd700;
+    padding: 10px;
+    text-align: center;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    border: 2px dashed #ffd700;
+}
+
+.custom-file-upload:hover {
+    background-color: #555;
+}
+
+#file-upload {
+    display: none;
+}
