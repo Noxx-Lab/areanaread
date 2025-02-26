@@ -1,9 +1,8 @@
 <?php
 include "navbar.php";
 include 'config.php';
-// Buscar o ID do mangá (por enquanto fixo, mas podes passar por GET)
-$id_manga = 1;
 
+$id_manga = $_GET["id"];
 
 $consulta = "SELECT * FROM mangas WHERE id_manga = ?";
 $stmt = $ligaDB->prepare($consulta);
@@ -49,7 +48,7 @@ $result_capitulos = $stmt_capitulos->get_result();
     <h2>Capítulos</h2>
     <div class="chapters">
         <?php while ($capitulo = $result_capitulos->fetch_assoc()): ?>
-            <a href="ler_capitulo.php?id=<?php echo $capitulo['id_capitulos']; ?>" class="chapter-button">
+            <a href="ler_manga.php?id=<?php echo $capitulo['id_capitulos']; ?>" class="chapter-button">
                 Capítulo <?php echo $capitulo['num_capitulo']; ?>
                 <span class="chapter-date"><?php echo date('d M, Y', strtotime($capitulo['data_lancamento'])); ?></span>
             </a>

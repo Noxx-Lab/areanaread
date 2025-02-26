@@ -7,8 +7,7 @@ use Cloudinary\Api\Upload\UploadApi;
 
 $uploadApi = new UploadApi(); 
 
-$sucessos = [];
-$erros = [];
+$mensagem="";
 
 // Buscar todos os mangás para exibição na página
 $sqlmangas = "SELECT id_manga, titulo, capa FROM mangas";
@@ -44,7 +43,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
     $rowManga = $resultManga->fetch_assoc();
 
     if (!$rowManga) {
-        die("<p style='color: red;'>Erro: Mangá não encontrado.</p>");
+        $mensagem = "<p class='erro'> Erro: Mangá não encontrado.</p>";
     }
 
     // Formatar o nome do mangá para URL
@@ -58,20 +57,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
         $tempFile = $arquivos['tmp_name'][$i];
 
         if (empty($nomeArquivo) || empty($tempFile)) {
-            die("<p style='color: red;'>❌ Upload cancelado! Arquivo inválido.</p>");
+            $mensagem = "<p class='erro'> Upload cancelado! Arquivo inválido.</p>";
         }
 
         $extensao = pathinfo($nomeArquivo, PATHINFO_EXTENSION);
         
         if (empty($extensao)) {
-            die("<p style='color: red;'>❌ Upload cancelado! O arquivo '$nomeArquivo' não tem uma extensão válida.</p>");
+            $mensagem = "<p class='erro'> Upload cancelado! O arquivo '$nomeArquivo' não tem uma extensão válida</p>";
         }
 
         $extensao = strtolower($extensao);
         $extensoesPermitidas = ['jpg', 'jpeg', 'png'];
 
         if (!in_array($extensao, $extensoesPermitidas)) {
-            die("<p style='color: red;'>❌ Upload cancelado! Formato não permitido: '$nomeArquivo'.</p>");
+            $mensagem = "<p class='erro'> Upload cancelado! Formato não permitido: '$nomeArquivo'</p>";
         }
 
         try {
@@ -81,7 +80,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
             ]);
 
             if (!isset($upload["secure_url"])) {
-                die("<p style='color: red;'>❌ Upload cancelado! Erro ao fazer upload para o Cloudinary: '$nomeArquivo'.</p>");
+                $mensagem = "<p class='erro'> Upload cancelado! Erro ao fazer upload para o Cloudinary: '$nomeArquivo'</p>";
             }
 
             $caminhoArquivo = $upload["secure_url"];
@@ -92,14 +91,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
             $stmt->bind_param("iis", $id_manga, $id_capitulo, $caminhoArquivo);
 
             if (!$stmt->execute()) {
-                die("<p style='color: red;'>❌ Upload cancelado! Erro ao salvar no banco de dados: '$nomeArquivo'.</p>");
+                $mensagem = "<p class='erro'> Upload cancelado! Erro ao salvar no banco de dados: '$nomeArquivo'</p>";
             }
         } catch (Exception $e) {
-            die("<p style='color: red;'>❌ Upload cancelado! Falha no upload de '$nomeArquivo': " . $e->getMessage() . "</p>");
+            $mensagem = "<p class='erro'> Upload cancelado! Falha no upload de '$nomeArquivo': " . $e->getMessage() . "</p>";
         }
     }
 
-    echo "<p style='color: green;'>✅ Todos os arquivos foram enviados com sucesso!</p>";
+    $mensagem = "<p class='sucesso'>Todos os arquivos foram enviados com sucesso!</p>";
 }
 ?>
 
@@ -128,42 +127,50 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
 </div>
 
 
-    <!-- Formulário para selecionar o mangá -->
-    <form action="uploud.php" method="POST" enctype="multipart/form-data">
-        
-        <h3>Selecione o Mangá:</h3>
-        <div class="manga-list">
-            <?php while ($manga = $resultmangas->fetch_assoc()): ?>
-                <label class="manga-card">
-                    <input type="radio" name="id_manga" value="<?php echo $manga['id_manga']; ?>" 
-                           onchange="this.form.submit()" 
-                           <?php echo ($id_manga_selecionado == $manga['id_manga']) ? 'checked' : ''; ?> required>
-                    <img src="<?php echo $manga['capa']; ?>" alt="<?php echo $manga['titulo']; ?>">
-                    <span><?php echo $manga['titulo']; ?></span>
-                </label>
-            <?php endwhile; ?>
-        </div>
-        
-        
+<form id="formUpload" action="uploud.php" method="POST" enctype="multipart/form-data">
+    <h3>Selecione o Mangá:</h3>
+    <div class="manga-list">
+        <?php while ($manga = $resultmangas->fetch_assoc()): ?>
+            <label class="manga-card">
+                <input type="radio" name="id_manga" value="<?php echo $manga['id_manga']; ?>" 
+                       onchange="this.form.submit()" 
+                       <?php echo ($id_manga_selecionado == $manga['id_manga']) ? 'checked' : ''; ?> required>
+                <img src="<?php echo $manga['capa']; ?>" alt="<?php echo $manga['titulo']; ?>">
+                <span><?php echo $manga['titulo']; ?></span>
+            </label>
+        <?php endwhile; ?>
+    </div>
+
+    <?php if ($id_manga_selecionado): ?>
         <h3>Selecione o Capítulo:</h3>
-        <div class="select-cap">
-        <select name="id_capitulo"required>
-            <option value="">Selecione um Capítulo </option>
-            <?php foreach ($capitulos as $cap): ?>
-                <option value="<?php echo $cap['id_capitulos']; ?>">
-                    Capítulo <?php echo $cap['num_capitulo']; ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
+        <div class="dropdown">
+            <select name="id_capitulo" required>
+                <option value="">Selecionar capítulo</option>
+                <?php foreach ($capitulos as $capitulo): ?>
+                    <option value="<?php echo $capitulo['id_capitulos']; ?>">
+                        Capítulo <?php echo $capitulo['num_capitulo']; ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
         </div>
 
         <label for="file-upload" class="custom-file-upload">
             <i class="bi bi-file-earmark-arrow-up"></i> <span id="file-label">Escolher Arquivos</span>
         </label>
         <input type="file" name="files[]" id="file-upload" multiple required>
-        <button type="submit" class="upload-btn">
+
+        <button type="submit" class="upload-btn" id="submit-btn">
             <i class="bi bi-upload"></i> Enviar Arquivos
         </button>
+
+        <!-- Spinner de Loading -->
+        <div class="loading-spinner" id="loading-spinner" style="display: none;"></div>
+
+        <!-- Área para exibir mensagens -->
+        <div class="mensagem" id="mensagem">
+            <?php echo $mensagem; ?>
+        </div>
+    <?php endif; ?>
     </form>
 </div>
 
@@ -177,6 +184,25 @@ document.getElementById("file-upload").addEventListener("change", function() {
     } else {
         label.textContent = "Escolher Arquivos";
     }
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    let formUpload = document.getElementById("formUpload");
+    let submitButton = document.getElementById("submit-btn");
+    let loadingSpinner = document.getElementById("loading-spinner");
+    let mensagemDiv = document.getElementById("mensagem");
+
+    formUpload.addEventListener("submit", function(event) {
+        // Oculta mensagens anteriores
+        mensagemDiv.innerHTML = "";
+
+        // Desativa o botão de envio
+        submitButton.disabled = true;
+        submitButton.innerHTML = "Enviando...";
+        
+        // Exibe o spinner de loading
+        loadingSpinner.style.display = "block";
+    });
 });
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -206,8 +232,8 @@ document.addEventListener("DOMContentLoaded", function () {
         radio.addEventListener("change", verificarSelecao);
     });
 });
-
 </script>
+
 
 </body>
 </html>

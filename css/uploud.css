@@ -127,19 +127,41 @@ body {
     font-weight: bold;
 }
 
-/* Personalizando o Select (aparência anterior) */
-select {
+/* Mensagens de sucesso e erro */
+.mensagem {
+    text-align: center;
+    font-weight:normal;
+    margin-top: 15px;
+}
+
+.sucesso {
+    color: #00ff00;
+}
+
+.erro {
+    color: #ff3333;
+}
+
+.dropdown {
     width: 100%;
-    height: 45px; /* Mantém o tamanho normal */
+    margin-top: 10px;
+}
+
+.dropdown select {
+    width: 100%;
+    padding: 10px;
     font-size: 16px;
-    font-weight: bold;
-    background-color: #222;
-    color: #fff;
-    border: 2px solid #ffd700;
     border-radius: 5px;
-    padding: 8px;
-    cursor: pointer;
-    appearance: none; /* Remove o estilo padrão do navegador */
+    border: 2px solid #ffcc00;
+    background-color: #1c1c1c;
+    color: white;
+    outline: none;
+    margin-bottom: 20px;
+}
+
+.dropdown select option {
+    background-color: #1c1c1c;
+    color: white;
 }
 
 /* Botão de Upload */
@@ -180,3 +202,26 @@ select {
 #file-upload {
     display: none;
 }
+
+.loading-spinner {
+    margin: 20px auto;
+    width: 40px;
+    height: 40px;
+    border: 5px solid rgba(255, 193, 7, 0.3);
+    border-top: 5px solid #ffcc00;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Desativa o botão */
+.upload-btn:disabled {
+    background-color: #888;
+    cursor: not-allowed;
+}
+
+
