@@ -4,69 +4,106 @@ body {
     color: #ffffff;
     font-family: Arial, sans-serif;
     margin: 0;
-    padding: 0;
-    margin-top: 200px;
+    padding: 0; 
+    margin-top: 80px;
 }
 
-/* Seção de informações do capítulo (similar à imagem 1) */
-.reader-info {
+/* Estilização do cabeçalho da leitura */
+.reader-header {
     text-align: center;
-    padding: 15px 20px;
+    padding: 20px;
     border-radius: 5px;
     margin: 0 auto;
+    width: 90%;
 }
 
-.reader-info h1 {
-    font-size: 22px;
-    margin: 0; 
-    color: #ffffff;
+/* Estilização do título do capítulo */
+.reader-header h1 {
+    font-size: 2cm;
+    font-weight: bold;
+    color: #DDD;
+    margin-bottom: 5px;
 }
 
-.reader-info p {
+/* Breadcrumbs abaixo do título */
+.reader-header .breadcrumbs {
+    margin-left: 15px;
     font-size: 14px;
     color: #b0b0b0;
-    margin-top: 5px;
+    flex: 1; /* Ocupa o espaço necessário na esquerda */
+    display: flex;
+    justify-content: flex-start;
 }
 
 /* Ajuste na navegação para melhor alinhamento */
-.reader-nav {
+.reader-controls {
     display: flex;
-    justify-content: center;
+    justify-content: space-between; /* Alinha os elementos à esquerda e à direita */
     align-items: center;
-    padding: 15px 20px;
+    padding: 10px 15px;
     border-radius: 5px;
-    gap: 15px;
+    margin-bottom: 20px;
+}
+
+/* Container do select de capítulos (mantido à esquerda) */
+.controls-chapter-select {
+    flex: 1; /* Ocupa o espaço necessário na esquerda */
+    display: flex;
+    justify-content: flex-start; /* Garante que fique à esquerda */
+}
+
+
+.reader-controls-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 5px; /* Reduzindo espaço entre os elementos */
+    flex: 1; /* Mantém os elementos alinhados à direita */
+
 }
 
 /* Botões de navegação */
 .nav-button {
     background-color: #6a5acd;
     color: white;
-    padding: 12px 18px;
+    padding: 10px 15px;
     text-decoration: none;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: bold;
     border-radius: 5px;
     transition: 0.3s;
     border: none;
+    cursor: pointer;
 }
 
 .nav-button:hover {
     background-color: #594aad;
-    transform: scale(1.05);
 }
 
 /* Selects para capítulos e páginas - ajustados para melhor espaçamento */
-.chapter-select, .page-select {
+.chapter-select {
     background-color: #2c2c3a;
     color: white;
     border: none;
-    padding: 10px;
+    padding: 8px;
     font-size: 14px;
     border-radius: 5px;
     cursor: pointer;
     width: 120px; /* Reduzindo um pouco a largura */
     text-align: center;
+}
+
+.page-select {
+    background-color: #2c2c3a;
+    color: white;
+    border: none;
+    padding: 8px;
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 73px; /* Reduzindo um pouco a largura */
+    text-align: center;
+    margin-right: 5px;
 }
 
 .chapter-select:hover, .page-select:hover {
@@ -89,13 +126,48 @@ body {
     box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.1);
 }
 
-/* Rodapé da leitura */
+/* Rodapé da leitura - Navegação inferior */
 .reader-footer {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-between; /* Mantém o select à esquerda e os botões à direita */
     align-items: center;
-    padding: 10px 20px;
-    background-color: #1c1c24;
+    padding: 15px 5px;
     border-radius: 5px;
     margin-top: 20px;
+}
+
+/* Select de capítulos no canto esquerdo */
+.footer-chapter-select {
+    margin-left: 5px;
+}
+
+/* Estilização do botão "Voltar ao Topo" */
+.volta_topo {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 30px;
+    height: 30px;
+    background-color: #695acd48; /* Mantendo o esquema de cores */
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 22px;
+    cursor: pointer;
+    display: none; /* Começa oculto */
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.3s, transform 0.3s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Efeito ao passar o mouse */
+.volta_topo:hover {
+    background-color: #594aad;
+}
+
+/* Torna o botão visível quando a página é rolada */
+.show {
+    display: flex;
+    opacity: 1;
 }

@@ -71,12 +71,13 @@ body {
 
 /* Container do Upload */
 .upload-container {
-    max-width: 600px;
+    max-width:  1200px; /* Aumenta a largura para parecer com a lista de projetos */
     margin: 20px auto;
     background-color: #222;
-    padding: 20px;
+    padding: 25px;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    overflow: hidden; /* Garante que os elementos não saiam do container */
 }
 
 /* Título */
@@ -91,22 +92,25 @@ body {
 /* Seção de seleção de mangás */
 .manga-list {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    flex-wrap: wrap; /* Evita que os cards saiam do container */
+    justify-content: center; /* Mantém os cards dentro do espaço do container */
+    align-items: center;
     gap: 15px;
-    margin-bottom: 20px;
+    padding: 15px;
+    max-width: 100%;
 }
+
 
 /* Card dos mangás */
 .manga-card {
-    background-color: #333;
-    padding: 10px;
-    border-radius: 8px;
+    width: 100px; /* Reduzido para caber mais dentro do container */
+    height: 160px;
+    padding: 6px;
+    border-radius: 6px;
     text-align: center;
     transition: transform 0.3s ease-in-out;
-    cursor: pointer;
-    border: 2px solid transparent;
 }
+
 
 .manga-card:hover {
     transform: scale(1.05);
@@ -114,17 +118,19 @@ body {
 }
 
 .manga-card img {
-    width: 80px;
-    height: 110px;
+    width: 90px;
+    height: 130px;
     object-fit: cover;
     border-radius: 5px;
 }
 
 .manga-card span {
     display: block;
-    margin-top: 5px;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: bold;
+    white-space: normal; /* Permite quebra de linha */
+    word-wrap: break-word;
+    text-align: center;
 }
 
 /* Mensagens de sucesso e erro */
@@ -144,19 +150,19 @@ body {
 
 .dropdown {
     width: 100%;
-    margin-top: 10px;
+    margin-top: 30px;
 }
 
 .dropdown select {
     width: 100%;
-    padding: 10px;
+    padding: 14px;
     font-size: 16px;
     border-radius: 5px;
     border: 2px solid #ffcc00;
     background-color: #1c1c1c;
     color: white;
     outline: none;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 }
 
 .dropdown select option {

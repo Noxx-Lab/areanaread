@@ -7,7 +7,6 @@ $mensagem = "";
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $id_manga = $_POST["id_manga"];
     $num_capitulo = $_POST['num_capitulo'];
-    $titulo = $_POST['titulo'];
 
     $verificar_cap = "Select count(*) From capitulos Where id_manga = ? and num_capitulo = ?";
     $stmt_verificar = $ligaDB->prepare($verificar_cap);
@@ -23,9 +22,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     else{
         // Inserir os dados do capítulo na base de dados
-        $sql_insert = "INSERT Into capitulos (id_manga, num_capitulo, titulo) Values (?, ?, ?)";
+        $sql_insert = "INSERT Into capitulos (id_manga, num_capitulo) Values (?, ?)";
         $stmt_insert = $ligaDB->prepare($sql_insert);
-        $stmt_insert->bind_param("iis", $id_manga, $num_capitulo, $titulo);
+        $stmt_insert->bind_param("ii", $id_manga, $num_capitulo);
 
         if ($stmt_insert->execute()) {
             $mensagem = "<p class='sucesso'> Capítulo adicionado com sucesso!</p>";
@@ -48,7 +47,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Busca os capítulos do mangá selecionado
     $capitulos = [];
-    $sql_cap = "SELECT num_capitulo, titulo, data_lancamento From capitulos Where id_manga = ? Order by num_capitulo Desc";
+    $sql_cap = "SELECT num_capitulo, data_lancamento From capitulos Where id_manga = ? Order by num_capitulo Desc";
     $stmt_cap = $ligaDB->prepare($sql_cap);
     $stmt_cap->bind_param("i", $id_manga);
     $stmt_cap->execute();
@@ -73,7 +72,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="manga-info">
                 <?php if ($manga): ?>
                 <img src="<?php echo $manga['capa']; ?>" alt="Capa do Mangá">
-                <h3><?php echo $manga['titulo']; ?></h3>
                 <p><strong>Tipo:</strong> <?php echo $manga['tipo']; ?></p>
                 <?php endif; ?>
             </div>
@@ -105,7 +103,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <form action="adicionar_capitulo.php?id_manga=<?php echo $id_manga; ?>" method="post">
                 <input type="hidden" name="id_manga" value="<?php echo $id_manga; ?>">
                 <input type="number" name="num_capitulo" placeholder="Número do Capítulo Ex: 1, 2, 3..." required>
-                <input type="text" name="titulo" placeholder="Título do Capítulo">
                 <button type="submit">Adicionar Capítulo</button>
             </form>
         </div>

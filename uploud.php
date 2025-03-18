@@ -7,7 +7,8 @@ use Cloudinary\Api\Upload\UploadApi;
 
 $uploadApi = new UploadApi(); 
 
-$mensagem="";
+$mensagem = isset($_SESSION['mensagem']) ? $_SESSION['mensagem'] : "";
+unset($_SESSION['mensagem']); // Remove a mensagem após exibi-la
 
 // Buscar todos os mangás para exibição na página
 $sqlmangas = "SELECT id_manga, titulo, capa FROM mangas";
@@ -29,10 +30,20 @@ if ($id_manga_selecionado) {
     }
 }
 
+
 // ✅ VERIFICA SE O UPLOAD ESTÁ SENDO FEITO (APENAS SE TIVER ARQUIVOS)
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_FILES['files']['name']) > 0 && !empty($_FILES['files']['name'][0])) {
     $id_manga = $_POST["id_manga"];
     $id_capitulo = $_POST["id_capitulo"];
+
+
+    $sql_num_capitulo = "SELECT num_capitulo FROM capitulos where id_capitulos = ? and id_manga = ?";
+    $stmt_num_cap = $ligaDB->prepare($sql_num_capitulo);
+    $stmt_num_cap->bind_param("ii", $id_capitulo, $id_manga);
+    $stmt_num_cap->execute();
+    $result_num_capitulo = $stmt_num_cap->get_result();
+    $num_capitulo = $result_num_capitulo->fetch_assoc()['num_capitulo'];
+
 
     // Buscar o nome do mangá no banco de dados
     $sqlManga = "SELECT titulo FROM mangas WHERE id_manga = ?";
@@ -40,47 +51,66 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
     $stmtManga->bind_param("i", $id_manga);
     $stmtManga->execute();
     $resultManga = $stmtManga->get_result();
-    $rowManga = $resultManga->fetch_assoc();
+    $rowManga = $resultManga->fetch_assoc();    
 
     if (!$rowManga) {
-        $mensagem = "<p class='erro'> Erro: Mangá não encontrado.</p>";
+        $_SESSION['mensagem'] = "<p class='erro'> Erro: Mangá não encontrado.</p>";
     }
 
     // Formatar o nome do mangá para URL
     $nomeManga = strtolower(str_replace(' ', '-', preg_replace('/[^A-Za-z0-9 ]/', '', $rowManga['titulo'])));
-
     $arquivos = $_FILES['files']; 
     $totalArquivos = count($arquivos['name']);
+
 
     for ($i = 0; $i < $totalArquivos; $i++) {
         $nomeArquivo = basename($arquivos['name'][$i]);
         $tempFile = $arquivos['tmp_name'][$i];
 
         if (empty($nomeArquivo) || empty($tempFile)) {
-            $mensagem = "<p class='erro'> Upload cancelado! Arquivo inválido.</p>";
+            $_SESSION['mensagem'] = "<p class='erro'> Upload cancelado! Arquivo inválido.</p>";
         }
 
         $extensao = pathinfo($nomeArquivo, PATHINFO_EXTENSION);
         
         if (empty($extensao)) {
-            $mensagem = "<p class='erro'> Upload cancelado! O arquivo '$nomeArquivo' não tem uma extensão válida</p>";
+            $_SESSION['mensagem'] = "<p class='erro'> Upload cancelado! O arquivo '$nomeArquivo' não tem uma extensão válida</p>";
+        }
+        $extensao = strtolower($extensao);
+        $extensoesPermitidas = ['jpg', 'jpeg', 'png', "webp"];
+
+            if (!in_array($extensao, $extensoesPermitidas)) {
+                $_SESSION['mensagem'] = "<p class='erro'> Upload cancelado! Formato não permitido: '$nomeArquivo'</p>";
         }
 
-        $extensao = strtolower($extensao);
-        $extensoesPermitidas = ['jpg', 'jpeg', 'png'];
+        if($extensao !== "webp"){
+            // 📌 **Converter para WebP**
+            $novoArquivoWebP = sys_get_temp_dir() . '/' . pathinfo($nomeArquivo, PATHINFO_FILENAME) . ".webp";
 
-        if (!in_array($extensao, $extensoesPermitidas)) {
-            $mensagem = "<p class='erro'> Upload cancelado! Formato não permitido: '$nomeArquivo'</p>";
+            if ($extensao === "jpg" || $extensao === "jpeg") {
+                $image = imagecreatefromjpeg($tempFile);
+            } else {
+                $image = imagecreatefrompng($tempFile);
+            }
+
+            if ($image) {
+                imagewebp($image, $novoArquivoWebP, 90); // Qualidade 90%
+                imagedestroy($image);
+                $tempFile = $novoArquivoWebP; // Substituir pelo WebP
+            } else {
+                $_SESSION['mensagem'] = "<p class='erro'> Erro ao processar imagem '$nomeArquivo'.</p>";
+                continue;
+            }
         }
 
         try {
             // Upload para Cloudinary
             $upload = $uploadApi->upload($tempFile, [
-                "folder" => "mangas/$nomeManga/capitulo-$id_capitulo/"
+                "folder" => "mangas/$nomeManga/capitulo-$num_capitulo/"
             ]);
 
             if (!isset($upload["secure_url"])) {
-                $mensagem = "<p class='erro'> Upload cancelado! Erro ao fazer upload para o Cloudinary: '$nomeArquivo'</p>";
+                $_SESSION['mensagem'] = "<p class='erro'> Upload cancelado! Erro ao fazer upload para o Cloudinary: '$nomeArquivo'</p>";
             }
 
             $caminhoArquivo = $upload["secure_url"];
@@ -91,14 +121,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
             $stmt->bind_param("iis", $id_manga, $id_capitulo, $caminhoArquivo);
 
             if (!$stmt->execute()) {
-                $mensagem = "<p class='erro'> Upload cancelado! Erro ao salvar no banco de dados: '$nomeArquivo'</p>";
+                $_SESSION['mensagem'] = "<p class='erro'> Upload cancelado! Erro ao salvar no banco de dados: '$nomeArquivo'</p>";
             }
         } catch (Exception $e) {
-            $mensagem = "<p class='erro'> Upload cancelado! Falha no upload de '$nomeArquivo': " . $e->getMessage() . "</p>";
+            $_SESSION['mensagem'] = "<p class='erro'> Upload cancelado! Falha no upload de '$nomeArquivo': " . $e->getMessage() . "</p>";
         }
     }
-
-    $mensagem = "<p class='sucesso'>Todos os arquivos foram enviados com sucesso!</p>";
+    $_SESSION['mensagem'] = "<p class='sucesso'>Todos os arquivos foram enviados com sucesso!</p>";
+    header("Location: uploud.php");
+    exit();
 }
 ?>
 
@@ -175,6 +206,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
 </div>
 
 <script>
+//O que conta e diz quantos ficheiros foram selecionados
 document.getElementById("file-upload").addEventListener("change", function() {
     let fileCount = this.files.length; 
     let label = document.getElementById("file-label");
@@ -186,6 +218,7 @@ document.getElementById("file-upload").addEventListener("change", function() {
     }
 });
 
+//O que faz o loading
 document.addEventListener("DOMContentLoaded", function () {
     let formUpload = document.getElementById("formUpload");
     let submitButton = document.getElementById("submit-btn");
@@ -205,6 +238,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+//E o que seleciona do select mt dor de cabeça
 document.addEventListener("DOMContentLoaded", function () {
     let mangaRadios = document.querySelectorAll('input[name="id_manga"]');
     let addCapituloBtn = document.getElementById("add-capitulo");

@@ -3,18 +3,28 @@ include 'config.php';
 include 'navbar.php';
 include 'cloudinary.php';
 
+$mensagem = isset($_SESSION['mensagem']) ? $_SESSION['mensagem'] : "";
+unset($_SESSION['mensagem']); // Remove a mensagem após exibi-la
+
+
 use Cloudinary\Api\Upload\UploadApi;
 
 $uploadApi = new UploadApi();
-$mensagem = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file']) && !empty($_FILES['file']['name'])) {
     $titulo = $_POST['titulo'];
+    $link = $_POST['link'];
     $tipo = $_POST['tipo'];
     $status = $_POST['status'];
     $sinopse = $_POST['sinopse'];
     $autor = $_POST['autor'];
     $artista = $_POST['artista'];
+    $ano_lancado = $_POST['ano_lancado'];
+
+    // Verificar se o ano é válido
+    if ($ano_lancado < 1900 || $ano_lancado > date('Y')) {
+        $_SESSION['mensagem'] = "<p class='erro'>❌ Ano de lançamento inválido.</p>";
+    }
 
     // Formatar o nome do mangá para URL (removendo caracteres especiais e espaços)
     $nomeManga = strtolower(str_replace(' ', '-', preg_replace('/[^A-Za-z0-9 ]/', '', $titulo)));
@@ -23,13 +33,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file']) && !empty($_F
     $tempFile = $_FILES['file']['tmp_name'];
 
     if (empty($nomeArquivo) || empty($tempFile)) {
-        $mensagem = "<p class = 'erro'>❌ Upload cancelado! Arquivo inválido.</p>";
+        $_SESSION['mensagem'] = "<p class = 'erro'>❌ Upload cancelado! Arquivo inválido.</p>";
     }
 
     $extensao = pathinfo($nomeArquivo, PATHINFO_EXTENSION);
 
     if (empty($extensao)) {
-        $mensagem = "<p class = 'erro'>❌ Upload cancelado! O arquivo '$nomeArquivo' não tem uma extensão válida.</p>";
+        $_SESSION['mensagem'] = "<p class = 'erro'>❌ Upload cancelado! O arquivo '$nomeArquivo' não tem uma extensão válida.</p>";
     }
 
     $extensao = strtolower($extensao);
@@ -48,25 +58,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file']) && !empty($_F
         ]);
 
         if (!isset($upload["secure_url"])) {
-            $mensagem = "<p class = 'erro'>❌ Upload cancelado! Erro ao enviar para o Cloudinary: '$nomeArquivo'.</p>";
+            $_SESSION['mensagem'] = "<p class = 'erro'>❌ Upload cancelado! Erro ao enviar para o Cloudinary: '$nomeArquivo'.</p>";
         }
 
         // Define a capa do mangá com o link do Cloudinary
         $capa = $upload["secure_url"];
 
     } catch (Exception $e) {
-        $mensagem = "<p class = 'erro'>❌ Upload cancelado! Erro: " . $e->getMessage() . "</p>";
+        $_SESSION['mensagem'] = "<p class = 'erro'> Upload cancelado! Erro: " . $e->getMessage() . "</p>";
     }
 
     // Inserir os dados do mangá na base de dados
-    $sql = "INSERT INTO mangas (titulo, tipo, status, sinopse, autor, artista, capa) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO mangas (titulo, link, tipo, status, sinopse, autor, artista, ano_lancado, capa) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = $ligaDB->prepare($sql);
-    $stmt->bind_param("sssssss", $titulo, $tipo, $status, $sinopse, $autor, $artista, $capa);
+    $stmt->bind_param("sssssssss", $titulo, $link, $tipo, $status, $sinopse, $autor, $artista, $ano_lancado, $capa);
 
+    $sucesso = false;
     if ($stmt->execute()) {
-        $mensagem = "<p class = 'sucesso'>✅ Mangá adicionado com sucesso!</p>";
+        $sucesso = true;
+        $_SESSION['mensagem'] = "<p class = 'sucesso'> Mangá adicionado com sucesso!</p>";
+        // Redireciona para evitar reenvio ao atualizar a página
+        header("Location: adicionar_manga.php");
+        exit();
+
     } else {
-        $mensagem = "<p class = 'erro'>❌ Erro ao adicionar o mangá.</p>";
+        $_SESSION['mensagem'] = "<p class = 'erro'> Erro ao adicionar o mangá.</p>";
     }
 }
 ?>
@@ -84,12 +100,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file']) && !empty($_F
 <div class="upload-container">
     <h2><i class="bi bi-plus-circle"></i> Adicionar Novo Mangá</h2>
 
-    <div class="mensagem">
-        <?php echo $mensagem; ?>
-    </div>
 
-    <form action="adicionar_manga.php" method="POST" enctype="multipart/form-data">
-        <input type="text" name="titulo" placeholder="Título" required>
+    <form id="formUpload" action="adicionar_manga.php" method="POST" enctype="multipart/form-data">
+    <input type="text" name="titulo" id="titulo" placeholder="Título" oninput="gerar_link()" required>
+    <input type="text" name="link" id="link" placeholder="Link" readonly required>
         <select name="tipo" required>
             <option value="">Tipo</option>
             <option value="Manga">Manga</option>
@@ -109,6 +123,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file']) && !empty($_F
         <textarea name="sinopse" placeholder="Sinopse" required></textarea>
         <input type="text" name="autor" placeholder="Autor">
         <input type="text" name="artista" placeholder="Artista">
+        <input type="number" name="ano_lancado" id="ano_lancado" placeholder="Ano que a obra foi lançada" min="1900" max="<?php echo date('Y'); ?>" required>
+
         
         <!-- Botão de Upload com atualização do texto -->
         <label for="file-upload" class="custom-file-upload">
@@ -116,7 +132,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file']) && !empty($_F
         </label>
         <input type="file" name="file" id="file-upload" required>
 
-        <button type="submit" class="upload-btn">Adicionar</button>
+        <button type="submit" class="upload-btn" id="submit-btn">Adicionar</button>
+
+        <!-- Adiciona o spinner no formulário -->
+        <div id="loading-spinner" class="loading-spinner" style="display: none;"></div>
+
+        <div class="mensagem" id="mensagem">
+            <?php echo $mensagem; ?>
+        </div>
     </form>
 </div>
 
@@ -130,6 +153,61 @@ document.getElementById("file-upload").addEventListener("change", function() {
         fileLabel.textContent = "Escolher Arquivo";
     }
 });
+
+function gerar_link() {
+    // Capturar os inputs corretamente
+    let tituloInput = document.getElementById("titulo");
+    let linkInput = document.getElementById("link");
+
+    if (!tituloInput || !linkInput) {
+        console.error("Erro: Elementos do formulário não encontrados.");
+        return;
+    }
+
+    let titulo = tituloInput.value.trim(); // Remove espaços extras no início e no fim
+
+    // Se o título estiver vazio, limpar o campo do link
+    if (titulo === "") {
+        linkInput.value = "";
+        return;
+    }
+
+    // Converter para minúsculas
+    let link = titulo.toLowerCase();
+
+    // Remover acentos
+    link = link.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+    // Substituir espaços por "-"
+    link = link.replace(/\s+/g, "-");
+
+    // Remover caracteres especiais, mantendo apenas letras, números e hífens
+    link = link.replace(/[^a-z0-9-]/g, "");
+
+    // Atualizar o campo de link
+    linkInput.value = link;
+}
+
+//O que faz o loading
+document.addEventListener("DOMContentLoaded", function () {
+    let formUpload = document.getElementById("formUpload");
+    let submitButton = document.getElementById("submit-btn");
+    let loadingSpinner = document.getElementById("loading-spinner");
+    let mensagemDiv = document.getElementById("mensagem");
+
+    formUpload.addEventListener("submit", function(event) {
+        // Oculta mensagens anteriores
+        mensagemDiv.innerHTML = "";
+
+        // Desativa o botão de envio
+        submitButton.disabled = true;
+        submitButton.innerHTML = "Enviando...";
+        
+        // Exibe o spinner de loading
+        loadingSpinner.style.display = "block";
+    });    
+});
+
 </script>
 </body>
 </html>

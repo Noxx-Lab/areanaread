@@ -4,6 +4,13 @@ include "navbar.php";
 
 $sqlmangas = "SELECT id_manga, titulo, status, tipo, capa FROM mangas";
 $resultmangas = $ligaDB->query($sqlmangas);
+
+/*$sql_count = "SELECT count(num_capitulo) from capitulos where id_manga = ?";
+$stmt_count = $ligaDB ->prepare($sql_count);
+$stmt_count -> bind_param("i", $manga['id_manga'] );
+$stmt_count ->execute();
+$result_count = $stmt_count->get_result();
+$count = $result_count->fetch_assoc()*/
 ?>
 
 <!DOCTYPE html>
@@ -17,7 +24,7 @@ $resultmangas = $ligaDB->query($sqlmangas);
 <body>
 
 <div class="lista-container">
-    <h2 class="titulo-lista">Lista de Mangás</h2>
+    <h2 class="titulo-lista">Lista de Projetos</h2>
     <div class="manga-grid">
         <?php while ($manga = $resultmangas->fetch_assoc()): ?>
             <div class="manga-card">

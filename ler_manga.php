@@ -4,12 +4,8 @@ include "navbar.php";
 
 $mensagem = "";
 
-// Obtém o ID do capítulo da URL
-$id_capitulo = isset($_GET['id']) ? intval($_GET['id']) : 0;
-
-if ($id_capitulo <= 0) {
-    $mensagem = "<p class='erro'> Erro: Capítulo inválido!</p>";
-}
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id_capitulo'])) {
+    $id_capitulo = intval($_POST['id_capitulo']); //Anti injeção
 
 // Busca informações do capítulo
 $sqlCapitulo = "SELECT c.id_capitulos, c.num_capitulo, c.id_manga, m.titulo 
@@ -30,10 +26,18 @@ $id_manga = $capitulo['id_manga'];
 $titulo_manga = $capitulo['titulo'];
 $num_capitulo = $capitulo['num_capitulo'];
 
+$sql_manga = "SELECT * from mangas where id_manga = ?";
+$stmt_manga = $ligaDB->prepare($sql_manga);
+$stmt_manga->bind_param("i",$id_manga);
+$stmt_manga->execute();
+$resulta_manga = $stmt_manga->get_result();
+$manga = $resulta_manga->fetch_assoc();
+
+
 // Busca as páginas do capítulo no Cloudinary
-$sqlPaginas = "SELECT caminho_pagina FROM paginas WHERE id_capitulos = ? ORDER BY id_pagina ASC";
+$sqlPaginas = "SELECT caminho_pagina FROM paginas WHERE id_capitulos = ? and id_manga = ? ORDER BY id_pagina ASC";
 $stmtPaginas = $ligaDB->prepare($sqlPaginas);
-$stmtPaginas->bind_param("i", $id_capitulo);
+$stmtPaginas->bind_param("ii", $id_capitulo, $id_manga);
 $stmtPaginas->execute();
 $resultPaginas = $stmtPaginas->get_result();
 $paginas = [];
@@ -69,6 +73,7 @@ $resultCapitulos = $stmtCapitulos->get_result();
 
 $total_paginas = count($paginas);
 
+}
 ?>
 
 <!DOCTYPE html>
@@ -77,69 +82,90 @@ $total_paginas = count($paginas);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $titulo_manga; ?> - Capítulo <?php echo $num_capitulo; ?></title>
-    <link rel="stylesheet" href="css/ler_manga.css">
+    <link rel="stylesheet" href="/arenaread/css/ler_manga.css">
 </head>
 <body>
 
-<div class="reader-info">
-    <h1><?php echo $titulo_manga; ?> - Capítulo <?php echo $num_capitulo; ?></h1>
-    <p>Leia o último capítulo de <strong><?php echo $titulo_manga; ?></strong> aqui na nossa plataforma. Não se esqueça de conferir os capítulos anteriores!</p>
-</div>
+<div class="reader-header">
+    <h1><?php echo $titulo_manga; ?></h1>
+    <h1>Capítulo <?php echo $num_capitulo ?></h1>
+    <p class="breadcrumbs"><a href="/arenaread/index.php">Home</a>/
+    <a href="/arenaread/<?php echo htmlspecialchars($manga["link"]);?>?id=<?php echo urlencode($manga["id_manga"]); ?>">
+    <?php echo htmlspecialchars($titulo_manga); ?>
+    </a>/ 
+    <strong>Capítulo <?php echo $num_capitulo; ?></strong></p> 
 
 
 <!-- Barra de navegação superior -->
-<div class="reader-nav">
-    <?php if ($capitulo_anterior): ?>
-        <a href="ler_manga.php?id=<?php echo $capitulo_anterior['id_capitulos']; ?>" class="nav-button">❮ Anterior</a>
-    <?php endif; ?>
-
+<div class="reader-controls">
     <!-- Seleção de capítulos -->
-    <select id="chapter-select" class="chapter-select" onchange="trocarCapitulo()">
-        <?php 
-        $sqlCapitulos = "SELECT id_capitulos, num_capitulo FROM capitulos WHERE id_manga = ? ORDER BY num_capitulo ASC";
-        $stmtCapitulos = $ligaDB->prepare($sqlCapitulos);
-        $stmtCapitulos->bind_param("i", $id_manga);
-        $stmtCapitulos->execute();
-        $resultCapitulos = $stmtCapitulos->get_result();
-        
-        while ($cap = $resultCapitulos->fetch_assoc()): ?>
-            <option value="ler_manga.php?id=<?php echo $cap['id_capitulos']; ?>" 
-                <?php echo ($cap['id_capitulos'] == $id_capitulo) ? 'selected' : ''; ?>>
-                Capítulo <?php echo $cap['num_capitulo']; ?>
-            </option>
-        <?php endwhile; ?>
-    </select>
+    <div class="controls-chapter-select">
+        <select id="chapter-select" class="chapter-select" onchange="trocarCapitulo()">
+            <?php foreach ($capitulos as $capitulo): ?>
+                <option value="/arenaread/<?php echo $manga['link']; ?>/capitulo-<?php echo $capitulo['num_capitulo']; ?>" 
+                    <?php echo ($capitulo['id_capitulos'] == $id_capitulo) ? 'selected' : ''; ?>>
+                    Capítulo <?php echo $capitulo['num_capitulo']; ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+
 
     <!-- Seleção de páginas -->
-    <select id="page-select" class="page-select" onchange="scrollParaPagina()">
-        <?php foreach ($paginas as $index => $pagina): ?>
-            <option value="pagina-<?php echo $index + 1; ?>">
-                <?php echo ($index + 1) . "/" . $total_paginas; ?>
-            </option>
-        <?php endforeach; ?>
-    </select>
+    <div class="reader-controls-right">
+        <select id="page-select" class="page-select" onchange="scrollParaPagina()">
+            <?php foreach ($paginas as $index => $pagina): ?>
+                <option value="pagina-<?php echo $index + 1; ?>">
+                    <?php echo ($index + 1) . "/" . $total_paginas; ?>
+                </option>
+            <?php endforeach; ?>
+        </select>    
+        <?php if (!empty($capitulo_anterior)): ?>
+            <a href="/arenaread/<?php echo htmlspecialchars($manga['link']); ?>/capitulo-<?php echo htmlspecialchars($capitulo_anterior['id_capitulos']); ?>" class="nav-button">❮ Anterior</a>
+        <?php endif; ?>
 
-    <?php if ($capitulo_proximo): ?>
-        <a href="ler_manga.php?id=<?php echo $capitulo_proximo['id_capitulos']; ?>" class="nav-button">Próximo ❯</a>
-    <?php endif; ?>
+        <?php if (!empty($capitulo_proximo)): ?>
+            <a href="/arenaread/<?php echo htmlspecialchars($manga['link']); ?>/capitulo-<?php echo htmlspecialchars($capitulo_proximo['id_capitulos']); ?>" class="nav-button">Próximo ❯</a>
+        <?php endif; ?>
+
+
+    </div>
 </div>
 
-<!-- Exibição das páginas do mangá -->
+<!-- NÃO APAGA ISSO MT IMPORTANTE SEU BURRO Exibição das páginas do mangá NÃO APAGA ISSO MT IMPORTANTE SEU BURRO -->
 <div class="reader-pages">
     <?php foreach ($paginas as $index => $pagina): ?>
-        <img id="pagina-<?php echo $index + 1; ?>" src="<?php echo $pagina; ?>" class="manga-page" loading="lazy">
+        <img id="pagina-<?php echo $index + 1; ?>" src="<?php echo $pagina; ?>" class="manga-page">
     <?php endforeach; ?>
 </div>
 
 <!-- Rodapé da página com botões de navegação -->
 <div class="reader-footer">
-    <?php if ($capitulo_anterior): ?>
-        <a href="ler_manga.php?id=<?php echo $capitulo_anterior['id_capitulos']; ?>" class="nav-button">❮ Anterior</a>
-    <?php endif; ?>
-    
-    <?php if ($capitulo_proximo): ?>
-        <a href="ler_manga.php?id=<?php echo $capitulo_proximo['id_capitulos']; ?>" class="nav-button">Próximo ❯</a>
-    <?php endif; ?>
+    <!-- Seleção de capítulos -->
+    <div class="footer-chapter-select">
+        <select id="chapter-select" class="chapter-select" onchange="trocarCapitulo()">
+            <?php foreach ($capitulos as $capitulo): ?>
+                <option value="/arenaread/<?php echo $manga['link']; ?>/capitulo-<?php echo $capitulo['num_capitulo']; ?>" 
+                    <?php echo ($capitulo['id_capitulos'] == $id_capitulo) ? 'selected' : ''; ?>>
+                    Capítulo <?php echo $capitulo['num_capitulo']; ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+    <div class="reader-footer-nav">
+                
+    <?php if (!empty($capitulo_anterior)): ?>
+            <a href="/arenaread/<?php echo htmlspecialchars($manga['link']); ?>/capitulo-<?php echo htmlspecialchars($capitulo_anterior['id_capitulos']); ?>" class="nav-button">❮ Anterior</a>
+        <?php endif; ?>
+
+        <?php if (!empty($capitulo_proximo)): ?>
+            <a href="/arenaread/<?php echo htmlspecialchars($manga['link']); ?>/capitulo-<?php echo htmlspecialchars($capitulo_proximo['id_capitulos']); ?>" class="nav-button">Próximo ❯</a>
+        <?php endif; ?>
+
+    </div>
+    <button id="volta_topo" class="volta_topo" onclick="scrollparatopo()">
+        <i class="bi bi-arrow-up-short"></i>
+    </button>
 </div>
 
 <script>
@@ -159,6 +185,25 @@ function scrollParaPagina() {
         element.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+        const volta_topoButton = document.getElementById("volta_topo");
+
+        // Exibir ou ocultar o botão conforme o usuário rola a página
+        window.addEventListener("scroll", function () {
+            if (window.scrollY > 80) {
+                volta_topoButton.classList.add("show");
+            } else {
+                volta_topoButton.classList.remove("show");
+            }
+        });
+
+        // Função para rolar suavemente até o topo
+        window.scrollparatopo = function () {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        };
+    });
+
 </script>
 
 </body>

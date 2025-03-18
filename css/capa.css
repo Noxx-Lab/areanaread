@@ -72,54 +72,60 @@ body {
     color: #ffcc00;
 }
 
-/* Estilização da Lista de Capítulos */
+/* Estilização geral da lista de capítulos */
 .chapter-list {
     margin-top: 20px;
+    padding: 10px;
 }
 
 .chapter-list h2 {
-    color: #ffcc00;
+    font-size: 20px;
+    color: #ffcc00; /* Cor amarela para combinar com o título */
+    font-weight: bold;
+    margin-bottom: 10px;
     border-bottom: 2px solid #ffcc00;
     padding-bottom: 5px;
 }
 
-/* Grade de capítulos */
+/* Contêiner flexível para organizar os botões */
 .chapters {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 10px;
+    gap: 10px; /* Espaçamento entre os botões */
 }
 
-/* Botões de Capítulos */
+/* Formulário dos capítulos */
+.chapter-form {
+    display: inline-block;
+}
+
+/* Botão de capítulo */
 .chapter-button {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: #3a0d0d;
-    color: white;
-    text-decoration: none;
-    padding: 12px;
-    border-radius: 8px;
+    background-color: #400000; /* Fundo vermelho escuro */
+    color: #fff; /* Texto branco */
+    border: 2px solid #a00000; /* Borda vermelha */
+    border-radius: 8px; /* Cantos arredondados */
+    padding: 10px 15px;
     font-size: 16px;
     font-weight: bold;
     text-align: center;
     width: 120px;
-    transition: background 0.3s, transform 0.2s;
-    border: 1px solid #ff4444;
+    cursor: pointer;
+    transition: 0.3s;
 }
 
+/* Efeito hover no botão */
 .chapter-button:hover {
-    background: #ff4444;
-    transform: scale(1.05);
+    background-color: #600000; /* Tom mais escuro ao passar o mouse */
+    border-color: #ff0000;
 }
 
-/* Estilo da Data */
+/* Estilização da data */
 .chapter-date {
     display: block;
     font-size: 12px;
-    color: #ccc;
+    color: #ddd;
     margin-top: 5px;
 }
+
 

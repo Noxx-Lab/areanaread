@@ -1,10 +1,18 @@
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
 /* Estilo geral */
 body {
     background-color: #121212;
     color: #fff;
     font-family: Arial, sans-serif;
     margin: 0;
-    padding: 0;
+    padding: 0px;
     padding-top: 100px; /* Ajuste para evitar sobreposição com a navbar */
 }
 

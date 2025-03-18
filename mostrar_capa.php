@@ -47,12 +47,17 @@ $result_capitulos = $stmt_capitulos->get_result();
     <div class="chapter-list">
     <h2>Capítulos</h2>
     <div class="chapters">
-        <?php while ($capitulo = $result_capitulos->fetch_assoc()): ?>
-            <a href="ler_manga.php?id=<?php echo $capitulo['id_capitulos']; ?>" class="chapter-button">
-                Capítulo <?php echo $capitulo['num_capitulo']; ?>
-                <span class="chapter-date"><?php echo date('d M, Y', strtotime($capitulo['data_lancamento'])); ?></span>
-            </a>
-        <?php endwhile; ?>
+    <?php while ($capitulo = $result_capitulos->fetch_assoc()): ?>
+        <form action="/arenaread/ler_manga.php" method="POST" class="hidden-form">
+            <input type="hidden" name="id_capitulo" value="<?php echo $capitulo['id_capitulos']; ?>">
+                <button type="submit" class="chapter-button">
+                    Capítulo <?php echo $capitulo['num_capitulo']; ?>
+                    <span class="chapter-date"><?php echo date('d M, Y', strtotime($capitulo['data_lancamento'])); ?></span>
+                </button>
+        </form>
+    <?php endwhile; ?>
+
+
             </div>
         </div>
     </div>
