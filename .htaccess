@@ -4,9 +4,6 @@ RewriteBase /arenaread/
 # Reescrever URL para mostrar um mangá
 RewriteRule ^([a-zA-Z0-9_-]+)/?$ mostrar_capa.php?manga=$1 [L,QSA]
 
-# Reescrever URL para mostrar capítulos usando o ID real internamente
-RewriteRule ^([a-zA-Z0-9_-]+)/capitulo-([0-9]+)/?$ ler_manga.php?id=$2 [L,QSA]
-
 # Reescrever URL para mostrar um capítulo específico
 RewriteRule ^([a-zA-Z0-9_-]+)/capitulo-([0-9]+)/?$ ler_manga.php?manga=$1&num_capitulo=$2 [L,QSA]
 

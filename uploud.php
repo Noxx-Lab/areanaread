@@ -15,7 +15,8 @@ $sqlmangas = "SELECT id_manga, titulo, capa FROM mangas";
 $resultmangas = $ligaDB->query($sqlmangas);
 
 // Verifica se um mangá foi selecionado para buscar os capítulos
-$id_manga_selecionado = isset($_POST['id_manga']) ? $_POST['id_manga'] : null;
+$id_manga_selecionado = isset($_GET['id_manga']) ? $_GET['id_manga'] : (isset($_POST['id_manga']) ? $_POST['id_manga'] : null);
+
 $capitulos = [];
 
 if ($id_manga_selecionado) {
@@ -164,7 +165,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
         <?php while ($manga = $resultmangas->fetch_assoc()): ?>
             <label class="manga-card">
                 <input type="radio" name="id_manga" value="<?php echo $manga['id_manga']; ?>" 
-                       onchange="this.form.submit()" 
+                       onchange="window.location.href='uploud.php?id_manga=' + this.value" 
                        <?php echo ($id_manga_selecionado == $manga['id_manga']) ? 'checked' : ''; ?> required>
                 <img src="<?php echo $manga['capa']; ?>" alt="<?php echo $manga['titulo']; ?>">
                 <span><?php echo $manga['titulo']; ?></span>

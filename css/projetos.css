@@ -31,7 +31,7 @@ body {
     text-align: center;
     font-size: 24px;
     font-weight: bold;
-    color: #ffc107;
+    color: #7a69ec;
     margin-bottom: 20px;
 }
 
@@ -67,7 +67,7 @@ body {
 /* Nome do mangá */
 .manga-card h3 {
     font-size: 14px;
-    color: #ffc107;
+    color: #fff;
     margin-top: 8px;
 }
 
@@ -76,4 +76,28 @@ body {
     font-size: 12px;
     color: #bbb;
     margin: 3px 0;
+}
+
+.linha-divisoria {
+    width: 90%;
+    height: 2px;
+    background-color: #3b3b3b;
+    margin: 30px auto;
+}
+
+.botao-carregar {
+    display: block;
+    margin: 30px auto;
+    background-color: #7F7095;
+    color: white;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+.botao-carregar:hover {
+    background-color: #9c8ab8;
 }

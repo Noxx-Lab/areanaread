@@ -9,6 +9,11 @@ unset($_SESSION['mensagem']); // Remove a mensagem após exibi-la
 
 use Cloudinary\Api\Upload\UploadApi;
 
+// Buscar todos os géneros da base de dados
+$sql_generos = "SELECT id_genero, nome_genero FROM generos ORDER BY nome_genero ASC";
+$result_generos = $ligaDB->query($sql_generos);
+
+
 $uploadApi = new UploadApi();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file']) && !empty($_FILES['file']['name'])) {
@@ -20,6 +25,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file']) && !empty($_F
     $autor = $_POST['autor'];
     $artista = $_POST['artista'];
     $ano_lancado = $_POST['ano_lancado'];
+
+    
 
     // Verificar se o ano é válido
     if ($ano_lancado < 1900 || $ano_lancado > date('Y')) {
@@ -76,13 +83,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file']) && !empty($_F
     $sucesso = false;
     if ($stmt->execute()) {
         $sucesso = true;
+        $ultimo_id = $ligaDB->insert_id;
+    
+        // Inserir os géneros associados
+        if (isset($_POST['generos']) && is_array($_POST['generos'])) {
+            $stmtGenero = $ligaDB->prepare("INSERT INTO manga_generos (id_manga, id_genero) VALUES (?, ?)");
+            foreach ($_POST['generos'] as $id_genero) {
+                $id_genero = intval($id_genero);
+                $stmtGenero->bind_param("ii", $ultimo_id, $id_genero);
+                $stmtGenero->execute();
+            }
+            $stmtGenero->close();
+        }
+    
         $_SESSION['mensagem'] = "<p class = 'sucesso'> Mangá adicionado com sucesso!</p>";
-        // Redireciona para evitar reenvio ao atualizar a página
         header("Location: adicionar_manga.php");
         exit();
-
-    } else {
-        $_SESSION['mensagem'] = "<p class = 'erro'> Erro ao adicionar o mangá.</p>";
     }
 }
 ?>
@@ -96,51 +112,64 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file']) && !empty($_F
     <link rel="stylesheet" href="css/adicionar_manga.css">
 </head>
 <body>
+<div class="page-wrapper">
+    <div class="upload-container">
+        <h2><i class="bi bi-plus-circle"></i> Adicionar Novo Mangá</h2>
 
-<div class="upload-container">
-    <h2><i class="bi bi-plus-circle"></i> Adicionar Novo Mangá</h2>
 
+        <form id="formUpload" action="adicionar_manga.php" method="POST" enctype="multipart/form-data">
+        <input type="text" name="titulo" id="titulo" placeholder="Título" oninput="gerar_link()" required>
+        <input type="text" name="link" id="link" placeholder="Link" readonly required>
+            <select name="tipo" required>
+                <option value="">Tipo</option>
+                <option value="Manga">Manga</option>
+                <option value="Manhua">Manhua</option>
+                <option value="Manhwa">Manhwa</option>
+                <option value="Comic">Comic</option>
+                <option value="Novel">Novel</option>
+            </select>
+            <select name="status" required>
+                <option value="">Status</option>
+                <option value="Ongoing">Ongoing</option>
+                <option value="Hiatus">Hiatus</option>
+                <option value="Finalizado">Finalizado</option>
+                <option value="Dropado">Dropado</option>
+                <option value="Lançamento">Lançamento</option>
+            </select>
+            <textarea name="sinopse" placeholder="Sinopse" required></textarea>
+            <div class="generos-container">
+                <button type="button" class="btn-toggle-generos" onclick="toggleGeneros()">Selecionar Géneros</button>
+                <div class="generos-lista" id="generos-lista" style="display: none;">
+                    <?php while($genero = $result_generos->fetch_assoc()): ?>
+                    <label class="genero-item">
+                        <input type="checkbox" name="generos[]" value="<?= $genero['id_genero'] ?>">
+                        <?= htmlspecialchars($genero['nome_genero']) ?>
+                    </label>
+                    <?php endwhile; ?>
+                </div>
+            </div>
 
-    <form id="formUpload" action="adicionar_manga.php" method="POST" enctype="multipart/form-data">
-    <input type="text" name="titulo" id="titulo" placeholder="Título" oninput="gerar_link()" required>
-    <input type="text" name="link" id="link" placeholder="Link" readonly required>
-        <select name="tipo" required>
-            <option value="">Tipo</option>
-            <option value="Manga">Manga</option>
-            <option value="Manhua">Manhua</option>
-            <option value="Manhwa">Manhwa</option>
-            <option value="Comic">Comic</option>
-            <option value="Novel">Novel</option>
-        </select>
-        <select name="status" required>
-            <option value="">Status</option>
-            <option value="Ongoing">Ongoing</option>
-            <option value="Hiatus">Hiatus</option>
-            <option value="Finalizado">Finalizado</option>
-            <option value="Dropado">Dropado</option>
-            <option value="Lançamento">Lançamento</option>
-        </select>
-        <textarea name="sinopse" placeholder="Sinopse" required></textarea>
-        <input type="text" name="autor" placeholder="Autor">
-        <input type="text" name="artista" placeholder="Artista">
-        <input type="number" name="ano_lancado" id="ano_lancado" placeholder="Ano que a obra foi lançada" min="1900" max="<?php echo date('Y'); ?>" required>
+            <input type="text" name="autor" placeholder="Autor">
+            <input type="text" name="artista" placeholder="Artista">
+            <input type="number" name="ano_lancado" id="ano_lancado" placeholder="Ano que a obra foi lançada" min="1900" max="<?php echo date('Y'); ?>" required>
 
         
-        <!-- Botão de Upload com atualização do texto -->
-        <label for="file-upload" class="custom-file-upload">
-            <i class="bi bi-file-earmark-arrow-up"></i> <span id="file-label">Escolher Arquivo para a Capa</span>
-        </label>
-        <input type="file" name="file" id="file-upload" required>
+            <!-- Botão de Upload com atualização do texto -->
+            <label for="file-upload" class="custom-file-upload">
+                <i class="bi bi-file-earmark-arrow-up"></i> <span id="file-label">Escolher Arquivo para a Capa</span>
+            </label>
+            <input type="file" name="file" id="file-upload" required>
 
-        <button type="submit" class="upload-btn" id="submit-btn">Adicionar</button>
+            <button type="submit" class="upload-btn" id="submit-btn">Adicionar</button>
 
-        <!-- Adiciona o spinner no formulário -->
-        <div id="loading-spinner" class="loading-spinner" style="display: none;"></div>
+            <!-- Adiciona o spinner no formulário -->
+            <div id="loading-spinner" class="loading-spinner" style="display: none;"></div>
 
-        <div class="mensagem" id="mensagem">
-            <?php echo $mensagem; ?>
-        </div>
-    </form>
+            <div class="mensagem" id="mensagem">
+                <?php echo $mensagem; ?>
+            </div>
+        </form>
+    </div>
 </div>
 
 <script>
@@ -187,6 +216,12 @@ function gerar_link() {
     // Atualizar o campo de link
     linkInput.value = link;
 }
+
+function toggleGeneros() {
+    const box = document.getElementById("generos-lista");
+    box.style.display = box.style.display === "none" ? "grid" : "none";
+}
+
 
 //O que faz o loading
 document.addEventListener("DOMContentLoaded", function () {

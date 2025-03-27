@@ -37,13 +37,13 @@ body {
 
 /* Botão Ativo */
 .add-manga {
-    background-color: #ffc107;
+    background-color: #6a5acd;
     color: #111;
-    border: 2px solid #ffd700;
+    border: 2px solid #6a5acd;
 }
 
 .add-manga:hover {
-    background-color: #ffbb00;
+    background-color: #6a5acd;
 }
 
 /* Botão Inicialmente Desativado */
@@ -56,14 +56,14 @@ body {
 
 /* Botão Ativo */
 .add-capitulo.enabled {
-    background-color: #ffc107;
+    background-color: #6a5acd;
     color: #111;
-    border: 2px solid #ffd700;
+    border: 2px solid #6a5acd;
     cursor: pointer;
 }
 
 .add-capitulo.enabled:hover {
-    background-color: #ffbb00;
+    background-color: #6a5acd;
 }
 
 
@@ -76,7 +76,7 @@ body {
     background-color: #222;
     padding: 25px;
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
     overflow: hidden; /* Garante que os elementos não saiam do container */
 }
 
@@ -84,7 +84,7 @@ body {
 .upload-container h2 {
     font-size: 24px;
     font-weight: bold;
-    color: #ffd700;
+    color: #7461ee;
     text-align: center;
     margin-bottom: 15px;
 }
@@ -114,7 +114,7 @@ body {
 
 .manga-card:hover {
     transform: scale(1.05);
-    border-color: #ffd700;
+    border-color: #6a5acd;
 }
 
 .manga-card img {
@@ -158,7 +158,7 @@ body {
     padding: 14px;
     font-size: 16px;
     border-radius: 5px;
-    border: 2px solid #ffcc00;
+    border: 2px solid #6a5acd;
     background-color: #1c1c1c;
     color: white;
     outline: none;
@@ -176,7 +176,7 @@ body {
     padding: 10px;
     font-size: 16px;
     font-weight: bold;
-    background-color: #ffd700;
+    background-color: #6a5acd;
     color: #111;
     border: none;
     border-radius: 5px;
@@ -185,20 +185,20 @@ body {
 }
 
 .upload-btn:hover {
-    background-color: #ffbb00;
+    background-color: #6a5acd;
 }
 
 /* Botão personalizado para escolher arquivos */
 .custom-file-upload {
     display: block;
     background-color: #444;
-    color: #ffd700;
+    color: #6a5acd;
     padding: 10px;
     text-align: center;
     border-radius: 5px;
     cursor: pointer;
     margin-bottom: 10px;
-    border: 2px dashed #ffd700;
+    border: 2px dashed #6a5acd;
 }
 
 .custom-file-upload:hover {
@@ -213,8 +213,8 @@ body {
     margin: 20px auto;
     width: 40px;
     height: 40px;
-    border: 5px solid rgba(255, 193, 7, 0.3);
-    border-top: 5px solid #ffcc00;
+    border: 5px solid rgba(255, 255, 255, 0.1);
+    border-top: 5px solid #6a5acd;
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }

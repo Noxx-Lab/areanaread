@@ -2,21 +2,24 @@
 include "navbar.php";
 include 'config.php';
 
-$id_manga = $_GET["id"];
+$link = $_GET["manga"] ?? null;
 
-$consulta = "SELECT * FROM mangas WHERE id_manga = ?";
+$consulta = "SELECT * FROM mangas WHERE link = ?";
 $stmt = $ligaDB->prepare($consulta);
-$stmt->bind_param("s", $id_manga);
+$stmt->bind_param("s", $link);
 $stmt->execute();
 $result = $stmt->get_result();
 $manga = $result->fetch_assoc();
+
+if ($manga) {
+        $id_manga = $manga['id_manga'];
+    }
 
 $consulta_capitulos = "SELECT * FROM capitulos WHERE id_manga = ? ORDER BY num_capitulo ASC";
 $stmt_capitulos = $ligaDB->prepare($consulta_capitulos);
 $stmt_capitulos->bind_param("s", $id_manga);
 $stmt_capitulos->execute();
 $result_capitulos = $stmt_capitulos->get_result();
-
 ?>
 <!DOCTYPE html>
 <html lang="pt">
@@ -48,7 +51,7 @@ $result_capitulos = $stmt_capitulos->get_result();
     <h2>Capítulos</h2>
     <div class="chapters">
     <?php while ($capitulo = $result_capitulos->fetch_assoc()): ?>
-        <form action="/arenaread/ler_manga.php" method="POST" class="hidden-form">
+        <form action="/arenaread/<?php echo $manga['link'];?>/capitulo-<?php echo $capitulo['num_capitulo']; ?>" method="POST" class="hidden-form">
             <input type="hidden" name="id_capitulo" value="<?php echo $capitulo['id_capitulos']; ?>">
                 <button type="submit" class="chapter-button">
                     Capítulo <?php echo $capitulo['num_capitulo']; ?>

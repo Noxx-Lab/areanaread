@@ -1,30 +1,24 @@
-
 /* Estilização da Navbar */
 .navbar {
     display: flex;
+    justify-content: space-between;
+    align-items: center;
     position: fixed; /* Mantém a navbar fixa no topo */
     top: 0;
     left: 0;
     right: 0;
     z-index: 1000;
     width: 100%;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Adiciona uma sombra para separação */
-    justify-content: space-between;
-    align-items: center;
-    background-color: #7F7095; /* Cor semelhante à da imagem */
+    background-color: #7F7095;
     padding: 15px 20px;
     font-family: Arial, sans-serif;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
 }
 
+/* Espaçamento para conteúdo abaixo da navbar */
 body {
-    padding-top: 125px; /* Ajusta a altura para evitar sobreposição */ 
+    padding-top: 125px;
 }
-
-/* Espaçamento entre a navbar e a capa */
-.manga-container {
-    margin-top: 30px; /* Adiciona espaço entre a navbar e a capa */
-}
-
 
 /* Logo e Links à Esquerda */
 .nav-left {
@@ -44,33 +38,38 @@ body {
     margin-right: 20px;
 }
 
-/* Campo de Pesquisa ao Centro */
+/* Centro com barra de pesquisa */
 .nav-center {
+    flex-grow: 1;
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-grow: 1; /* Faz a barra de pesquisa centralizar */
 }
 
-/* Ajustar a barra de pesquisa para ficar igual à segunda imagem */
+.search-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
 .search-bar {
-    width: 100%; /* Ocupa todo o espaço disponível */
-    max-width: 300px; /* Define um limite máximo para não ficar muito grande */
+    width: 100%;
+    max-width: 300px;
     padding: 8px 12px;
+    margin: 0px auto;
     border-radius: 8px;
     border: 1px solid #000;
     outline: none;
-    background-color: white; /* Fundo branco como na segunda imagem */
-    color: black; /* Texto preto para visibilidade */
+    background-color: white;
+    color: black;
     font-size: 16px;
 }
 
-/* Ajuste no botão de pesquisa */
+/* Botão de pesquisa */
 .search-button {
     padding: 8px 12px;
-    margin-left: 5px;
-    border: 1px solid #000;
     border-radius: 8px;
+    border: 1px solid #000;
     background-color: #fff;
     color: #000;
     cursor: pointer;
@@ -80,7 +79,6 @@ body {
 .search-button:hover {
     background-color: #f0f0f0;
 }
-
 
 /* Botões à Direita */
 .nav-right {
@@ -98,9 +96,66 @@ body {
     font-size: 14px;
     cursor: pointer;
     transition: background-color 0.3s;
-}  
-
+}
 
 .nav-btn:hover {
-    background-color:#6f638d;
+    background-color: #6f638d;
+}
+
+.hamburger {
+    display: none; /* Escondido por padrão no desktop */
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        flex-wrap: wrap;
+        padding: 10px;
+    }
+
+    .nav-left a {
+        display: none; /* esconde todos por padrão */
+    }
+
+    .logo-link,
+    .nav-home,
+    .nav-projetos {
+        display: inline-block; /* só mostra estes 3 */
+    }
+
+    .logo {
+        display: block;
+    }
+
+    .nav-center {
+        width: 100%;
+        justify-content: center;
+        margin-top: 10px;
+        order: 3;
+    }
+
+    .nav-right {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        margin-top: 10px;
+        order: 4;
+    }
+
+    .nav-right.show {
+        display: flex;
+    }
+
+    .nav-btn {
+        width: 100%;
+        text-align: center;
+        padding: 10px;
+        border-radius: 0;
+    }
+
+    .hamburger {
+        display: block;
+        font-size: 24px;
+        cursor: pointer;
+        color: white;
+    }
 }

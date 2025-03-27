@@ -35,7 +35,7 @@ body {
 
 .manga-info h1 {
     margin: 0;
-    color: #ffcc00;
+    color: #6a5acd;
 }
 
 .manga-info p {
@@ -48,7 +48,7 @@ body {
 }
 
 .manga-sinopse h2 {
-    border-bottom: 2px solid #ffcc00;
+    border-bottom: 2px solid #6a5acd;
     padding-bottom: 5px;
 }
 
@@ -69,7 +69,7 @@ body {
 
 /* Estilo do título */
 .manga-header h1 {
-    color: #ffcc00;
+    color: #6a5acd;
 }
 
 /* Estilização geral da lista de capítulos */
@@ -80,10 +80,10 @@ body {
 
 .chapter-list h2 {
     font-size: 20px;
-    color: #ffcc00; /* Cor amarela para combinar com o título */
+    color: #6a5acd; /* Cor amarela para combinar com o título */
     font-weight: bold;
     margin-bottom: 10px;
-    border-bottom: 2px solid #ffcc00;
+    border-bottom: 2px solid #6a5acd;
     padding-bottom: 5px;
 }
 
@@ -101,9 +101,9 @@ body {
 
 /* Botão de capítulo */
 .chapter-button {
-    background-color: #400000; /* Fundo vermelho escuro */
+    background-color: #3f0368; /* Fundo vermelho escuro */
     color: #fff; /* Texto branco */
-    border: 2px solid #a00000; /* Borda vermelha */
+    border: 2px solid #7b00a0; /* Borda vermelha */
     border-radius: 8px; /* Cantos arredondados */
     padding: 10px 15px;
     font-size: 16px;
@@ -116,8 +116,8 @@ body {
 
 /* Efeito hover no botão */
 .chapter-button:hover {
-    background-color: #600000; /* Tom mais escuro ao passar o mouse */
-    border-color: #ff0000;
+    background-color: #500060; /* Tom mais escuro ao passar o mouse */
+    border-color: #9900ff;
 }
 
 /* Estilização da data */
