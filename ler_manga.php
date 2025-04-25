@@ -8,7 +8,7 @@ $mensagem = "";
 // Define id_capitulo a partir do POST
 $id_capitulo = isset($_POST['id_capitulo']) ? intval($_POST['id_capitulo']) : null;
 
-// Se ainda não foi passado via POST, tenta buscar via GET (amigável)
+// Se ainda não foi passado via POST, tenta buscar via GET
 if (!$id_capitulo && isset($_GET['manga']) && isset($_GET['num_capitulo'])) {
     $link = $_GET['manga'];
     $num_capitulo = intval($_GET['num_capitulo']);
@@ -24,8 +24,7 @@ if (!$id_capitulo && isset($_GET['manga']) && isset($_GET['num_capitulo'])) {
     $stmt_id->fetch();
     $stmt_id->close();
 }
-
-// Continua o fluxo normalmente
+// Pega informações básicas do capítulo e do mangá
 $sqlCapitulo = "SELECT c.id_capitulos, c.num_capitulo, c.id_manga, m.titulo 
                     FROM capitulos c
                     JOIN mangas m ON c.id_manga = m.id_manga
@@ -80,6 +79,7 @@ $stmtProximo->execute();
 $resultProximo = $stmtProximo->get_result();
 $capitulo_proximo = $resultProximo->fetch_assoc();
 
+// Lista de todos os capítulos (para select)
 $sqlCapitulos = "SELECT id_capitulos, num_capitulo FROM capitulos WHERE id_manga = ? Order by num_capitulo DESC";
 $stmtCapitulos = $ligaDB->prepare($sqlCapitulos);
 $stmtCapitulos->bind_param("i", $id_manga);
@@ -89,7 +89,7 @@ $resultCapitulos = $stmtCapitulos->get_result();
     while ($row = $resultCapitulos->fetch_assoc()) {
         $capitulos[] = $row;
     }
-
+// Total de páginas no capítulo
 $total_paginas = count($paginas);
 
 }
@@ -136,7 +136,7 @@ $total_paginas = count($paginas);
 
     <!-- Seleção de páginas -->
     <div class="reader-controls-right">
-        <select id="page-select" class="page-select" onchange="scrollParaPagina()">
+        <select id="page-select-top" class="page-select" onchange="scrollParaPagina(this)">
             <?php foreach ($paginas as $index => $pagina): ?>
                 <option value="pagina-<?php echo $index + 1; ?>">
                     <?php echo ($index + 1) . "/" . $total_paginas; ?>
@@ -164,7 +164,7 @@ $total_paginas = count($paginas);
 <!-- NÃO APAGA ISSO MT IMPORTANTE SEU BURRO Exibição das páginas do mangá NÃO APAGA ISSO MT IMPORTANTE SEU BURRO -->
 <div class="reader-pages">
     <?php foreach ($paginas as $index => $pagina): ?>
-        <img id="pagina-<?php echo $index + 1; ?>" src="<?php echo $pagina; ?>" class="manga-page">
+        <img id="pagina-<?php echo $index + 1; ?>" src="<?php echo $pagina; ?>" class="manga-page" alt="Página <?php echo $index + 1; ?> do capítulo <?php echo $num_capitulo; ?>">
     <?php endforeach; ?>
 </div>
 
@@ -182,7 +182,7 @@ $total_paginas = count($paginas);
     </form>
     <!-- Seleção de páginas -->
     <div class="reader-controls-right">
-        <select id="page-select" class="page-select" onchange="scrollParaPagina()">
+        <select id="page-select-bottom" class="page-select" onchange="scrollParaPagina(this)">
             <?php foreach ($paginas as $index => $pagina): ?>
                 <option value="pagina-<?php echo $index + 1; ?>">
                     <?php echo ($index + 1) . "/" . $total_paginas; ?>
@@ -212,42 +212,146 @@ $total_paginas = count($paginas);
 </div>
 
 <script>
-// Função para trocar de capítulo ao selecionar um no dropdown
+// Troca para o capítulo selecionado no dropdown
 function trocarCapitulo(url) {
-    window.location.href = url;}
+    window.location.href = url;
+}
 
-// Função para rolar até a página selecionada no dropdown
-function scrollParaPagina() {
-    let select = document.getElementById("page-select");
-    let selectedPage = select.value;
-    let element = document.getElementById(selectedPage);
+// Faz scroll suave até a página selecionada
+function scrollParaPagina(select) {
+    const selectedPage = select.value;
+    const element = document.getElementById(selectedPage);
     if (element) {
         element.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-        const volta_topoButton = document.getElementById("volta_topo");
+    const imagens = document.querySelectorAll(".manga-page"); // Todas as imagens do capítulo
+    const selects = document.querySelectorAll(".page-select"); // Todos os <select> de páginas
+    const mangaKey = window.location.pathname; // Chave única para o capítulo atual
 
-        // Exibir ou ocultar o botão conforme o usuário rola a página
-        window.addEventListener("scroll", function () {
-            if (window.scrollY > 80) {
-                volta_topoButton.classList.add("show");
-            } else {
-                volta_topoButton.classList.remove("show");
+    // 1. Recupera o progresso salvo no localStorage
+    const ultimaPagina = localStorage.getItem("progresso_" + mangaKey);
+    if (ultimaPagina) {
+        const elemento = document.getElementById(ultimaPagina);
+        if (elemento) {
+            setTimeout(() => {
+                elemento.scrollIntoView({ behavior: "smooth", block: "start" });
+            }, 300); // Dá um pequeno delay para garantir que a página terminou de renderizar
+        }
+    }
+
+    // 2. Cria o Observer que detecta a imagem (página) visível
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const paginaId = entry.target.id;
+
+                // 3. Atualiza todos os <select> com a página atual
+                selects.forEach(select => {
+                    select.value = paginaId;
+                });
+
+                // 4. Salva o progresso no localStorage (por URL única)
+                localStorage.setItem("progresso_" + mangaKey, paginaId);
             }
         });
-
-        // Função para rolar suavemente até o topo
-        window.scrollparatopo = function () {
-            window.scrollTo({ top: 0, behavior: "smooth" });
-        };
+    }, {
+        threshold: 0.6, // Página precisa estar pelo menos 60% visível
+        rootMargin: "0px"
     });
-    
-if (window.history.replaceState) {
-    window.history.replaceState(null, null, window.location.href);
-}
+
+    // 5. Observa todas as imagens
+    imagens.forEach(img => observer.observe(img));
+});
+
+
+
+// Exibe botão "voltar ao topo" com base no scroll
+document.addEventListener("DOMContentLoaded", () => {
+    const voltaTopoBtn = document.getElementById("volta_topo");
+
+    window.addEventListener("scroll", () => {
+        voltaTopoBtn.classList.toggle("show", window.scrollY > 80);
+    });
+
+    // Função para rolar até o topo da página
+    window.scrollparatopo = () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    // Pré-carrega as imagens do próximo capítulo (se existir)
+    const proximoBtn = document.querySelector('form[action*="capitulo-"] + form input[name="id_capitulo"]');
+    if (proximoBtn) {
+        const proximoURL = proximoBtn.closest('form').action;
+        fetch(proximoURL)
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const imagens = doc.querySelectorAll(".manga-page");
+                imagens.forEach(img => {
+                    const preload = new Image();
+                    preload.src = img.src;
+                });
+            });
+    }
+
+    // Evita reenvio de formulário ao dar F5
+    if (window.history.replaceState) {
+        window.history.replaceState(null, null, window.location.href);
+    }
+});
+
+//Pre-carregamento do capítulo mas só começa a pre-carregar se o utilizador chegar no meio do capitulo
+document.addEventListener("DOMContentLoaded", function () {
+    const imagens = document.querySelectorAll(".manga-page");
+
+    if (imagens.length < 2) return; // Verifica se há pelo menos 2 imagens
+
+    const metadeIndex = Math.floor(imagens.length / 2);
+    const imagemMeio = imagens[metadeIndex];
+    const proximoForm = document.querySelector('.reader-footer form[action*="capitulo-"]');
+
+    if (!imagemMeio || !proximoForm) return;
+
+    const proximoURL = proximoForm.action;
+
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                console.log("Meio do capítulo visível. Pré-carregando próximo...");
+                preloadProximoCapitulo(proximoURL);
+                observer.disconnect(); // Para não carregar várias vezes
+            }
+        });
+    }, {
+        root: null,
+        rootMargin: "200px", // pode ajustar conforme preferires
+        threshold: 0.1
+    });
+
+    observer.observe(imagemMeio);
+
+    function preloadProximoCapitulo(url) {
+        fetch(url)
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const imagens = doc.querySelectorAll(".manga-page");
+
+                imagens.forEach(img => {
+                    const preload = new Image();
+                    preload.src = img.src;
+                });
+            })
+            .catch(err => console.error("Erro ao pré-carregar:", err));
+    }
+});
 </script>
+
 
 </body>
 </html>

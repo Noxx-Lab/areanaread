@@ -3,11 +3,15 @@ include 'config.php';
 include 'navbar.php';
 
 $mensagem = "";
-
+if (isset($_SESSION['mensagem'])) {
+    $mensagem = $_SESSION['mensagem'];
+    unset($_SESSION['mensagem']);
+}
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $id_manga = $_POST["id_manga"];
     $num_capitulo = $_POST['num_capitulo'];
 
+    // Verifica se já existe esse capítulo para o mangá
     $verificar_cap = "Select count(*) From capitulos Where id_manga = ? and num_capitulo = ?";
     $stmt_verificar = $ligaDB->prepare($verificar_cap);
     $stmt_verificar->bind_param("ii", $id_manga, $num_capitulo);
@@ -18,26 +22,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
     if ($existe > 0){
-        $mensagem = "<p class='erro'> Este capítulo já existe para este manga </p>";
+        $_SESSION['mensagem'] = "<p class='erro'> Este capítulo já existe para este manga </p>";
     }
     else{
         // Inserir os dados do capítulo na base de dados
-        $sql_insert = "INSERT Into capitulos (id_manga, num_capitulo) Values (?, ?)";
+        $sql_insert = "INSERT into capitulos (id_manga, num_capitulo) values (?, ?)";
         $stmt_insert = $ligaDB->prepare($sql_insert);
         $stmt_insert->bind_param("ii", $id_manga, $num_capitulo);
 
         if ($stmt_insert->execute()) {
-            $mensagem = "<p class='sucesso'> Capítulo adicionado com sucesso!</p>";
+            $_SESSION['mensagem'] = "<p class='sucesso'> Capítulo adicionado com sucesso!</p>";
         } else {
-            $mensagem = "<p class='erro'> Erro ao adicionar o Capítulo.</p>";
+            $_SESSION['mensagem'] = "<p class='erro'> Erro ao adicionar o Capítulo.</p>";
         }
         }
+        header("Location: adicionar_capitulo.php?id_manga=$id_manga");
+        exit;
     }
-    // Verifica se o ID do mangá foi passado na URL
     $id_manga = isset($_GET["id_manga"]) ? $_GET["id_manga"] : null;
 
-    // Busca os dados do mangá selecionado
-    $sqlmanga = "SELECT * FROM mangas WHERE id_manga = ?";
+    // Busca os dados da obra selecionado
+    $sqlmanga = "SELECT * from mangas where id_manga = ?";
     $stmtManga = $ligaDB->prepare($sqlmanga);
     $stmtManga->bind_param("i", $id_manga);
     $stmtManga->execute();
@@ -45,9 +50,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $manga = $resultManga->fetch_assoc();
     $stmtManga->close();
 
-    // Busca os capítulos do mangá selecionado
+    // Busca os capítulos da obra selecionado
     $capitulos = [];
-    $sql_cap = "SELECT num_capitulo, data_lancamento From capitulos Where id_manga = ? Order by num_capitulo Desc";
+    $sql_cap = "SELECT num_capitulo, data_lancamento from capitulos where id_manga = ? order by num_capitulo Desc";
     $stmt_cap = $ligaDB->prepare($sql_cap);
     $stmt_cap->bind_param("i", $id_manga);
     $stmt_cap->execute();
@@ -56,6 +61,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $capitulos[] = $res;
     }
     $stmt_cap->close();
+
 ?>
 
 <!DOCTYPE html>

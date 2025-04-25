@@ -1,3 +1,10 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
 body {
     font-family: Arial, sans-serif;
     background-color: #121212;
@@ -128,4 +135,25 @@ body {
     margin-top: 5px;
 }
 
+.generos-tags {
+    margin: 10px 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.genero-tag {
+    background-color: #333;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 5px;
+    font-size: 13px;
+    border: 1px solid #6a5acd;
+    transition: background 0.3s;
+}
+
+.genero-tag:hover {
+    background-color: #6a5acd;
+    color: #111;
+}
 

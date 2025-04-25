@@ -1,44 +1,65 @@
-<?php session_start(); ?>
+<?php
+session_start();
+include 'config.php';
+
+$erro = "";
+
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $email_user = trim($_POST['login']); // pode ser email ou username
+    $senha = trim($_POST['password']);
+
+    $sql_login = "SELECT * FROM users WHERE email = ? OR username = ?";
+    $stmt_login = $ligaDB->prepare($sql_login);
+    $stmt_login->bind_param("ss", $email_user, $email_user);
+    $stmt_login->execute();
+    $resultado_login = $stmt_login->get_result();
+
+    if ($resultado_login->num_rows === 1) {
+        $user = $resultado_login->fetch_assoc();
+        if (password_verify($senha, $user["senha"])) {
+            $_SESSION['iduser'] = $user['iduser'];
+            $_SESSION['nome'] = $user['username'];
+            $_SESSION['rank'] = $user['rank'];
+            header("Location: index.php");
+            exit;
+        } else {
+            $erro = "Senha incorreta!";
+        }
+    } else {
+        $erro = "Conta não encontrada!";
+    }
+}
+?>
+
+
+
 <!DOCTYPE html>
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página de Login</title>
+    <title>Login</title>
     <link rel="stylesheet" href="css/login.css">
 </head>
 <body>
-    <div class="login-container">
-        <!-- Formulário que envia os dados para login.php -->
-        <form class="login-form" action="processalogin.php" method="POST">
-            <h2>Iniciar sessão</h2>
+    <div class="login-box">
+        <h2>Iniciar sessão</h2>
+        <form method="POST" action="">
+            <label>Email ou Username</label>
+            <input type="text" name="login">
 
-            <?php
-            if (isset($_SESSION['error'])) {
-                echo '<div class="error-message">' . $_SESSION['error'] . '</div>';
-                unset($_SESSION['error']);
-            }
-            ?>
+            <label>Senha</label>
+            <input type="password" name="password" required>
 
-            <div class="input-group">
-                <label for="email">Email ou Username</label>
-                <!-- Campo de Email -->
-                <input type="text" id="email_username" name="email_username" placeholder="Email ou Username" required>
+            <button type="submit">Entrar</button>
+            <div class="link-group">
+                <a href="/arenaread/sign_up.php">Criar conta</a>
+                <span class="separator">|</span>
+                <a href="/arenaread/esqueceu_senha.php">Esqueceu sua senha?</a>
             </div>
-            <div class="input-group">
-                <label for="password">Senha</label>
-                <!-- Campo de Senha -->
-                <input type="password" id="password" name="password" placeholder="Senha" required>
-            </div>
-            <button type="submit" class="btn-login">Entrar</button>
-            <button type="button" class="btn-signup" onclick="window.location.href='Sign_up.php'">Criar conta</button>
-            <div class="links">
-                <a href="#">Esqueceu sua senha?</a>
-                <a href="index.php">Voltar</a>
-            </div>
+            <a href="index.php" class="voltar-link">Voltar</a>
+
         </form>
+        <?php if (!empty($erro)) echo "<p class='erro'>$erro</p>"; ?>
     </div>
 </body>
 </html>
-
-

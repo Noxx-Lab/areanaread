@@ -1,106 +1,120 @@
-/* Reset básico para remover margens, espaçamentos e ajustar box model */
+/* Reset básico */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* Estilização do corpo da página */
+/* Fundo geral */
 body {
-    font-family: Arial, sans-serif; 
-    background-color: #1a1a1a; 
-    display: flex; 
+    margin: 0;
+    padding: 0;
+    background-color: #0f0f1a; /* Roxo escuro */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #f0f0f0;
+    display: flex;
     justify-content: center;
-    align-items: center; 
+    align-items: center;
     height: 100vh;
 }
 
-/* Container que envolve o formulário de login */
-.login-container {
-    background-color: #fff;
-    padding: 30px;
-    border-radius: 10px; 
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
-    width: 100%; 
-    max-width: 400px; 
-    text-align: center; 
+/* Container do login */
+.login-box {
+    background-color: #1a1a1a; /* Preto suave */
+    padding: 40px 50px;
+    border-radius: 12px;
+    box-shadow: 0 0 15px #6a5acd70;
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
 }
 
-/* Estilização do título no formulário */
-.login-form h2 {
-    font-size: 24px; 
-    margin-bottom: 20px; 
+/* Título */
+.login-box h2 {
+    margin-bottom: 25px;
+    color: #b48cff;
 }
 
-/* Grupos de entrada (input) */
-.input-group {
-    margin-bottom: 15px; /* Espaço entre os campos */
-    text-align: left; /* Alinha o texto à esquerda */
+/* Labels */
+.login-box label {
+    display: block;
+    text-align: left;
+    margin-top: 15px;
+    font-weight: 500;
+    color: #ddd;
 }
 
-.input-group label {
-    display: block; 
-    margin-bottom: 5px; 
-    font-size: 14px; 
+/* Inputs */
+.login-box input[type="text"],
+.login-box input[type="password"],
+.login-box input[type="email"] {
+    width: 100%;
+    padding: 12px;
+    margin-top: 5px;
+    background-color: #2a2a3a;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 14px;
 }
 
-.input-group input {
-    width: 100%; 
-    padding: 10px; 
-    border: 1px solid #ccc;
-    border-radius: 5px; 
-    font-size: 14px; 
+.login-box input::placeholder {
+    color: #aaa;
 }
 
-/* Botão "Entrar" */
-.btn-login {
-    width: 100%; 
-    padding: 10px; 
-    background-color: #8174A0; 
-    color: #fff; 
-    font-size: 16px; 
-    border: none; 
-    border-radius: 5px; 
-    margin-bottom: 10px; 
-    cursor: pointer; 
-    transition: background-color 0.3s; 
-}
 
-.btn-login:hover {
-    background-color: #8174a0e1; 
-}
-
-/* Botão "Criar conta" */
-.btn-signup {
-    width: 100%; 
-    padding: 10px; 
-    background-color: #4b3c61; 
-    color: #fff; 
-    font-size: 16px; 
-    border: none; 
-    border-radius: 5px; 
+/* Botão de login */
+.login-box button {
+    width: 100%;
+    padding: 14px;
+    background-color: #7b5bda;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    margin-top: 10px;
     cursor: pointer;
-    transition: background-color 0.3s; 
+    transition: background-color 0.3s ease;
 }
 
-.btn-signup:hover {
-    background-color: #3c3054; 
+.login-box button:hover {
+    background-color: #6a5acd;
 }
 
-/* Links para recuperação de senha e voltar */
-.links {
-    margin-top: 15px; 
+.login-box .link-group {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+    font-size: 14px;
+    color: #aaa;
 }
 
-.links a {
-    display: block; 
-    color: #555; 
-    font-size: 14px; 
-    margin-bottom: 5px; 
-    text-decoration: none; 
+.login-box .link-group a {
+    color: #aaa;
+    text-decoration: none;
     transition: color 0.3s;
 }
 
-.links a:hover {
-    color: #000;
+.login-box .link-group a:hover {
+    color: #c0aaff;
+}
+
+.login-box .voltar-link {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #aaa;
+    text-decoration: none;
+}
+
+.login-box .voltar-link a {
+    color: #c0aaff;
+    text-decoration: none;
+}
+
+
+/* Mensagens */
+.erro {
+    color: #ff7070;
+    margin-top: 15px;
 }

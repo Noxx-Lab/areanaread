@@ -27,11 +27,18 @@ body {
     transition: transform 0.5s ease-in-out;
 }
 
+.carousel * {
+    user-select: none;
+    -webkit-user-drag: none;
+    -webkit-touch-callout: none;
+}
+
 /* Cada item ocupa 100% do espaço do carrossel */
 .carousel-item {
     flex: 0 0 100%;
     box-sizing: border-box;
     padding: 10px 0;
+    cursor: grab;
 }
 
 /* Card do carrossel */
@@ -135,6 +142,104 @@ body {
     transform: scale(1.2);
 }
 
+.carousel-generos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.genero-tag {
+    padding: 5px 12px;
+    background-color: transparent;
+    border: 2px solid #6a5acd;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #fff;
+    white-space: nowrap;
+}
+
+.grid-atualizacoes {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    background-color: #1e1e1e;
+    padding: 20px;
+    border-radius: 12px;
+}
+
+.card-atualizacao {
+    background-color: #111;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    min-height: 350px;
+    padding: 12px;
+    transition: 0.3s;
+}
+
+.card-atualizacao:hover {
+    transform: translateY(-5px);
+}
+
+.titulo-atualizacoes {
+    text-align: center;
+    color: #a18cd1;
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.card-atualizacao img {
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.titulo-manga {
+    font-size: 15px;
+    font-weight: bold;
+    color: #fff;
+    margin-top: 10px;
+    margin-bottom: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 20px; /* mesma altura para todos */
+}
+
+.capitulos-lista {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-top: auto;
+}
+
+.capitulos-lista li a {
+    font-size: 13px;
+    color: #a18cd1;
+    display: flex;
+    justify-content: space-between;
+    text-decoration: none;
+}
+
+.capitulos-lista li a:hover {
+    color: #d9b3ff;
+}
+
+.tempo {
+    color: #999;
+    font-size: 12px;
+}
+
+
+
 /* Responsivo */
 @media screen and (max-width: 768px) {
     .carousel-content {
@@ -155,5 +260,19 @@ body {
 
     .read-button {
         margin: 0 auto;
+    }
+    .card-atualizacao {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .card-atualizacao .capa img {
+        width: 80%;
+        height: auto;
+    }
+
+    .card-atualizacao .info {
+        padding: 15px;
+        text-align: center;
     }
 }

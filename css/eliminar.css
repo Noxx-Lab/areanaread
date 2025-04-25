@@ -1,0 +1,236 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    background-color: #121212;
+    color: #ffffff;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  
+  .container {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: #1f1f1f;
+    border-radius: 16px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.6);
+  }
+  
+  h2 {
+    margin-bottom: 20px;
+    font-size: 20px;
+    font-weight: 600;
+  }
+  
+  .obras-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: flex-start;
+  }
+  
+  .obra-card {
+    width: 120px;
+    background-color: #2c2c2c;
+    border-radius: 10px;
+    text-align: center;
+    padding: 10px;
+    transition: 0.3s;
+    border: 2px solid transparent;
+    cursor: pointer;
+  }
+  
+  .obra-card:hover {
+    background-color: #383838;
+  }
+  
+  .obra-card.selected {
+    border: 2px solid #a678f1;
+  }
+  
+  .obra-card img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-bottom: 8px;
+  }
+  
+  .obra-card span {
+    display: block;
+    font-size: 13px;
+    color: #eee;
+    line-height: 1.2;
+  }
+  
+  /* Alerta de obra sem capítulos */
+  .alert-info {
+    background-color: #e74c3c;
+    padding: 12px;
+    text-align: center;
+    color: white;
+    border-radius: 8px;
+    margin-top: 25px;
+    font-weight: bold;
+  }
+
+  /* Mensagem de erro e sucesso */
+.mensagem {
+    margin-top: 15px;
+    text-align: center;
+}
+
+.sucesso {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.erro {
+    color: #dc3545;
+    font-weight: bold;
+}
+  
+  /* Dropdown Capítulos */
+  .dropdown-container {
+    margin-top: 30px;
+    background-color: #2b2b2b;
+    border: 1px solid #a678f1;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  
+  .dropdown-button {
+    padding: 12px;
+    background-color: #1a1a1a;
+    cursor: pointer;
+    color: #eee;
+    font-size: 14px;
+    border-bottom: 1px solid #a678f1;
+    position: relative;
+  }
+  
+  .dropdown-button::after {
+    position: absolute;
+    right: 16px;
+    top: 12px;
+    font-size: 12px;
+  }
+  
+  
+  .dropdown-list {
+    display: none;
+    padding: 10px 15px;
+    background-color: #1f1f1f;
+    max-height: 250px;
+    overflow-y: auto;
+  }
+  
+  .dropdown-container.active .dropdown-list {
+    display: block;
+  }
+  
+  .dropdown-list label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: #ccc;
+    cursor: pointer;
+  }
+  
+  .dropdown-list input[type="checkbox"] {
+    margin-right: 6px;
+  }
+  
+  /* Ações de botões */
+  .acoes {
+    margin-top: 20px;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+  }
+  
+  button {
+    background-color: #a678f1;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  button:hover {
+    background-color: #925de3;
+  }
+  
+
+  .modal-confirmar {
+    position: fixed;
+    z-index: 1000;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .modal-caixa {
+    background-color: #1b1b1f;
+    padding: 40px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(0,0,0,0.5);
+    color: #fff;
+  }
+  
+  .modal-caixa p {
+    margin-bottom: 30px;
+    font-size: 1.2em;
+  }
+  
+  .modal-botoes {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+  }
+  
+  .modal-botoes .confirmar,
+  .modal-botoes .cancelar {
+    padding: 10px 30px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  
+  .modal-botoes .confirmar {
+    background-color: #a678f2;
+    color: #fff;
+  }
+  
+  .modal-botoes .cancelar {
+    background-color: #444;
+    color: #fff;
+  }
+  
+  .modal-botoes .confirmar:hover {
+    background-color: #8c5ed7;
+  }
+  
+  .modal-botoes .cancelar:hover {
+    background-color: #333;
+  }
+  
+  
+  
+  
+  

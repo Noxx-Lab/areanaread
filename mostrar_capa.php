@@ -1,68 +1,101 @@
 <?php
 include "navbar.php";
-include 'config.php';
+include 'config.php'; 
 
 $link = $_GET["manga"] ?? null;
+$generos = []; 
 
-$consulta = "SELECT * FROM mangas WHERE link = ?";
+// Busca os dados do mangá pelo link amigável
+$consulta = "SELECT * from mangas where link = ?";
 $stmt = $ligaDB->prepare($consulta);
 $stmt->bind_param("s", $link);
 $stmt->execute();
 $result = $stmt->get_result();
 $manga = $result->fetch_assoc();
 
+// Se o mangá for encontrado, pega o ID
 if ($manga) {
-        $id_manga = $manga['id_manga'];
-    }
+    $id_manga = $manga['id_manga'];
+}
 
-$consulta_capitulos = "SELECT * FROM capitulos WHERE id_manga = ? ORDER BY num_capitulo ASC";
+// Busca os capítulos do mangá
+$consulta_capitulos = "SELECT * from capitulos where id_manga = ? order by num_capitulo ASC";
 $stmt_capitulos = $ligaDB->prepare($consulta_capitulos);
-$stmt_capitulos->bind_param("s", $id_manga);
+$stmt_capitulos->bind_param("i", $id_manga);
 $stmt_capitulos->execute();
 $result_capitulos = $stmt_capitulos->get_result();
+
+// Busca os géneros do mangá
+$consulta_generos = "SELECT g.nome_genero 
+                     FROM manga_generos mg 
+                     JOIN generos g ON mg.id_genero = g.id_genero 
+                     WHERE mg.id_manga = ?";
+$stmt_generos = $ligaDB->prepare($consulta_generos);
+$stmt_generos->bind_param("i", $id_manga);
+$stmt_generos->execute();
+$result_generos = $stmt_generos->get_result();
+
+// Adiciona os géneros ao array
+while ($row = $result_generos->fetch_assoc()) {
+    $generos[] = $row['nome_genero'];
+}
+
+
 ?>
+
 <!DOCTYPE html>
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $manga['titulo']; ?></title>
+    <title><?= htmlspecialchars($manga['titulo']) ?></title>
     <link rel="stylesheet" href="css/capa.css">
 </head>
 <body>
-    <div class="container">
-        <div class="manga-header">
-            <img src="<?php echo $manga['capa']; ?>" alt="Capa do Mangá">
-            <div class="manga-info">
-                <h1><?php echo $manga['titulo']; ?></h1>
-                <p class="status">Status: <?php echo $manga['status']; ?></p>
-                <p class="tipo">Tipo: <?php echo $manga['tipo']; ?></p>
-                <p class="autor">Autor: <?php echo $manga['autor']; ?></p>
-                <p class="artista">Artista: <?php echo $manga['artista']; ?></p>
-                <p class="ano">Ano de Lançamento: <?php echo $manga['ano_lancado']; ?></p>
-            </div>
-        </div>
-        <div class="manga-sinopse">
-            <h2>Sinopse</h2>
-            <p><?php echo $manga['sinopse']; ?></p>
+
+<div class="container">
+    <div class="manga-header">
+        <img src="<?= $manga['capa'] ?>" alt="Capa do Mangá">
+        <div class="manga-info">
+            <h1><?= htmlspecialchars($manga['titulo']) ?></h1>
+
+            <?php if (!empty($generos)): ?>
+                <div class="generos-tags">
+                    <?php foreach ($generos as $genero): ?>
+                        <span class="genero-tag"><?= htmlspecialchars($genero) ?></span>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+
+            <p class="status">Status: <?= htmlspecialchars($manga['status']) ?></p>
+            <p class="tipo">Tipo: <?= htmlspecialchars($manga['tipo']) ?></p>
+            <p class="autor">Autor: <?= htmlspecialchars($manga['autor']) ?></p>
+            <p class="artista">Artista: <?= htmlspecialchars($manga['artista']) ?></p>
+            <p class="ano">Ano de Lançamento: <?= htmlspecialchars($manga['ano_lancado']) ?></p>
         </div>
     </div>
-    <div class="chapter-list">
+
+    <div class="manga-sinopse">
+        <h2>Sinopse</h2>
+        <p><?= nl2br(htmlspecialchars($manga['sinopse'])) ?></p>
+    </div>
+</div>
+
+<div class="chapter-list">
     <h2>Capítulos</h2>
     <div class="chapters">
-    <?php while ($capitulo = $result_capitulos->fetch_assoc()): ?>
-        <form action="/arenaread/<?php echo $manga['link'];?>/capitulo-<?php echo $capitulo['num_capitulo']; ?>" method="POST" class="hidden-form">
-            <input type="hidden" name="id_capitulo" value="<?php echo $capitulo['id_capitulos']; ?>">
+        <?php while ($capitulo = $result_capitulos->fetch_assoc()): ?>
+            <form action="/arenaread/<?= $manga['link'] ?>/capitulo-<?= $capitulo['num_capitulo'] ?>" method="POST" class="hidden-form">
+                <input type="hidden" name="id_capitulo" value="<?= $capitulo['id_capitulos'] ?>">
                 <button type="submit" class="chapter-button">
-                    Capítulo <?php echo $capitulo['num_capitulo']; ?>
-                    <span class="chapter-date"><?php echo date('d M, Y', strtotime($capitulo['data_lancamento'])); ?></span>
+                    Capítulo <?= $capitulo['num_capitulo'] ?>
+                    <span class="chapter-date"><?= date('d M, Y', strtotime($capitulo['data_lancamento'])) ?></span>
                 </button>
-        </form>
-    <?php endwhile; ?>
-
-
-            </div>
-        </div>
+            </form>
+        <?php endwhile; ?>
     </div>
+</div>
+
 </body>
 </html>
+

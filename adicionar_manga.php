@@ -96,7 +96,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file']) && !empty($_F
             $stmtGenero->close();
         }
     
-        $_SESSION['mensagem'] = "<p class = 'sucesso'> Mangá adicionado com sucesso!</p>";
+        $_SESSION['mensagem'] = "<p class = 'sucesso'> Obra adicionado com sucesso!</p>";
         header("Location: adicionar_manga.php");
         exit();
     }
@@ -137,10 +137,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file']) && !empty($_F
                 <option value="Lançamento">Lançamento</option>
             </select>
             <textarea name="sinopse" placeholder="Sinopse" required></textarea>
+
             <div class="generos-container">
                 <button type="button" class="btn-toggle-generos" onclick="toggleGeneros()">Selecionar Géneros</button>
+
+                <input type="text" id="filtro-generos" placeholder="Pesquisar género..." style="display: none;">
+
                 <div class="generos-lista" id="generos-lista" style="display: none;">
-                    <?php while($genero = $result_generos->fetch_assoc()): ?>
+                     <?php while($genero = $result_generos->fetch_assoc()): ?>
                     <label class="genero-item">
                         <input type="checkbox" name="generos[]" value="<?= $genero['id_genero'] ?>">
                         <?= htmlspecialchars($genero['nome_genero']) ?>
@@ -148,6 +152,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file']) && !empty($_F
                     <?php endwhile; ?>
                 </div>
             </div>
+
 
             <input type="text" name="autor" placeholder="Autor">
             <input type="text" name="artista" placeholder="Artista">
@@ -218,10 +223,25 @@ function gerar_link() {
 }
 
 function toggleGeneros() {
-    const box = document.getElementById("generos-lista");
-    box.style.display = box.style.display === "none" ? "grid" : "none";
+    const lista = document.getElementById("generos-lista");
+    const filtro = document.getElementById("filtro-generos");
+
+    const mostrar = lista.style.display === "none";
+
+    lista.style.display = mostrar ? "grid" : "none";
+    filtro.style.display = mostrar ? "block" : "none";
 }
 
+
+document.getElementById("filtro-generos").addEventListener("input", function() {
+    let termo = this.value.toLowerCase();
+    let generos = document.querySelectorAll(".genero-item");
+
+    generos.forEach(function(item) {
+        let texto = item.textContent.toLowerCase();
+        item.style.display = texto.includes(termo) ? "flex" : "none";
+    });
+});
 
 //O que faz o loading
 document.addEventListener("DOMContentLoaded", function () {
