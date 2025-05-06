@@ -17,7 +17,6 @@ if($_SERVER['REQUEST_METHOD'] === "POST"){
         $user = $resultado_existe->fetch_assoc();
 
         $token = bin2hex(random_bytes(50)); //Vai criar um token para fazer o recuperar password mais seguro obg stackoverflow
-        date_default_timezone_set('Europe/Lisbon');
         $tempo = date("Y-m-d H:i:s", strtotime("+5 min"));
 
         $sql_atualizar = "UPDATE users set token_esqueceu = ?, token_tempo = ? where email = ?";
