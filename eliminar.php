@@ -33,10 +33,7 @@ function extrairPublicIdcapa($url) {
 }
 
 // Buscar obras
-$sql_obras = "SELECT id_manga, titulo, capa FROM mangas ORDER BY titulo ASC";
-$stmt_obra = $ligaDB->prepare($sql_obras);
-$stmt_obra-> execute();
-$obras = $stmt_obra->get_result()->fetch_all(MYSQLI_ASSOC);
+$obras = buscar_obra($ligaDB);
 
 // Se uma obra foi selecionada, buscar os seus capitulos
 $capitulos = [];
@@ -60,12 +57,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Eliminar obra completa
     if (isset($_POST["acao"]) && $_POST["acao"] === "eliminar_obra") {
-        // === ELIMINA PÁGINAS DO CLOUDINARY ===
-        $sql_busca = "SELECT caminho_pagina FROM paginas WHERE id_manga = ?";
-        $stmt_busca = $ligaDB->prepare($sql_busca);
-        $stmt_busca->bind_param("i", $id_manga);
-        $stmt_busca->execute();
-        $result_imgs = $stmt_busca->get_result();
+  
+        $result_imgs = buscar_obra_mais($ligaDB,$id_manga);
 
         $public_ids = [];
         while ($row = $result_imgs->fetch_assoc()) {
@@ -86,12 +79,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 error_log("Capa Public ID: " . $public_id_capa);
             }
         }
-        // === ELIMINA A CAPA DO CLOUDINARY (mesmo sem capítulos) ===
-        $sql_capa = "SELECT capa FROM mangas WHERE id_manga = ?";
-        $stmt_capa = $ligaDB->prepare($sql_capa);
-        $stmt_capa->bind_param("i", $id_manga);
-        $stmt_capa->execute();
-        $result_capa = $stmt_capa->get_result();
+
+       $result_capa = buscar_obra_mais($ligaDB,$id_manga);
 
         if ($row_capa = $result_capa->fetch_assoc()) {
             $capa_url = $row_capa['capa'];

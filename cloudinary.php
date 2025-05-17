@@ -1,5 +1,5 @@
 <?php
-include 'vendor\autoload.php'; // Garante que o Cloudinary está instalado
+require 'vendor/autoload.php'; // Garante que o Cloudinary está instalado
 
 use Cloudinary\Configuration\Configuration;
 
