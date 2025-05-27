@@ -19,7 +19,8 @@ if ($manga) {
 }
 
 // Busca os capítulos do mangá
-$consulta_capitulos = "SELECT * from capitulos where id_manga = ? order by num_capitulo ASC";
+$consulta_capitulos = "SELECT DISTINCT c.* from capitulos c inner join paginas p on c.id_capitulos = p.id_capitulos where c.id_manga = ? order by c.num_capitulo ASC";
+
 $stmt_capitulos = $ligaDB->prepare($consulta_capitulos);
 $stmt_capitulos->bind_param("i", $id_manga);
 $stmt_capitulos->execute();

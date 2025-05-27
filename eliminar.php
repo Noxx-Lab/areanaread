@@ -12,26 +12,6 @@ use Cloudinary\Api\Admin\AdminApi;
 
 $adminApi = new AdminApi();
 
-//Para conseguir o caminho das páginas no cloudinary
-function extrairPublicId($url) {
-    $parsed = parse_url($url);
-    $path = $parsed['path'];
-    $semUpload = explode('/upload/', $path)[1];
-    $partes = explode('/', $semUpload);
-    if (preg_match('/^v\d+$/', $partes[0])) {
-        array_shift($partes);
-    }
-    return implode('/', array_slice($partes, 0, 3));
-}
-//Para conseguir o caminho da capa no cloudinary
-function extrairPublicIdcapa($url) {
-    $parsed = parse_url($url);
-    $path = $parsed['path'];
-    $semUpload = explode('/upload/', $path)[1];
-    $semVersao = preg_replace('/^v\d+\//', '', $semUpload);
-    return pathinfo($semVersao, PATHINFO_DIRNAME) . '/' . pathinfo($semVersao, PATHINFO_FILENAME);
-}
-
 // Buscar obras
 $obras = buscar_obra($ligaDB);
 
@@ -39,75 +19,43 @@ $obras = buscar_obra($ligaDB);
 $capitulos = [];
 $id_manga_selecionado = $_GET['id_manga'] ?? $_POST['id_manga'] ?? null;
 if ($id_manga_selecionado) {
-    $sql_id_selecionado = "SELECT id_capitulos, num_capitulo FROM capitulos WHERE id_manga = ? ORDER BY num_capitulo ASC";
-    $stmt_id_selecionado = $ligaDB->prepare($sql_id_selecionado);
-    $stmt_id_selecionado->bind_param("i", $id_manga_selecionado);
-    $stmt_id_selecionado->execute();
-    $capitulos = $stmt_id_selecionado->get_result()->fetch_all(MYSQLI_ASSOC);
+    $capitulos = buscar_capitulos_manga($ligaDB, $id_manga_selecionado,null,'array');
 }
 $obra_sem_capitulos = $id_manga_selecionado && empty($capitulos);
-
-
-
-
-
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id_manga = intval($_POST['id_manga'] ?? 0);
 
     // Eliminar obra completa
     if (isset($_POST["acao"]) && $_POST["acao"] === "eliminar_obra") {
-  
-        $result_imgs = buscar_obra_mais($ligaDB,$id_manga);
+        
+        //Busca todas as páginas da obra
+        $result_imgs = buscar_pagina($ligaDB,$id_manga,null,"array");
 
         $public_ids = [];
-        while ($row = $result_imgs->fetch_assoc()) {
-            $public_ids[] = extrairPublicId($row['caminho_pagina']);
+        foreach ($result_imgs as $paginas) {
+            $public_ids[] =  extrairPublicId($paginas['caminho_pagina']);
+          }
+        
+        //Busca a capa da obra se existir
+        $result_capa = buscar_obra_mais($ligaDB,$id_manga)["capa"];  
+
+        if ($result_capa){
+          $public_ids[] =  extrairPublicId($result_capa, "capa");
+        }
+        
+        //Elimina do Cloudinary a capa e as páginas da obra selecionada
+        if(!empty($public_ids)) {
+          try {
+            $adminApi->deleteAssets($public_ids);
+          }
+          catch (Exception $e) {
+            error_log("Erro ao apagar assets: ".$e->getMessage());
+          }
         }
 
-        foreach ($public_ids as $prefixo) {
-            try {
-                $recursos = $adminApi->assets([
-                    "type" => "upload",
-                    "prefix" => $prefixo
-                ]);
-                $publics = array_map(fn($r) => $r['public_id'], $recursos['resources']);
-                if (!empty($publics)) {
-                    $adminApi->deleteAssets($publics);
-                }
-            } catch (Exception $e) {
-                error_log("Capa Public ID: " . $public_id_capa);
-            }
-        }
-
-       $result_capa = buscar_obra_mais($ligaDB,$id_manga);
-
-        if ($row_capa = $result_capa->fetch_assoc()) {
-            $capa_url = $row_capa['capa'];
-            $public_id_capa = extrairPublicIdcapa($capa_url);
-
-            try {
-                $adminApi->deleteAssets([$public_id_capa]);
-            } catch (Exception $e) {
-                error_log("Capa Public ID: " . $public_id_capa);
-            }
-        }
-
-        // === ELIMINA DADOS DA BASE DE DADOS ===
-        $sql_delete_pagina = "DELETE FROM paginas WHERE id_manga = ?";
-        $stmt_delete_paginas = $ligaDB->prepare($sql_delete_pagina);
-        $stmt_delete_paginas->bind_param("i", $id_manga);
-        $stmt_delete_paginas->execute();
-
-        $sql_delete_capitulos = "DELETE FROM capitulos WHERE id_manga = ?";
-        $stmt_delete_capitulos = $ligaDB->prepare($sql_delete_capitulos);
-        $stmt_delete_capitulos->bind_param("i", $id_manga);
-        $stmt_delete_capitulos->execute();
-
-        $sql_delete_manga = "DELETE FROM mangas WHERE id_manga = ?";
-        $stmt_delete_manga = $ligaDB->prepare($sql_delete_manga);
-        $stmt_delete_manga->bind_param("i", $id_manga);
-        if ($stmt_delete_manga->execute()) {
+        $delete = eliminar($ligaDB,$id_manga, "obra");
+        if ($delete === true) {
             $_SESSION['mensagem'] = "<p class = 'sucesso'> Obra eliminada com sucesso!";
         } else {
             $_SESSION['mensagem'] = "<p class = 'erro'> Erro ao eliminar a obra.";
@@ -121,19 +69,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     elseif (isset($_POST["acao"]) && $_POST["acao"] === "eliminar_capitulos") {
         foreach ($_POST['capitulos'] as $id_capitulo) {
             $id_capitulo = intval($id_capitulo);
-    
-            // Buscar os caminhos das imagens antes de apagar
-            $sql_busca = "SELECT caminho_pagina FROM paginas WHERE id_capitulos = ?";
-            $stmt_busca = $ligaDB->prepare($sql_busca);
-            $stmt_busca->bind_param("i", $id_capitulo);
-            $stmt_busca->execute();
-            $result_imgs = $stmt_busca->get_result();
+            
+            //Busca todas as páginas da obra
+            $result_imgs = buscar_pagina($ligaDB,null,$id_capitulo,"array");
     
             $public_ids = [];
-            while ($row = $result_imgs->fetch_assoc()) {
-                $public_ids[] = extrairPublicId($row['caminho_pagina']);
+            foreach($result_imgs as $paginas){
+              $public_ids[] = extrairPublicId($paginas["caminho_pagina"]);
             }
-
+            
             foreach ($public_ids as $prefixo) {
                 $recursos = $adminApi->assets([
                     "type" => "upload",
@@ -145,16 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
     
-            // Apagar da base de dados
-            $sql_pag = "DELETE FROM paginas WHERE id_capitulos = ?";
-            $stmt_pag = $ligaDB->prepare($sql_pag);
-            $stmt_pag->bind_param("i", $id_capitulo);
-            $stmt_pag->execute();
-    
-            $sql_cap = "DELETE FROM capitulos WHERE id_capitulos = ?";
-            $stmt_cap = $ligaDB->prepare($sql_cap);
-            $stmt_cap->bind_param("i", $id_capitulo);
-            $stmt_cap->execute();
+            $delete_capitulo = eliminar($ligaDB,$id_capitulo,"capitulo");
     
             $_SESSION['mensagem'] = "<p class = 'sucesso'>Capítulo $id_capitulo eliminado com sucesso.</p>";
         }

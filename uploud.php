@@ -16,10 +16,7 @@ $uploadApi = new UploadApi();
 $mensagem = isset($_SESSION['mensagem']) ? $_SESSION['mensagem'] : "";
 unset($_SESSION['mensagem']);
 
-$sql_obras = "SELECT id_manga, titulo, capa FROM mangas ORDER BY titulo ASC";
-$stmt_obra = $ligaDB->prepare($sql_obras);
-$stmt_obra-> execute();
-$obras = $stmt_obra->get_result()->fetch_all(MYSQLI_ASSOC);
+$obras = buscar_obra($ligaDB);
 
 // Verifica se um mangá foi selecionado para buscar os capítulos
 $id_manga_selecionado = isset($_GET['id_manga']) ? $_GET['id_manga'] : (isset($_POST['id_manga']) ? $_POST['id_manga'] : null);
@@ -29,15 +26,7 @@ $capitulos = [];
 
 // Se houver um mangá selecionado, busca os capítulos desse mangá
 if ($id_manga_selecionado) {
-    $sqlCapitulos = "SELECT id_capitulos, num_capitulo FROM capitulos WHERE id_manga = ? Order by num_capitulo ASC";
-    $stmtCapitulos = $ligaDB->prepare($sqlCapitulos);
-    $stmtCapitulos->bind_param("i", $id_manga_selecionado);
-    $stmtCapitulos->execute();
-    $resultCapitulos = $stmtCapitulos->get_result();
-
-    while ($row = $resultCapitulos->fetch_assoc()) {
-        $capitulos[] = $row;
-    }
+    $capitulos = buscar_capitulos_manga($ligaDB,$id_manga_selecionado,null,'array');
 }
 
 
@@ -47,29 +36,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
     $id_capitulo = $_POST["id_capitulo"];
 
     
-    $sql_num_capitulo = "SELECT num_capitulo FROM capitulos where id_capitulos = ? and id_manga = ?";
-    $stmt_num_cap = $ligaDB->prepare($sql_num_capitulo);
-    $stmt_num_cap->bind_param("ii", $id_capitulo, $id_manga);
-    $stmt_num_cap->execute();
-    $result_num_capitulo = $stmt_num_cap->get_result();
-    $num_capitulo = $result_num_capitulo->fetch_assoc()['num_capitulo'];
-
+    $num_capitulo = buscar_capitulos_manga($ligaDB,null, $id_capitulo, 'normal')["num_capitulo"];
 
     // Buscar o nome do mangá no banco de dados
-    $sqlManga = "SELECT titulo FROM mangas WHERE id_manga = ?";
-    $stmtManga = $ligaDB->prepare($sqlManga);
-    $stmtManga->bind_param("i", $id_manga);
-    $stmtManga->execute();
-    $resultManga = $stmtManga->get_result();
-    $rowManga = $resultManga->fetch_assoc();    
-
-    //Verefica se encontrou alguma obra
-    if (!$rowManga) {
-        $_SESSION['mensagem'] = "<p class='erro'> Erro: Obra não encontrado.</p>";
-    }
+    $buscar_titulo = buscar_obra_mais($ligaDB,$id_manga)["titulo"];    
 
     // Formatar o nome do mangá para URL para a Cloudinary  
-    $nomeManga = strtolower(str_replace(' ', '-', preg_replace('/[^A-Za-z0-9 ]/', '', $rowManga['titulo'])));
+    $nomeManga = strtolower(str_replace(' ', '-', preg_replace('/[^A-Za-z0-9 ]/', '', $buscar_titulo)));
     $arquivos = $_FILES['files']; 
     $totalArquivos = count($arquivos['name']);
 
@@ -97,27 +70,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
                 $_SESSION['mensagem'] = "<p class='erro'> Upload cancelado! Formato não permitido: '$nomeArquivo'</p>";
         }
         //Se a imagem não for webp ele converte para ajudar no processamento 
-        if($extensao !== "webp"){
-            // 📌 **Converter para WebP**
-            $novoArquivoWebP = sys_get_temp_dir() . '/' . pathinfo($nomeArquivo, PATHINFO_FILENAME) . ".webp";
+        if (in_array($extensao, ['jpg', 'jpeg','png'])) {
+            $temp_convertido = converte_webp($tempFile, $nomeArquivo,$extensao);
 
-            // Cria a imagem a partir do tipo original
-            if ($extensao === "jpg" || $extensao === "jpeg") {
-                $image = imagecreatefromjpeg($tempFile);
-            } elseif ($extensao === "png") {
-                $image = imagecreatefrompng($tempFile);
-            } else {
-                $image = false; // Caso não seja reconhecido
-            }
 
-            if ($image) {
-                imagewebp($image, $novoArquivoWebP, 90); // Qualidade 90%
-                imagedestroy($image);
-                $tempFile = $novoArquivoWebP; // Substituir pelo WebP
-            } else {
+            if($temp_convertido === false) {
                 $_SESSION['mensagem'] = "<p class='erro'> Erro ao processar imagem '$nomeArquivo'.</p>";
                 continue;
             }
+            $tempFile = $temp_convertido;
         }
 
         try {

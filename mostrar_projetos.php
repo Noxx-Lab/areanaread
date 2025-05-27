@@ -16,7 +16,7 @@ while ($manga = $resultmangas->fetch_assoc()) {
     $id_manga = $manga['id_manga'];
 
     // Conta os capítulos deste mangá
-    $sql_count_manga = "SELECT count(*) as total from capitulos where id_manga = ?";
+    $sql_count_manga = "SELECT count(DISTINCT c.id_capitulos) as total from capitulos c inner join paginas p on c.id_capitulos = p.id_capitulos where c.id_manga = ? ";
     $stmt_count = $ligaDB->prepare($sql_count_manga);
     $stmt_count->bind_param("i", $id_manga);
     $stmt_count->execute();

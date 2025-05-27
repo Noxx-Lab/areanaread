@@ -35,13 +35,14 @@ $ultimos_mangas = [];
 
 
 $sql_ultimos = "SELECT m.id_manga, m.titulo, m.link, m.capa, m.sinopse from mangas m join capitulos c on m.id_manga = c.id_manga
-                group by m.id_manga ORDER BY MAX(c.data_lancamento) Desc limit 10";
+group by m.id_manga ORDER BY MAX(c.data_lancamento) Desc limit 10";
+
 $result_ultimos = $ligaDB->query($sql_ultimos);
 
 while ($manga = $result_ultimos->fetch_assoc()){
     $id_manga = $manga['id_manga'];
 
-    $stmt_ultimo = "SELECT num_capitulo, data_lancamento from capitulos where id_manga = ? order by data_lancamento Desc limit 3";
+    $stmt_ultimo = "SELECT DISTINCT c.num_capitulo, c.data_lancamento from capitulos c inner join paginas p on c.id_capitulos = p.id_capitulos where c.id_manga = ? order by c.data_lancamento Desc limit 3";
     $stmt_capitulo= $ligaDB ->prepare($stmt_ultimo);
     $stmt_capitulo -> bind_param("i", $id_manga);
     $stmt_capitulo -> execute();

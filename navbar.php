@@ -32,6 +32,10 @@
         <a href="/arenaread/uploud.php" class="nav-outra">Upload</a>
         <?php endif; ?>
 
+        <?php if (isset($_SESSION['rank']) && $_SESSION['rank'] === 'admin'): ?>
+            <a href="/arenaread/editar.php" class="nav-outra">Editar</a>
+        <?php endif; ?>
+
         <?php if (isset($_SESSION['rank']) && in_array($_SESSION['rank'], ['admin', 'editor'])): ?>
             <a href="/arenaread/eliminar.php" class="nav-outra">Eliminar</a>
         <?php endif; ?>
