@@ -147,3 +147,18 @@ function eliminar ($ligaDB, $id, $modo){
     }
     return false; // que deu errado
 }
+
+function generos ($ligaDB, $id_manga=null){
+    if ($id_manga === null){
+        $sql_generos = "SELECT * FROM generos ORDER BY nome_genero ASC";
+        $result_generos = $ligaDB->query($sql_generos);
+        return $result_generos->fetch_all(MYSQLI_ASSOC);
+    }
+    else{
+        $sql_generos = "SELECT g.* from manga_generos mg inner join generos g on mg.id_genero = g.id_genero where mg.id_manga = ?";
+        $result_generos = $ligaDB->prepare($sql_generos);
+        $result_generos->bind_param("i", $id_manga);
+        $result_generos->execute();
+        return $result_generos->get_result()->fetch_all(MYSQLI_ASSOC);
+    }
+}

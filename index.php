@@ -84,7 +84,6 @@ while ($manga = $result_ultimos->fetch_assoc()){
     $result_count = $stmt_count->get_result();
     $total_capitulos = $result_count->fetch_assoc()['total'];
     $manga['total_capitulos'] = $total_capitulos;
-
     $mangas_carrossel[] = $manga;
     }
 
