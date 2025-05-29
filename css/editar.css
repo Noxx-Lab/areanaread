@@ -21,14 +21,18 @@ body {
     box-shadow: 0 0 10px rgba(0,0,0,0.6);
   }
 .titulo-pagina {
-  color: #7e65a6;
+  color: #eeeeee;
   font-size: 2.1rem;
   margin-bottom: 32px;
   font-weight: bold;
   text-align: center;
   letter-spacing: 1px;
 }
-.icon-edit { font-size: 1.25em; margin-right: 8px; vertical-align: middle; }
+.icon-edit { 
+  font-size: 1.25em;
+  margin-right: 8px;
+  vertical-align: middle; 
+}
 
 .obras-grid {
     display: flex;

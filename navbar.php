@@ -8,7 +8,7 @@
     
     <!-- Estilo da navbar -->
     <link rel="stylesheet" href="/arenaread/css/navbar.css">
-
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <!-- Ícones do Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
 </head>
@@ -21,12 +21,12 @@
     <div class="nav-left">
         <!-- Logo clicável que redireciona para a homepage -->
         <a href="/arenaread/index.php" class="logo-link">
-            <img src="/arenaread/imagens/logo1.png" alt="ArenaRead" class="logo">
+            <img src="https://res.cloudinary.com/dghfkjx36/image/upload/v1748129111/logo1_dc4amd.png" alt="ArenaRead" class="logo">
         </a>
 
         <!-- Links de navegação -->
         <a href="/arenaread/index.php" class="nav-home">Home</a>
-        <a href="/arenaread/mostrar_projetos.php" class="nav-projetos">Projetos</a>
+        <a href="/arenaread/projetos.php" class="nav-projetos">Projetos</a>
         
         <?php if (isset($_SESSION['rank']) && $_SESSION['rank'] === 'admin'): ?>
         <a href="/arenaread/uploud.php" class="nav-outra">Upload</a>

@@ -116,10 +116,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload de Capítulos</title>
 
     <link rel="stylesheet" href="css/uploud.css">
-    
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
 </head>
 
@@ -145,6 +144,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
 
 <form id="formUpload" action="uploud.php" method="POST" enctype="multipart/form-data">
     <input type="hidden" name="id_manga" value="<?= $id_manga_selecionado ?>" required>
+    <h2 class="titulo-pagina"> Upload Páginas</h2>
     <h3>Selecione uma Obra</h3>
 <div class="obras-grid">
   <?php foreach ($obras as $obra): ?>

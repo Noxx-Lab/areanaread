@@ -76,14 +76,8 @@ while ($manga = $result_ultimos->fetch_assoc()){
         $capitulos[] = $cap;
     }
 
-    // Guardar no array final APÓS contares os capítulos
-    $sql_count_manga = "SELECT count(*) as total from capitulos where id_manga = ?";
-    $stmt_count = $ligaDB->prepare($sql_count_manga);
-    $stmt_count->bind_param("i", $id_manga);
-    $stmt_count->execute();
-    $result_count = $stmt_count->get_result();
-    $total_capitulos = $result_count->fetch_assoc()['total'];
-    $manga['total_capitulos'] = $total_capitulos;
+    
+    $manga['total_capitulos'] = contar($ligaDB, $id_manga);
     $mangas_carrossel[] = $manga;
     }
 
@@ -97,6 +91,7 @@ while ($manga = $result_ultimos->fetch_assoc()){
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ArenaRead</title>
     <link rel="stylesheet" href="/arenaread/css/index.css">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
 <body>
 
@@ -132,18 +127,18 @@ while ($manga = $result_ultimos->fetch_assoc()){
     <div class="grid-atualizacoes">
         <?php foreach ($ultimos_mangas as $manga): ?>
             <div class="card-atualizacao">
-                <a href="/arenaread/<?= $manga['link']; ?>">
-                    <img src="<?= $manga['capa']; ?>" alt="<?= htmlspecialchars($manga['titulo']); ?>">
+                <a href="/arenaread/<?php echo $manga['link']; ?>">
+                    <img src="<?php echo $manga['capa']; ?>" alt="<?php echo htmlspecialchars($manga['titulo']); ?>">
                 </a>
-                <h3 class="titulo-manga" title="<?= htmlspecialchars($manga['titulo']) ?>">
+                <h3 class="titulo-manga" title="<?php echo htmlspecialchars($manga['titulo']) ?>">
                     <?= htmlspecialchars($manga['titulo']) ?>
                 </h3>
                 <ul class="capitulos-lista">
                     <?php foreach ($manga['capitulos'] as $cap): ?>
                         <li>
-                            <a href="/arenaread/<?= $manga['link']; ?>/capitulo-<?= $cap['num_capitulo']; ?>">
-                                Capítulo <?= $cap['num_capitulo']; ?>
-                                <span class="tempo"><?= tempoDecorrido($cap['data_lancamento']); ?></span>
+                            <a href="/arenaread/<?php echo $manga['link']; ?>/capitulo-<?php echo $cap['num_capitulo']; ?>">
+                                Capítulo <?php echo $cap['num_capitulo']; ?>
+                                <span class="tempo"><?php echo tempoDecorrido($cap['data_lancamento']); ?></span>
                             </a>
                         </li>
                     <?php endforeach; ?>

@@ -14,6 +14,14 @@ body {
     padding-top: 95px;
 }
 
+.titulo-pagina {
+  color: #9e7ed1;
+  font-size: 2.1rem;
+  margin-bottom: 32px;
+  font-weight: bold;
+  text-align: center;
+  letter-spacing: 1px;
+}
 /* Container para alinhar os botões */
 .button-group {
     display: flex;
@@ -65,10 +73,6 @@ body {
 .add-capitulo.enabled:hover {
     background-color: #6a5acd;
 }
-
-
-
-
 /* Container do Upload */
 .upload-container {
     max-width:  1200px; /* Aumenta a largura para parecer com a lista de projetos */
@@ -80,14 +84,6 @@ body {
     overflow: hidden; /* Garante que os elementos não saiam do container */
 }
 
-/* Título */
-.upload-container h2 {
-    font-size: 24px;
-    font-weight: bold;
-    color: #7461ee;
-    text-align: center;
-    margin-bottom: 15px;
-}
 
 .obras-grid {
     display: flex;

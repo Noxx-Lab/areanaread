@@ -110,6 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gestão de Eliminações</title>
   <link rel="stylesheet" href="css/eliminar.css">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
 <body>
   <div class="container">
@@ -117,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <div class="mensagem"><?= $_SESSION['mensagem']; unset($_SESSION['mensagem']); ?></div>
     <?php endif; ?>
 
-    <h2>Gestão de Eliminações</h2>
+    <h2 class="titulo-pagina"> Eliminar</h2>
 
     <form method="POST" id="form-eliminar">
     <input type="hidden" name="acao" id="acao" value="">

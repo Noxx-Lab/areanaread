@@ -110,6 +110,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file']) && !empty($_F
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Adicionar Manga</title>
     <link rel="stylesheet" href="css/adicionar_manga.css">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
 <body>
 <div class="page-wrapper">
