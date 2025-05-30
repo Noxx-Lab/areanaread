@@ -116,7 +116,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <title>Upload</title>
     <link rel="stylesheet" href="css/uploud.css">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
@@ -132,10 +132,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
         <i class="bi bi-journal-plus"></i> Adicionar Obra
     </a> 
 
-    <a href="<?= $id_manga_selecionado ? "adicionar_capitulo.php?id_manga=$id_manga_selecionado" : 'javascript:void(0);' ?>"
+    <a href="<?php echo  $id_manga_selecionado ? "adicionar_capitulo.php?id_manga=$id_manga_selecionado" : 'javascript:void(0);' ?>"
    id="add-capitulo"
-   class="add-capitulo <?= $id_manga_selecionado ? 'enabled' : 'disabled' ?>"
-   title="<?= $id_manga_selecionado ? 'Adicionar Capítulo Novo' : 'Selecione um mangá primeiro' ?>">
+   class="add-capitulo <?php echo $id_manga_selecionado ? 'enabled' : 'disabled' ?>"
+   title="<?php echo $id_manga_selecionado ? 'Adicionar Capítulo Novo' : 'Selecione um mangá primeiro' ?>">
    <i class="bi bi-journal-text"></i> Adicionar Capítulos
 </a>
 
@@ -143,15 +143,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
 
 
 <form id="formUpload" action="uploud.php" method="POST" enctype="multipart/form-data">
-    <input type="hidden" name="id_manga" value="<?= $id_manga_selecionado ?>" required>
+    <input type="hidden" name="id_manga" value="<?php echo $id_manga_selecionado ?>" required>
     <h2 class="titulo-pagina"> Upload Páginas</h2>
     <h3>Selecione uma Obra</h3>
 <div class="obras-grid">
   <?php foreach ($obras as $obra): ?>
-    <label class="obra-card <?= ($id_manga_selecionado == $obra['id_manga']) ? 'selected' : '' ?>">
-      <input type="radio" name="id_manga" value="<?= $obra['id_manga'] ?>" style="display: none" onchange="selecionarObra(this)">
-      <img src="<?= $obra['capa'] ?>" alt="<?= $obra['titulo'] ?>">
-      <span><?= $obra['titulo'] ?></span>
+    <label class="obra-card <?php echo ($id_manga_selecionado == $obra['id_manga']) ? 'selected' : '' ?>">
+      <input type="radio" name="id_manga" value="<?php echo $obra['id_manga'] ?>" style="display: none" onchange="selecionarObra(this)">
+      <img src="<?php echo $obra['capa'] ?>" alt="<?php echo $obra['titulo'] ?>">
+      <span><?php echo $obra['titulo'] ?></span>
     </label>
   <?php endforeach; ?>
 </div>

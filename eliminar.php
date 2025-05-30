@@ -108,29 +108,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gestão de Eliminações</title>
+  <title>Eliminar</title>
   <link rel="stylesheet" href="css/eliminar.css">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
 <body>
   <div class="container">
     <?php if (isset($_SESSION['mensagem'])): ?>
-      <div class="mensagem"><?= $_SESSION['mensagem']; unset($_SESSION['mensagem']); ?></div>
+      <div class="mensagem"><?php echo $_SESSION['mensagem']; unset($_SESSION['mensagem']); ?></div>
     <?php endif; ?>
 
     <h2 class="titulo-pagina"> Eliminar</h2>
 
     <form method="POST" id="form-eliminar">
     <input type="hidden" name="acao" id="acao" value="">
-      <input type="hidden" name="id_manga" value="<?= $id_manga_selecionado ?>" required>
+      <input type="hidden" name="id_manga" value="<?php echo $id_manga_selecionado ?>" required>
 
       <h3>Selecione uma Obra</h3>
       <div class="obras-grid">
         <?php foreach ($obras as $obra): ?>
-          <label class="obra-card <?= ($id_manga_selecionado == $obra['id_manga']) ? 'selected' : '' ?>">
-            <input type="radio" name="id_manga" value="<?= $obra['id_manga'] ?>" style="display: none">
-            <img src="<?= $obra['capa'] ?>" alt="<?= $obra['titulo'] ?>">
-            <span><?= $obra['titulo'] ?></span>
+          <label class="obra-card <?php echo ($id_manga_selecionado == $obra['id_manga']) ? 'selected' : '' ?>">
+            <input type="radio" name="id_manga" value="<?php echo $obra['id_manga'] ?>" style="display: none">
+            <img src="<?php echo $obra['capa'] ?>" alt="<?php echo $obra['titulo'] ?>">
+            <span><?php echo $obra['titulo'] ?></span>
           </label>
         <?php endforeach; ?>
       </div>
@@ -147,8 +147,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label><input type="checkbox" id="selecionar-todos" onchange="selecionarTodos(this)"> Selecionar Todos</label>
             <?php foreach ($capitulos as $cap): ?>
               <label>
-                <input type="checkbox" name="capitulos[]" value="<?= $cap['id_capitulos'] ?>">
-                Capítulo <?= $cap['num_capitulo'] ?>
+                <input type="checkbox" name="capitulos[]" value="<?php echo $cap['id_capitulos'] ?>">
+                Capítulo <?php echo $cap['num_capitulo'] ?>
               </label>
             <?php endforeach; ?>
           </div>

@@ -1,4 +1,7 @@
-<?php session_start(); ?>
+<?php session_start();
+
+
+?>
 
 <!DOCTYPE html>
 <html lang="pt">
@@ -44,15 +47,15 @@
     <!-- Seção central da navbar (barra de pesquisa) -->
     <div class="nav-center">
         <div class="search-wrapper">
-            <input type="text" placeholder="Pesquisar" class="search-bar" id="search-bar">
-            <button class="search-button"><i class="bi bi-search"></i></button>
+            <input type="text"  placeholder="Pesquisar" class="search-bar" id="search-bar" autocomplete="off">
+            <div id="search-result" class="search-result"></div>
         </div>
     </div>
 
     <div class="nav-right">
     <?php if (isset($_SESSION['nome'])): ?>
     <div class="user-area">
-        <span class="user-name">Olá, <?= htmlspecialchars($_SESSION['nome']) ?></span>
+        <span class="user-name">Olá, <?php echo htmlspecialchars($_SESSION['nome']) ?></span>
         <form action="logout.php" method="POST" class="logout-form">
             <button type="submit" class="nav-btn logout-btn">Logout</button>
         </form>
@@ -75,6 +78,36 @@ function toggleMenu() {
     const menu = document.getElementById("nav-right");
     menu.classList.toggle("show"); // Adiciona ou remove a classe 'show'
 }
+const barra = document.getElementById('search-bar');
+const caixa = document.getElementById('search-result');
+
+barra.oninput = function() {
+    let texto = barra.value.trim();
+    if (texto.length < 1) {
+        caixa.innerHTML = '';
+        caixa.style.display = 'none';
+        return;
+    }
+    // AJAX simples:
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', 'pesquisa.php?pesquisa=' + encodeURIComponent(texto));
+    xhr.onload = function() {
+        if (xhr.status == 200) {
+            caixa.innerHTML = xhr.responseText;
+            caixa.style.display = 'block';
+        }
+    }
+    xhr.send();
+};
+
+// Esconde ao clicar fora
+document.onclick = function(e) {
+    if (!e.target.closest('.search-wrapper')) {
+        caixa.style.display = 'none';
+    }
+};
+
+
 </script>
 
 </body>
