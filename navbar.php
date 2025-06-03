@@ -53,12 +53,17 @@
     </div>
 
     <div class="nav-right">
-    <?php if (isset($_SESSION['nome'])): ?>
-    <div class="user-area">
+        <?php if (isset($_SESSION['nome'])): ?>
+         <div class="user-area"></div>
+        <?php if(isset($_SESSION['rank']) && $_SESSION['rank'] === 'admin'): ?>
+            <a href="/arenaread/dashboard.php" class="nav-btn">Dashboard</a>
+        <?php endif; ?>
+        <div class="user-dropdown">
         <span class="user-name">Olá, <?php echo htmlspecialchars($_SESSION['nome']) ?></span>
         <form action="logout.php" method="POST" class="logout-form">
             <button type="submit" class="nav-btn logout-btn">Logout</button>
         </form>
+    </div>
     </div>
     <?php else: ?>
         <a href="historico.php" class="nav-btn"><i class="bi bi-bookmark"></i> Histórico</a>

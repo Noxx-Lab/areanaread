@@ -147,8 +147,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file']) && !empty($_F
                 <div class="generos-lista" id="generos-lista" style="display: none;">
                      <?php while($genero = $result_generos->fetch_assoc()): ?>
                     <label class="genero-item">
-                        <input type="checkbox" name="generos[]" value="<?= $genero['id_genero'] ?>">
-                        <?= htmlspecialchars($genero['nome_genero']) ?>
+                        <input type="checkbox" name="generos[]" value="<?php echo $genero['id_genero'] ?>">
+                        <?php echo htmlspecialchars($genero['nome_genero']) ?>
                     </label>
                     <?php endwhile; ?>
                 </div>

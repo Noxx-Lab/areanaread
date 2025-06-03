@@ -173,3 +173,26 @@ function contar ($ligaDB, $id_manga){
     return $capitulos = $result_count->fetch_assoc()['total'];
     
 }
+
+function tempoDecorrido($data) {
+    $agora = new DateTime();
+    $data = new DateTime($data);
+    $diff = $agora->diff($data);
+
+    $tempos = [
+        'y' => 'ano',
+        'm' => 'mês',
+        'd' => 'dia',
+        'h' => 'hora',
+        'i' => 'min'
+    ];
+
+    foreach ($tempos as $chave => $texto) {
+        if ($diff->$chave > 0) {
+            return $diff->$chave . ' ' . $texto . ($diff->$chave > 1 ? 's' : '') . ' atrás';
+        }
+    }
+
+    return 'Agora mesmo';
+}
+

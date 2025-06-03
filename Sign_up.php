@@ -79,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <title>Registar</title>
+    <title>SignUp</title>
     <link rel="stylesheet" href="css/signup.css">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
@@ -106,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <a href="index.php" class="btn-voltar">Voltar</a>
 
         </form>
-        <?= $mensagem ?>
+        <?php echo $mensagem ?>
     </div>
 </body>
 </html>

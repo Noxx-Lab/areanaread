@@ -154,10 +154,20 @@ body {
 }
 
 .user-area {
-    position: relative;
     display: flex;
     align-items: center;
+    gap: 12px;
+    position: relative;
 }
+
+.user-dropdown {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
 
 .user-name {
     color: white;
@@ -174,11 +184,15 @@ body {
     display: none;
     position: absolute;
     top: 100%;
-    right: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 2px;
+    z-index: 100;
 }
 
 /* Mostra o botão ao passar o rato */
-.user-area:hover .logout-form {
+.user-dropdown:hover .logout-form,
+.user-dropdown:focus-within .logout-form {
     display: block;
 }
 
