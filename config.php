@@ -120,6 +120,13 @@ function eliminar ($ligaDB, $id, $modo){
         $stmt_eliminar_pagina->bind_param("i", $id);
         $stmt_eliminar_pagina->execute();
 
+        // Apagar progressos desse capítulo
+        $sql_del_progress = "DELETE FROM user_progress WHERE id_manga = ?";
+        $stmt_del = $ligaDB->prepare($sql_del_progress);
+        $stmt_del->bind_param("i", $id);
+        $stmt_del->execute();
+
+
         //Elimina todos os capitulos dessa obra
         $sql_eliminar_capitulos = "DELETE from capitulos where id_manga = ?";
         $stmt_eliminar_capitulos = $ligaDB->prepare($sql_eliminar_capitulos);
@@ -138,6 +145,12 @@ function eliminar ($ligaDB, $id, $modo){
         $stmt_eliminar_pagina = $ligaDB->prepare($sql_eliminar_pagina);
         $stmt_eliminar_pagina->bind_param("i", $id);
         $stmt_eliminar_pagina->execute();
+
+        // Apagar progressos desse capítulo
+        $sql_del_progress = "DELETE FROM user_progress WHERE id_capitulo = ?";
+        $stmt_del = $ligaDB->prepare($sql_del_progress);
+        $stmt_del->bind_param("i", $id);
+        $stmt_del->execute();
 
         //Elimina o(s) capitulo(S) selecionados
         $sql_eliminar_capitulos = "DELETE from capitulos where id_capitulos = ?";
@@ -196,3 +209,24 @@ function tempoDecorrido($data) {
     return 'Agora mesmo';
 }
 
+function user_progress($ligaDB, $id_user, $id_manga, $id_capitulo ){
+    $sql_progress = "INSERT into user_progress (id_user, id_manga, id_capitulo, data_leitura)
+    VALUES (?,?,?, NOW()) on duplicate key UPDATE data_leitura = NOW()";
+    $stmt_progress = $ligaDB->prepare($sql_progress);
+    $stmt_progress->bind_param("iii", $id_user, $id_manga, $id_capitulo);
+    $stmt_progress->execute();
+}
+
+function capitulos_lidos($ligaDB, $id_user, $id_manga){
+    $sql_lido = "SELECT id_capitulo from user_progress where id_user = ? and id_manga = ?";
+    $stmt_lido = $ligaDB->prepare($sql_lido);
+    $stmt_lido->bind_param("ii", $id_user, $id_manga);
+    $stmt_lido->execute();
+
+    $res = $stmt_lido->get_result();
+    $capitulosLido = [];
+    while ($row = $res->fetch_assoc()) {
+        $capitulosLido[] = $row["id_capitulo"];
+    }
+    return $capitulosLido;
+}

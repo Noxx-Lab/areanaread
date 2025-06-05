@@ -4,7 +4,6 @@ include "navbar.php";
 
 $mensagem = "";
 
-
 // Define id_capitulo a partir do POST
 $id_capitulo = isset($_POST['id_capitulo']) ? intval($_POST['id_capitulo']) : null;
 
@@ -39,6 +38,10 @@ $sqlCapitulo = "SELECT c.id_capitulos, c.num_capitulo, c.id_manga, m.titulo
         $id_manga = $capitulo['id_manga'];
         $titulo_manga = $capitulo['titulo'];
         $num_capitulo = $capitulo['num_capitulo'];
+
+        if(isset($_SESSION['iduser']) && !isset($_GET['preload']) && !isset($_POST['preload'])) {
+            user_progress($ligaDB, $_SESSION["iduser"], $id_manga, $id_capitulo);
+        }
 
         // buscar info do manga
         $sql_manga = "SELECT * FROM mangas WHERE id_manga = ?";
@@ -199,7 +202,7 @@ $total_paginas = count($paginas);
         <?php endif; ?>
 
         <?php if (!empty($capitulo_proximo)): ?>
-            <form action="/arenaread/<?php echo $manga['link'];?>/capitulo-<?php echo $capitulo_proximo['num_capitulo']; ?>" method="post">
+            <form id="form-proximo-capitulo" action="/arenaread/<?php echo $manga['link'];?>/capitulo-<?php echo $capitulo_proximo['num_capitulo']; ?>" method="post">
                 <input type="hidden" name="id_capitulo" value="<?php echo $capitulo_proximo['id_capitulos'] ?>">
                 <button type="submit" class="nav-button">Próximo ></button>
             </form>
@@ -212,12 +215,9 @@ $total_paginas = count($paginas);
 </div>
 
 <script>
-// Troca para o capítulo selecionado no dropdown
 function trocarCapitulo(url) {
     window.location.href = url;
 }
-
-// Faz scroll suave até a página selecionada
 function scrollParaPagina(select) {
     const selectedPage = select.value;
     const element = document.getElementById(selectedPage);
@@ -227,121 +227,68 @@ function scrollParaPagina(select) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-    const imagens = document.querySelectorAll(".manga-page"); // Todas as imagens do capítulo
-    const selects = document.querySelectorAll(".page-select"); // Todos os <select> de páginas
-    const mangaKey = window.location.pathname; // Chave única para o capítulo atual
+    // --- Progresso LocalStorage ---
+    const imagens = document.querySelectorAll(".manga-page");
+    const selects = document.querySelectorAll(".page-select");
+    const mangaKey = window.location.pathname;
 
-    // 1. Recupera o progresso salvo no localStorage
-    const ultimaPagina = localStorage.getItem("progresso_" + mangaKey);
-    if (ultimaPagina) {
-        const elemento = document.getElementById(ultimaPagina);
-        if (elemento) {
-            setTimeout(() => {
-                elemento.scrollIntoView({ behavior: "smooth", block: "start" });
-            }, 300); // Dá um pequeno delay para garantir que a página terminou de renderizar
-        }
-    }
-
-    // 2. Cria o Observer que detecta a imagem (página) visível
     const observer = new IntersectionObserver(entries => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 const paginaId = entry.target.id;
-
-                // 3. Atualiza todos os <select> com a página atual
-                selects.forEach(select => {
-                    select.value = paginaId;
-                });
-
-                // 4. Salva o progresso no localStorage (por URL única)
+                selects.forEach(select => { select.value = paginaId; });
                 localStorage.setItem("progresso_" + mangaKey, paginaId);
             }
         });
-    }, {
-        threshold: 0.6, // Página precisa estar pelo menos 60% visível
-        rootMargin: "0px"
-    });
-
-    // 5. Observa todas as imagens
+    }, { threshold: 0.6, rootMargin: "0px" });
     imagens.forEach(img => observer.observe(img));
 });
 
-
-
-// Exibe botão "voltar ao topo" com base no scroll
 document.addEventListener("DOMContentLoaded", () => {
+    // --- Botão Voltar ao Topo ---
     const voltaTopoBtn = document.getElementById("volta_topo");
-
     window.addEventListener("scroll", () => {
         voltaTopoBtn.classList.toggle("show", window.scrollY > 80);
     });
+    window.scrollparatopo = () => { window.scrollTo({ top: 0, behavior: "smooth" }); };
 
-    // Função para rolar até o topo da página
-    window.scrollparatopo = () => {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-    };
-
-    // Pré-carrega as imagens do próximo capítulo (se existir)
-    const proximoBtn = document.querySelector('form[action*="capitulo-"] + form input[name="id_capitulo"]');
-    if (proximoBtn) {
-        const proximoURL = proximoBtn.closest('form').action;
-        fetch(proximoURL)
-            .then(response => response.text())
-            .then(html => {
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-                const imagens = doc.querySelectorAll(".manga-page");
-                imagens.forEach(img => {
-                    const preload = new Image();
-                    preload.src = img.src;
-                });
-            });
-    }
-
-    // Evita reenvio de formulário ao dar F5
+    // --- Evita reenvio de formulário ao dar F5 ---
     if (window.history.replaceState) {
         window.history.replaceState(null, null, window.location.href);
     }
 });
 
-//Pre-carregamento do capítulo mas só começa a pre-carregar se o utilizador chegar no meio do capitulo
+// --- Pré-carregamento inteligente do próximo capítulo ---
 document.addEventListener("DOMContentLoaded", function () {
     const imagens = document.querySelectorAll(".manga-page");
-
-    if (imagens.length < 2) return; // Verifica se há pelo menos 2 imagens
+    if (imagens.length < 2) return;
 
     const metadeIndex = Math.floor(imagens.length / 2);
     const imagemMeio = imagens[metadeIndex];
-    const proximoForm = document.querySelector('.reader-footer form[action*="capitulo-"]');
-
+    const proximoForm = document.getElementById('form-proximo-capitulo');
     if (!imagemMeio || !proximoForm) return;
 
     const proximoURL = proximoForm.action;
-
     const observer = new IntersectionObserver(entries => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                console.log("Meio do capítulo visível. Pré-carregando próximo...");
                 preloadProximoCapitulo(proximoURL);
-                observer.disconnect(); // Para não carregar várias vezes
+                observer.disconnect();
             }
         });
-    }, {
-        root: null,
-        rootMargin: "200px", // pode ajustar conforme preferires
-        threshold: 0.1
-    });
+    }, { root: null, rootMargin: "200px", threshold: 0.1 });
 
     observer.observe(imagemMeio);
 
     function preloadProximoCapitulo(url) {
-        fetch(url)
+        const urlComPreload = url + (url.includes('?') ? '&' : '?') + 'preload=1';
+        console.log("A fazer pre-loading do próximo capítulo:", urlComPreload);
+        fetch(urlComPreload)
             .then(response => response.text())
             .then(html => {
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
                 const imagens = doc.querySelectorAll(".manga-page");
-
                 imagens.forEach(img => {
                     const preload = new Image();
                     preload.src = img.src;
@@ -350,6 +297,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .catch(err => console.error("Erro ao pré-carregar:", err));
     }
 });
+
 </script>
 
 

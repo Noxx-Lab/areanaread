@@ -24,8 +24,8 @@ body {
     padding: 40px 50px;
     border-radius: 12px;
     box-shadow: 0 0 15px #6a5acd70;
-    max-width: 400px;
-    width: 100%;
+    max-width: 100%;
+    width: 400px;
     text-align: center;
 }
 
@@ -57,6 +57,56 @@ body {
     color: white;
     font-size: 14px;
 }
+
+.campo-password{
+    text-align: left;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+#password-regras{
+    display: none;
+    margin-top: 7px;
+    margin-bottom: 12px;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 1.05em;
+    text-align: left;
+    width: 100%;           /* Ocupar toda a largura do input */
+    margin-left: 0;
+    box-sizing: border-box;
+}
+
+.regra {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: 6px 0 6px 5px;
+    font-size: 1em;
+    color: #fa6b74; /* Vermelho por padrão */
+    transition: color 0.2s;
+    position: relative;
+    padding-left: 22px; /* espaço para o ícone */
+}
+
+.regra::before {
+    position: absolute;
+    left: 0;
+    color: #fa6b74;
+    font-weight: bold;
+    font-size: 1.05em;
+    transition: color 0.2s, content 0.2s;
+}
+
+.regra.valid {
+    color: #43c973; /* Verde quando válida */
+}
+
+.regra.valid::before {
+    color: #43c973;
+}
+
 
 /* Botão principal */
 .login-box button {

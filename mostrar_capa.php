@@ -3,7 +3,8 @@ include "navbar.php";
 include 'config.php'; 
 
 $link = $_GET["manga"] ?? null;
-$generos = []; 
+$generos = [];
+$lidos = [];
 
 // Busca os dados do mangá pelo link amigável
 $consulta = "SELECT * from mangas where link = ?";
@@ -41,7 +42,9 @@ while ($row = $result_generos->fetch_assoc()) {
     $generos[] = $row['nome_genero'];
 }
 
-
+if (isset($_SESSION["iduser"])){
+$lidos = capitulos_lidos($ligaDB,$_SESSION["iduser"], $id_manga);
+}
 ?>
 
 <!DOCTYPE html>
@@ -87,13 +90,19 @@ while ($row = $result_generos->fetch_assoc()) {
     <h2>Capítulos</h2>
     <div class="chapters">
         <?php while ($capitulo = $result_capitulos->fetch_assoc()): ?>
-            <form action="/arenaread/<?= $manga['link'] ?>/capitulo-<?= $capitulo['num_capitulo'] ?>" method="POST" class="hidden-form">
-                <input type="hidden" name="id_capitulo" value="<?= $capitulo['id_capitulos'] ?>">
-                <button type="submit" class="chapter-button">
+            <?php
+                $classe_lido = '';
+                if (isset($_SESSION['iduser']) && in_array((int)$capitulo['id_capitulos'],$lidos)) {
+                $classe_lido = 'capitulo-lido';
+                }
+            ?>
+        <form action="/arenaread/<?= $manga['link'] ?>/capitulo-<?= $capitulo['num_capitulo'] ?>" method="POST" class="hidden-form">
+            <input type="hidden" name="id_capitulo" value="<?= $capitulo['id_capitulos'] ?>">
+                <button type="submit" class="chapter-button <?php echo $classe_lido ?>">
                     Capítulo <?= $capitulo['num_capitulo'] ?>
-                    <span class="chapter-date"><?= date('d M, Y', strtotime($capitulo['data_lancamento'])) ?></span>
+                        <span class="chapter-date"><?= date('d M, Y', strtotime($capitulo['data_lancamento'])) ?></span>
                 </button>
-            </form>
+        </form>
         <?php endwhile; ?>
     </div>
 </div>

@@ -26,7 +26,7 @@ order by leituras DESC limit 1")->fetch_assoc();
 $obras_status = $ligaDB->query("SELECT status, count(*) as total from mangas group by status")->fetch_all();
 
 foreach ($obras_status as $status_obra){
-    echo $status_obra["Status"] . ": " . $status_obra["total"];
+    echo $status_obra["status"] . ": " . $status_obra["total"];
 }
 
 

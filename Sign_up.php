@@ -93,9 +93,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label>Email</label>
             <input type="email" name="email" required>
 
-            <label>Senha</label>
-            <input type="password" name="senha" pattern="^(?=.*[A-Za-z])(?=.*\d).+$" minlength="6" required>
-
+            <div class="campo-password">
+                <label>Senha</label>
+                <input type="password" name="senha" id="senha" required>
+                <div id="password-regras">
+                    <div class="regra" id="regra-tamanho">Pelo menos 8 caracteres</div>
+                    <div class="regra" id="regra-upper">Pelo menos 1 letra maiúscula</div>
+                    <div class="regra" id="regra-lower">Pelo menos 1 letra minúscila</div>
+                    <div class="regra" id="regra-number">Pelo menos 1 número</div>
+                </div>  
+            </div>
             <label>Confirmar Senha</label>
             <input type="password" name="confirmar" pattern="^(?=.*[A-Za-z])(?=.*\d).+$" minlength="6" required>
 
@@ -108,5 +115,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
         <?php echo $mensagem ?>
     </div>
+<script>
+    const passwordInput = document.getElementById("senha");
+    const regrasDIV = document.getElementById("password-regras");
+    const regras = {
+        length: document.getElementById("regra-tamanho"),
+        upper: document.getElementById("regra-upper"),
+        lower: document.getElementById("regra-lower"),
+        number: document.getElementById("regra-number")
+    };
+    passwordInput.addEventListener("focus", function(){
+        regrasDIV.style.display = "block";
+    });
+    passwordInput.addEventListener("blur", function(){
+        setTimeout(() => {
+            if(!passwordInput.value) regrasDIV.style.display = "none";
+        }, 120);
+    });
+
+    passwordInput.addEventListener("input", function(){
+        const val = passwordInput.value;
+        regras.length.classList.toggle("valid", val.length >= 8);
+        regras.upper.classList.toggle("valid", /[A-Z]/.test(val));
+        regras.lower.classList.toggle("valid", /[a-z]/.test(val));
+        regras.number.classList.toggle("valid", /\d/.test(val));
+
+        regrasDIV.style.display= "block";
+        
+    });
+</script>
 </body>
 </html>

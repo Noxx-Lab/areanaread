@@ -21,7 +21,7 @@ $result_ultimos = $ligaDB->query($sql_ultimos);
 while ($manga = $result_ultimos->fetch_assoc()){
     $id_manga = $manga['id_manga'];
 
-    $stmt_ultimo = "SELECT DISTINCT c.num_capitulo, c.data_lancamento from capitulos c inner join paginas p on c.id_capitulos = p.id_capitulos where c.id_manga = ? order by c.data_lancamento Desc limit 3";
+    $stmt_ultimo = "SELECT DISTINCT c.id_capitulos, c.num_capitulo, c.data_lancamento from capitulos c inner join paginas p on c.id_capitulos = p.id_capitulos where c.id_manga = ? order by c.data_lancamento Desc limit 3";
     $stmt_capitulo= $ligaDB ->prepare($stmt_ultimo);
     $stmt_capitulo -> bind_param("i", $id_manga);
     $stmt_capitulo -> execute();
@@ -105,6 +105,12 @@ while ($manga = $result_ultimos->fetch_assoc()){
     <h2 class="titulo-atualizacoes">Últimas Atualizações</h2>
     <div class="grid-atualizacoes">
         <?php foreach ($ultimos_mangas as $manga): ?>
+            <?php
+            $lidos = [];
+            if (isset($_SESSION["iduser"])) {
+            $lidos = capitulos_lidos($ligaDB, $_SESSION["iduser"], $manga["id_manga"]);
+            }
+            ?>
             <div class="card-atualizacao">
                 <a href="/arenaread/<?php echo $manga['link']; ?>">
                     <img src="<?php echo $manga['capa']; ?>" alt="<?php echo htmlspecialchars($manga['titulo']); ?>">
@@ -114,8 +120,14 @@ while ($manga = $result_ultimos->fetch_assoc()){
                 </h3>
                 <ul class="capitulos-lista">
                     <?php foreach ($manga['capitulos'] as $cap): ?>
+                        <?php
+                            $classe_lido = '';
+                            if (isset($_SESSION['iduser']) && in_array((int) $cap['id_capitulos'], $lidos)) {
+                                $classe_lido = 'capitulo-lido';
+                            }
+                        ?>
                         <li>
-                            <a href="/arenaread/<?php echo $manga['link']; ?>/capitulo-<?php echo $cap['num_capitulo']; ?>">
+                            <a href="/arenaread/<?php echo $manga['link']; ?>/capitulo-<?php echo $cap['num_capitulo']; ?>" class = "<?php echo $classe_lido ?>">
                                 Capítulo <?php echo $cap['num_capitulo']; ?>
                                 <span class="tempo"><?php echo tempoDecorrido($cap['data_lancamento']); ?></span>
                             </a>

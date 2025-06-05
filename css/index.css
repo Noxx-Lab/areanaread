@@ -181,9 +181,10 @@ body {
     transition: 0.3s;
 }
 
-.card-atualizacao:hover {
-    transform: translateY(-5px);
+.capitulo-lido {
+    color: #a18cd1 !important;
 }
+
 
 .titulo-atualizacoes {
     text-align: center;
@@ -223,14 +224,14 @@ body {
 
 .capitulos-lista li a {
     font-size: 13px;
-    color: #a18cd1;
+    color: #ffffffb4;
     display: flex;
     justify-content: space-between;
     text-decoration: none;
 }
 
 .capitulos-lista li a:hover {
-    color: #d9b3ff;
+    color: #fff;
 }
 
 .tempo {
