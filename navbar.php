@@ -30,18 +30,6 @@
         <!-- Links de navegação -->
         <a href="/arenaread/index.php" class="nav-home">Home</a>
         <a href="/arenaread/projetos.php" class="nav-projetos">Projetos</a>
-        
-        <?php if (isset($_SESSION['rank']) && $_SESSION['rank'] === 'admin'): ?>
-        <a href="/arenaread/uploud.php" class="nav-outra">Upload</a>
-        <?php endif; ?>
-
-        <?php if (isset($_SESSION['rank']) && $_SESSION['rank'] === 'admin'): ?>
-            <a href="/arenaread/editar.php" class="nav-outra">Editar</a>
-        <?php endif; ?>
-
-        <?php if (isset($_SESSION['rank']) && in_array($_SESSION['rank'], ['admin', 'editor'])): ?>
-            <a href="/arenaread/eliminar.php" class="nav-outra">Eliminar</a>
-        <?php endif; ?>
     </div>
 
     <!-- Seção central da navbar (barra de pesquisa) -->

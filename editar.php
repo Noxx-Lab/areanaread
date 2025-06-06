@@ -140,6 +140,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["editar"])){
     <link rel="stylesheet" href="css/editar.css">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
+<div class="sidebar">
+  <div class="sidebar-nav">
+  <a href="dashboard.php" class="<?= basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'active' : '' ?>">Dashboard</a>
+        <a href="contas.php" class="<?= basename($_SERVER['PHP_SELF']) == 'contas.php' ? 'active' : '' ?>">Contas</a>
+        <a href="uploud.php" class="<?= basename($_SERVER['PHP_SELF']) == 'upload.php' ? 'active' : '' ?>">Upload</a>
+        <a href="editar.php" class="<?= basename($_SERVER['PHP_SELF']) == 'editar.php' ? 'active' : '' ?>">Editar</a>
+        <a href="eliminar.php"
+            class="<?= basename($_SERVER['PHP_SELF']) == 'eliminar.php' ? 'active' : '' ?>">Eliminar</a>
+    </div>
+</div>
     <div class="container">
         <?php if($mensagem): ?>
             <div class="mensagem"><?php echo $mensagem; ?></div>

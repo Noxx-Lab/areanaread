@@ -121,9 +121,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
 </head>
-
-
 <body>
+<div class="sidebar">
+  <div class="sidebar-nav">
+  <a href="dashboard.php" class="<?= basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'active' : '' ?>">Dashboard</a>
+  <a href="contas.php"   class="<?= basename($_SERVER['PHP_SELF']) == 'contas.php' ? 'active' : '' ?>">Contas</a>
+  <a href="uploud.php"   class="<?= basename($_SERVER['PHP_SELF']) == 'upload.php' ? 'active' : '' ?>">Upload</a>
+  <a href="editar.php"   class="<?= basename($_SERVER['PHP_SELF']) == 'editar.php' ? 'active' : '' ?>">Editar</a>
+  <a href="eliminar.php" class="<?= basename($_SERVER['PHP_SELF']) == 'eliminar.php' ? 'active' : '' ?>">Eliminar</a>
+  </div>
+</div>
 <div class="upload-container">
 
 <div class="button-group">

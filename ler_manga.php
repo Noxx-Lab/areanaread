@@ -105,6 +105,7 @@ $total_paginas = count($paginas);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $titulo_manga; ?> - Capítulo <?php echo $num_capitulo; ?></title>
     <link rel="stylesheet" href="/arenaread/css/ler_manga.css">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
 <body>
 
