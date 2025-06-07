@@ -76,6 +76,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body>
     <div class="container">
         <div class="capitulos-container">
+        <a href="uploud.php" class="btn-voltar">
+        <i class="bi bi-arrow-left-square"></i> Voltar</a>
             <div class="manga-info">
                 <?php if ($manga): ?>
                 <img src="<?php echo $manga['capa']; ?>" alt="Capa do Mangá">

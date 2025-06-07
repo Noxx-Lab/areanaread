@@ -16,6 +16,31 @@ body {
     justify-content: center;
 }
 
+.btn-voltar {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 1.09rem;
+    font-weight: 600;
+    background: transparent;
+    color: #8f79c4;
+    border: none;
+    outline: none;
+    margin-bottom: 20px;
+    margin-left: 10px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: color 0.16s;
+}
+.btn-voltar i {
+    font-size: 1.33em;
+}
+.btn-voltar:hover {
+    color: #d1c6ff;
+    text-decoration: underline;
+}
+
+
 /* Container principal */
 .capitulos-container {
     display: flex;

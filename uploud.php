@@ -1,7 +1,9 @@
 <?php
-include 'config.php'; // Conexão com o banco de dados
+include 'config.php';
 include "navbar.php";
-include "cloudinary.php"; // Configuração do Cloudinary
+include "cloudinary.php";
+$pagina_atual = "uploud";
+include "sidebar.php";
 
 if (!isset($_SESSION['rank']) || !in_array($_SESSION['rank'], ['admin', 'editor'])) {
     header("Location: index.php");
@@ -122,15 +124,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
 </head>
 <body>
-<div class="sidebar">
-  <div class="sidebar-nav">
-  <a href="dashboard.php" class="<?= basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'active' : '' ?>">Dashboard</a>
-  <a href="contas.php"   class="<?= basename($_SERVER['PHP_SELF']) == 'contas.php' ? 'active' : '' ?>">Contas</a>
-  <a href="uploud.php"   class="<?= basename($_SERVER['PHP_SELF']) == 'upload.php' ? 'active' : '' ?>">Upload</a>
-  <a href="editar.php"   class="<?= basename($_SERVER['PHP_SELF']) == 'editar.php' ? 'active' : '' ?>">Editar</a>
-  <a href="eliminar.php" class="<?= basename($_SERVER['PHP_SELF']) == 'eliminar.php' ? 'active' : '' ?>">Eliminar</a>
-  </div>
-</div>
 <div class="upload-container">
 
 <div class="button-group">
@@ -148,55 +141,51 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
 
 </div>
 
-
 <form id="formUpload" action="uploud.php" method="POST" enctype="multipart/form-data">
-    <input type="hidden" name="id_manga" value="<?php echo $id_manga_selecionado ?>" required>
-    <h2 class="titulo-pagina"> Upload Páginas</h2>
-    <h3>Selecione uma Obra</h3>
-<div class="obras-grid">
-  <?php foreach ($obras as $obra): ?>
-    <label class="obra-card <?php echo ($id_manga_selecionado == $obra['id_manga']) ? 'selected' : '' ?>">
-      <input type="radio" name="id_manga" value="<?php echo $obra['id_manga'] ?>" style="display: none" onchange="selecionarObra(this)">
-      <img src="<?php echo $obra['capa'] ?>" alt="<?php echo $obra['titulo'] ?>">
-      <span><?php echo $obra['titulo'] ?></span>
+  <h2 class="titulo-pagina"> Upload Páginas</h2>
+  <h3>Selecione uma Obra</h3>
+  <div class="obras-grid">
+    <?php foreach ($obras as $obra): ?>
+      <label class="obra-card <?php echo ($id_manga_selecionado == $obra['id_manga']) ? 'selected' : '' ?>">
+        <input type="radio" name="id_manga" value="<?php echo $obra['id_manga'] ?>" style="display:none"
+          <?php if ($id_manga_selecionado == $obra['id_manga']) echo "checked"; ?>
+          onchange="this.form.submit();">
+        <img src="<?php echo htmlspecialchars($obra['capa']) ?>" alt="<?php echo htmlspecialchars($obra['titulo']) ?>">
+        <span><?php echo htmlspecialchars($obra['titulo']) ?></span>
+      </label>
+    <?php endforeach; ?>
+  </div>
+
+  <?php if ($id_manga_selecionado): ?>
+    <h3>Selecione o Capítulo:</h3>
+    <div class="dropdown">
+      <select name="id_capitulo" required>
+        <option value="">Selecionar capítulo</option>
+        <?php foreach ($capitulos as $capitulo): ?>
+          <option value="<?php echo $capitulo['id_capitulos']; ?>">
+            Capítulo <?php echo $capitulo['num_capitulo']; ?>
+          </option>
+        <?php endforeach; ?>
+      </select>
+    </div>
+    
+    <!-- Upload de arquivos -->
+    <label for="file-upload" class="custom-file-upload">
+      <i class="bi bi-file-earmark-arrow-up"></i> <span id="file-label">Escolher Arquivos</span>
     </label>
-  <?php endforeach; ?>
-</div>
+    <input type="file" name="files[]" id="file-upload" multiple required>
+    
+    <!-- Botão de envio -->
+    <button type="submit" class="upload-btn" id="submit-btn">
+      <i class="bi bi-upload"></i> Enviar Arquivos
+    </button>
+    <div class="loading-spinner" id="loading-spinner" style="display: none;"></div>
+    <div class="mensagem" id="mensagem">
+      <?php echo $mensagem; ?>
+    </div>
+  <?php endif; ?>
+</form>
 
-
-    <?php if ($id_manga_selecionado): ?>
-        <h3>Selecione o Capítulo:</h3>
-        <div class="dropdown">
-            <select name="id_capitulo" required>
-                <option value="">Selecionar capítulo</option>
-                <?php foreach ($capitulos as $capitulo): ?>
-                    <option value="<?php echo $capitulo['id_capitulos']; ?>">
-                        Capítulo <?php echo $capitulo['num_capitulo']; ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </div>
-        
-        <!-- Upload de arquivos -->
-        <label for="file-upload" class="custom-file-upload">
-            <i class="bi bi-file-earmark-arrow-up"></i> <span id="file-label">Escolher Arquivos</span>
-        </label>
-        <input type="file" name="files[]" id="file-upload" multiple required>
-        
-        <!-- Botão de envio -->
-        <button type="submit" class="upload-btn" id="submit-btn">
-            <i class="bi bi-upload"></i> Enviar Arquivos
-        </button>
-
-        <!-- Spinner de Loading -->
-        <div class="loading-spinner" id="loading-spinner" style="display: none;"></div>
-
-        <!-- Área para exibir mensagens -->
-        <div class="mensagem" id="mensagem">
-            <?php echo $mensagem; ?>
-        </div>
-    <?php endif; ?>
-    </form>
 </div>
 
 <script>

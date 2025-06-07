@@ -2,6 +2,8 @@
 include 'config.php';
 include 'cloudinary.php';
 include 'navbar.php';
+$pagina_atual = "eliminar";
+include "sidebar.php";
 
 if (!isset($_SESSION['rank']) || $_SESSION['rank'] !== 'admin') {
     header("Location: index.php");
@@ -113,15 +115,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
 <body>
-<div class="sidebar">
-  <div class="sidebar-nav">
-  <a href="dashboard.php" class="<?= basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'active' : '' ?>">Dashboard</a>
-  <a href="contas.php"   class="<?= basename($_SERVER['PHP_SELF']) == 'contas.php' ? 'active' : '' ?>">Contas</a>
-  <a href="uploud.php"   class="<?= basename($_SERVER['PHP_SELF']) == 'upload.php' ? 'active' : '' ?>">Upload</a>
-  <a href="editar.php"   class="<?= basename($_SERVER['PHP_SELF']) == 'editar.php' ? 'active' : '' ?>">Editar</a>
-  <a href="eliminar.php" class="<?= basename($_SERVER['PHP_SELF']) == 'eliminar.php' ? 'active' : '' ?>">Eliminar</a>
-  </div>
-</div>
   <div class="container">
     <?php if (isset($_SESSION['mensagem'])): ?>
       <div class="mensagem"><?php echo $_SESSION['mensagem']; unset($_SESSION['mensagem']); ?></div>

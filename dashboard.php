@@ -1,8 +1,10 @@
 <?php
 include "config.php";
 include "navbar.php";
+$pagina_atual = "dashboard";
+include "sidebar.php";
 
-if (!isset($_SESSION["rank"]) || $_SESSION["rank"] !== "admin") {
+if (!isset($_SESSION['rank']) || !in_array($_SESSION['rank'], ['admin', 'editor'])) {
     header("Location: index.php");
     exit;
 }
@@ -32,16 +34,16 @@ from mangas m join user_progress up on m.id_manga = up.id_manga group by m.id_ma
 order by leitures DESC limit 1")->fetch_assoc();
 
 
-//Obras por status
-$obras_status = $ligaDB->query("SELECT status, count(*) as total from mangas group by status")->fetch_all(MYSQLI_ASSOC);
-
 //Obtas por genero
 $obra_genero = $ligaDB->query("SELECT g.*, count(*) as total from manga_generos mg inner join generos g on mg.id_genero = g.id_genero group by g.nome_genero")->fetch_all(MYSQLI_ASSOC);
 
+$nome_genero = [];
+$total_genero = [];
 
-//obras por tipo
-$obra_tipo = $ligaDB->query("SELECT tipo, count(*) as total from mangas group by tipo")->fetch_all(MYSQLI_ASSOC);
-
+foreach($obra_genero as $genero_obra){
+    $nome_genero [] = $genero_obra["nome_genero"];
+    $total_genero [] = $genero_obra["total"];
+}
 
 //Informação das contas de todos os utilizadores 
 $user_info = $ligaDB->query("SELECT email, rank from users group by rank")->fetch_all(MYSQLI_ASSOC);
@@ -61,17 +63,8 @@ $total_users = $ligaDB->query("SELECT count(*) as total from users")->fetch_asso
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="graficos.js"></script>
 </head>
+<body>
 
-<div class="sidebar">
-<div class="sidebar-nav">
-  <a href="dashboard.php" class="<?= basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'active' : '' ?>">Dashboard</a>
-  <a href="contas.php"   class="<?= basename($_SERVER['PHP_SELF']) == 'contas.php' ? 'active' : '' ?>">Contas</a>
-  <a href="uploud.php"   class="<?= basename($_SERVER['PHP_SELF']) == 'upload.php' ? 'active' : '' ?>">Upload</a>
-  <a href="editar.php"   class="<?= basename($_SERVER['PHP_SELF']) == 'editar.php' ? 'active' : '' ?>">Editar</a>
-  <a href="eliminar.php" class="<?= basename($_SERVER['PHP_SELF']) == 'eliminar.php' ? 'active' : '' ?>">Eliminar</a>
-</div>
-
-</div>
     <div class="main-content">
         <h1 class="dashboard-titulo">Dashboard</h1>
         <div class="dashboard-cards">
@@ -96,9 +89,16 @@ $total_users = $ligaDB->query("SELECT count(*) as total from users")->fetch_asso
             </div>
         </div>
     </div>
-    <h2 class="grafico-obra-titulo">Distribuição de Obras por Capítulos</h2>
-    <div class="grafico-container">
-        <canvas id="grafico-obras"></canvas>
+    <div class="dashboard-graficos">
+        <div class="grafico-container">
+            <h2 class="grafico-obra-titulo">Distribuição de Obras por Capítulos</h2>
+            <canvas id="grafico-obras"></canvas>
+        </div>
+        <div class="dashboard-grafico-box">
+            <h2 class="grafico-obra-titulo">Obras por Género</h2>
+            <canvas id="grafico-generos"></canvas>
+            <div id="legenda-generos"></div>
+        </div>
     </div>
 </div>
 
@@ -110,6 +110,9 @@ const obrasPorIntervalo = {
 "151-250": <?php echo $capitulos_por_obras['151_250'] ?? 0 ?>,
 "251+": <?php echo $capitulos_por_obras['251+'] ?? 0 ?>
 };
+
+const generosLabels = <?php echo json_encode($nome_genero); ?>;
+const generosData = <?php echo json_encode($total_genero); ?>;
 </script>
     
 </body>

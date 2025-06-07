@@ -43,7 +43,7 @@
     <div class="nav-right">
         <?php if (isset($_SESSION['nome'])): ?>
          <div class="user-area"></div>
-        <?php if(isset($_SESSION['rank']) && $_SESSION['rank'] === 'admin'): ?>
+         <?php if (isset($_SESSION['rank']) && in_array($_SESSION['rank'], ['admin', 'editor'])): ?>
             <a href="/arenaread/dashboard.php" class="nav-btn">Dashboard</a>
         <?php endif; ?>
         <div class="user-dropdown">

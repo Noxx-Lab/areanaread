@@ -115,7 +115,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file']) && !empty($_F
 <body>
 <div class="page-wrapper">
     <div class="upload-container">
+    <div class="voltar-titulo-row">
+        <a href="uploud.php" class="btn-voltar">
+            <i class="bi bi-arrow-left-square"></i> Voltar
+        </a>
         <h2><i class="bi bi-plus-circle"></i> Adicionar Novo Mangá</h2>
+    </div>
 
 
         <form id="formUpload" action="adicionar_manga.php" method="POST" enctype="multipart/form-data">
