@@ -13,48 +13,68 @@ body {
     padding: 20px;
     padding-top: 95px;
 }
-
-.sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 230px;
-    height: 100vh;
-    background: #544868;
-    color: #fff;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-top: 150px;
-    z-index: 10;
-}
-
-.sidebar-header h2 {
-    margin: 0 0 32px 0;
-    font-size: 1.3rem;
-    color: #a67ae9;
-    text-align: center;
-}
-.sidebar-nav {
+.dropdown-container {
+    margin-top: 30px;
+    background-color: #2b2b2b;
+    border: 1px solid #a678f1;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
     width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+    margin-bottom: 10px;
 }
-.sidebar-nav a {
-    padding: 14px 20px;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 7px;
-    font-weight: 500;
-    letter-spacing: 0.01em;
-    transition: background 0.15s, color 0.15s;
 
+.dropdown-button {
+    padding: 12px;
+    background-color: #1a1a1a;
+    cursor: pointer;
+    color: #eee;
+    font-size: 14px;
+    border-bottom: 1px solid #a678f1;
+    position: relative;
+    width: 100%;
 }
-.sidebar-nav a.active,
-.sidebar-nav a:hover {
-    background: #a67ae9;
-    color: #1a1a1a;
+
+.dropdown-list {
+    display: none;
+    padding: 10px 15px;
+    background-color: #1f1f1f;
+    max-height: 114px; /* 4x altura de linha (aprox) */
+    overflow-y: auto;
+    min-width: 250px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.dropdown-container.active .dropdown-list {
+    display: block;
+}
+
+.dropdown-list label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 15px;
+    color: #ccc;
+    cursor: pointer;
+    padding: 7px 8px;
+    border-radius: 7px;
+    transition: background 0.2s;
+}
+
+.dropdown-list label:hover,
+.dropdown-list input[type="radio"]:checked + span {
+    background: #a678f133;
+    color: #a678f1;
+}
+
+.dropdown-list input[type="radio"] {
+    display: none;
+}
+
+.dropdown-list input[type="radio"] {
+    margin-right: 7px;
+    display: none;
 }
 
 .titulo-pagina {
@@ -162,6 +182,8 @@ body {
     line-height: 1.2;
     margin-top: 6px;
   }
+
+  
 /* Mensagens de sucesso e erro */
 .mensagem {
     text-align: center;
@@ -212,6 +234,37 @@ body {
     cursor: pointer;
     transition: 0.3s;
 }
+
+.capitulo-label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 1.06rem;
+    color: #fff;
+    cursor: pointer;
+    transition: color .2s, opacity .2s;
+  }
+  
+  .capitulo-label input[type="radio"] {
+    margin-right: 8px;
+    accent-color: #a67ae9;
+  }
+  
+  .capitulo-label.disabled-capitulo {
+    color: #a67ae9;
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+  
+  .capitulo-label.disabled-capitulo input[type="radio"] {
+    accent-color: #aaa;
+    cursor: not-allowed;
+  }
+  
+  .capitulo-label.disabled-capitulo span {
+    font-style: italic;
+    font-size: 1em;
+  }
+  
 
 .upload-btn:hover {
     background-color: #6a5acd;

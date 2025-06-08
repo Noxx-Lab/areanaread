@@ -176,15 +176,22 @@ function generos ($ligaDB, $id_manga=null){
     }
 }
 
-function contar ($ligaDB, $id_manga){
-    // Conta os capítulos deste mangá
-    $sql_count_manga = "SELECT count(DISTINCT c.id_capitulos) as total from capitulos c inner join paginas p on c.id_capitulos = p.id_capitulos where c.id_manga = ? ";
-    $stmt_count = $ligaDB->prepare($sql_count_manga);
-    $stmt_count->bind_param("i", $id_manga);
-    $stmt_count->execute();
-    $result_count = $stmt_count->get_result();
-    return $capitulos = $result_count->fetch_assoc()['total'];
-    
+function contar ($ligaDB, $id = null, $modo){
+    if ($modo ==="cap_por_obra"){// Conta os capítulos deste mangá
+        $sql_count_manga = "SELECT count(DISTINCT c.id_capitulos) as total from capitulos c inner join paginas p on c.id_capitulos = p.id_capitulos where c.id_manga = ? ";
+        $stmt_count = $ligaDB->prepare($sql_count_manga);
+        $stmt_count->bind_param("i", $id);
+        $stmt_count->execute();
+        $result_count = $stmt_count->get_result();
+        return $capitulos = $result_count->fetch_assoc()['total'];}
+    if($modo === 'pag_por_cap'){
+        $sql_count_pag = "SELECT COUNT(*) as total from paginas where id_capitulos = ?";
+        $stmt_count_pag = $ligaDB->prepare($sql_count_pag);
+        $stmt_count_pag->bind_param("i", $id);
+        $stmt_count_pag->execute();
+        $result = $stmt_count_pag->get_result();
+        return $result->fetch_assoc()['total'] > 0; // true se tem páginas
+    }
 }
 
 function tempoDecorrido($data) {

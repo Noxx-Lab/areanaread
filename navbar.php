@@ -41,6 +41,9 @@
     </div>
 
     <div class="nav-right">
+        <?php if (isset($_SESSION['rank']) && in_array($_SESSION['rank'], ["admin", "editor","user"])): ?>
+        <a href="/arenaread/historico.php" class="nav-btn"><i class="bi bi-bookmark"></i> Histórico</a>
+        <?php endif; ?>
         <?php if (isset($_SESSION['nome'])): ?>
          <div class="user-area"></div>
          <?php if (isset($_SESSION['rank']) && in_array($_SESSION['rank'], ['admin', 'editor'])): ?>
@@ -54,7 +57,6 @@
     </div>
     </div>
     <?php else: ?>
-        <a href="historico.php" class="nav-btn"><i class="bi bi-bookmark"></i> Histórico</a>
         <a href="login.php" class="nav-btn">Login</a>
         <a href="sign_up.php" class="nav-btn">Sign Up</a>
     <?php endif; ?>

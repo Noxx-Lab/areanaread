@@ -15,7 +15,7 @@ $mangas_com_capitulos = [];
 while ($manga = $resultmangas->fetch_assoc()) {
     $id_manga = $manga['id_manga'];
 
-    $manga['total_capitulos'] = contar($ligaDB,$id_manga);
+    $manga['total_capitulos'] = contar($ligaDB,$id_manga,"cap_por_obra");
 
     // Pega os géneros ligados ao mangá
     $sql_generos = "SELECT nome_genero from generos 

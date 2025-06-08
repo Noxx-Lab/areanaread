@@ -56,7 +56,7 @@ while ($manga = $result_ultimos->fetch_assoc()){
     }
 
     
-    $manga['total_capitulos'] = contar($ligaDB, $id_manga);
+    $manga['total_capitulos'] = contar($ligaDB, $id_manga,"cap_por_obra");
     $mangas_carrossel[] = $manga;
     }
 

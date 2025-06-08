@@ -38,6 +38,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
     $id_capitulo = $_POST["id_capitulo"];
 
     
+
+    
     $num_capitulo = buscar_capitulos_manga($ligaDB,null, $id_capitulo, 'normal')["num_capitulo"];
 
     // Buscar o nome do mangá no banco de dados
@@ -155,20 +157,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
       </label>
     <?php endforeach; ?>
   </div>
-
   <?php if ($id_manga_selecionado): ?>
     <h3>Selecione o Capítulo:</h3>
-    <div class="dropdown">
-      <select name="id_capitulo" required>
-        <option value="">Selecionar capítulo</option>
-        <?php foreach ($capitulos as $capitulo): ?>
-          <option value="<?php echo $capitulo['id_capitulos']; ?>">
-            Capítulo <?php echo $capitulo['num_capitulo']; ?>
-          </option>
-        <?php endforeach; ?>
-      </select>
-    </div>
-    
+    <div class="dropdown-container" id="dropdown-capitulos">
+  <div class="dropdown-button" onclick="toggleDropdown()">Selecionar Capítulo</div>
+  <div class="dropdown-list">
+  <?php foreach ($capitulos as $cap): ?>
+  <?php $capitulo_tem_paginas = contar($ligaDB, $cap['id_capitulos'], 'pag_por_cap'); ?>
+  <label class="capitulo-label<?php echo $capitulo_tem_paginas ? ' disabled-capitulo' : '' ?>">
+    <input type="radio" name="id_capitulo" value="<?php echo $cap['id_capitulos'] ?>" <?php echo $capitulo_tem_paginas ? 'disabled' : '' ?> required>
+    <span>
+      Capítulo <?php echo $cap['num_capitulo'] ?> <?php echo $capitulo_tem_paginas ? '(Já tem páginas)' : '' ?>
+    </span>
+  </label>
+<?php endforeach; ?>
+  </div>
+</div>
+
     <!-- Upload de arquivos -->
     <label for="file-upload" class="custom-file-upload">
       <i class="bi bi-file-earmark-arrow-up"></i> <span id="file-label">Escolher Arquivos</span>
@@ -235,6 +240,29 @@ function selecionarObra(radio) {
   // Submeter o formulário para carregar os capítulos
   document.getElementById("formUpload").submit();
 }
+
+function toggleDropdown() {
+    document.getElementById('dropdown-capitulos').classList.toggle('active');
+}
+
+// Fecha o dropdown se clicar fora
+document.addEventListener('click', function(event) {
+    let container = document.getElementById('dropdown-capitulos');
+    if (container && !container.contains(event.target)) {
+        container.classList.remove('active');
+    }
+});
+
+// Atualiza texto do botão ao selecionar
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.dropdown-list input[type="radio"]').forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            const label = this.parentNode.textContent.trim();
+            document.querySelector('.dropdown-button').textContent = label;
+            document.getElementById('dropdown-capitulos').classList.remove('active');
+        });
+    });
+});
 
 
 </script>

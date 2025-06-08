@@ -1,0 +1,104 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #121212;
+    color: #ffffff;
+    margin: 0;
+    padding: 20px;
+    padding-top: 125px; 
+}
+
+.titulo {
+    text-align: center;
+    font-size: 2.6rem;
+    font-weight: bold;
+    color: #a67ae9;
+    margin-bottom: 22px;   /* Menor espaço abaixo do título */
+    margin-top: 0;
+    margin-right: 20px;         /* Garante que não tenha espaço acima */
+}
+
+.historico-legenda {
+    display: block;
+    margin-bottom: 15px;
+    color: #fff;
+    font-size: 1.05em;
+}
+
+.historico-lista {
+    display: flex;
+    flex-direction: column;
+    align-items: center;      /* Centraliza horizontalmente */
+    justify-content: flex-start;
+    width: 100%;
+    margin-top: 0;
+    min-height: 200px;
+}
+
+.historico-card {
+    display: flex;
+    align-items: flex-start;
+    background: #27252e;
+    border: 2px solid #a67ae9;
+    border-radius: 12px;
+    margin-bottom: 22px;
+    padding: 16px 22px;
+    box-shadow: 0 3px 18px #0002;
+    width: 650px;             /* <-- largura fixa para todos iguais */
+    min-height: 160px;        /* altura mínima opcional */
+    transition: box-shadow 0.2s;
+}
+
+.historico-card:hover {
+    box-shadow: 0 6px 24px #a67ae955;
+}
+.historico-capa {
+    width: 90px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 7px;
+    border: 2px solid #a67ae9;
+    margin-right: 26px;
+    background: #18171c;
+}
+.historico-info {
+    flex: 1;
+}
+.historico-titulo {
+    color: #a67ae9;
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 7px;
+}
+.historico-capitulos {
+    display: flex;
+    gap: 18px;
+    margin-top: 8px;
+}
+.historico-cap {
+    background: #333;
+    color: #fff;
+    padding: 7px 14px;
+    border-radius: 7px;
+    border: 1.5px solid #a67ae9;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: background 0.2s;
+    text-decoration: none;
+}
+.historico-cap:hover {
+    background: #a67ae9;
+    color: #222;
+}
+.historico-data {
+    color: #a67ae9;
+    font-size: 0.95em;
+    margin-left: 8px;
+}
+

@@ -52,7 +52,7 @@ $lidos = capitulos_lidos($ligaDB,$_SESSION["iduser"], $id_manga);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($manga['titulo']) ?></title>
+    <title><?php echo htmlspecialchars($manga['titulo']) ?></title>
     <link rel="stylesheet" href="css/capa.css">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
@@ -60,29 +60,29 @@ $lidos = capitulos_lidos($ligaDB,$_SESSION["iduser"], $id_manga);
 
 <div class="container">
     <div class="manga-header">
-        <img src="<?= $manga['capa'] ?>" alt="Capa do Mangá">
+        <img src="<?php echo $manga['capa'] ?>" alt="Capa do Mangá">
         <div class="manga-info">
-            <h1><?= htmlspecialchars($manga['titulo']) ?></h1>
+            <h1><?php echo htmlspecialchars($manga['titulo']) ?></h1>
 
             <?php if (!empty($generos)): ?>
                 <div class="generos-tags">
                     <?php foreach ($generos as $genero): ?>
-                        <span class="genero-tag"><?= htmlspecialchars($genero) ?></span>
+                        <span class="genero-tag"><?php echo htmlspecialchars($genero) ?></span>
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
 
-            <p class="status">Status: <?= htmlspecialchars($manga['status']) ?></p>
-            <p class="tipo">Tipo: <?= htmlspecialchars($manga['tipo']) ?></p>
-            <p class="autor">Autor: <?= htmlspecialchars($manga['autor']) ?></p>
-            <p class="artista">Artista: <?= htmlspecialchars($manga['artista']) ?></p>
-            <p class="ano">Ano de Lançamento: <?= htmlspecialchars($manga['ano_lancado']) ?></p>
+            <p class="status">Status: <?php echo htmlspecialchars($manga['status']) ?></p>
+            <p class="tipo">Tipo: <?php echo htmlspecialchars($manga['tipo']) ?></p>
+            <p class="autor">Autor: <?php echo htmlspecialchars($manga['autor']) ?></p>
+            <p class="artista">Artista: <?php echo htmlspecialchars($manga['artista']) ?></p>
+            <p class="ano">Ano de Lançamento: <?php echo htmlspecialchars($manga['ano_lancado']) ?></p>
         </div>
     </div>
 
     <div class="manga-sinopse">
         <h2>Sinopse</h2>
-        <p><?= nl2br(htmlspecialchars($manga['sinopse'])) ?></p>
+        <p><?php echo nl2br(htmlspecialchars($manga['sinopse'])) ?></p>
     </div>
 </div>
 
@@ -96,11 +96,11 @@ $lidos = capitulos_lidos($ligaDB,$_SESSION["iduser"], $id_manga);
                 $classe_lido = 'capitulo-lido';
                 }
             ?>
-        <form action="/arenaread/<?= $manga['link'] ?>/capitulo-<?= $capitulo['num_capitulo'] ?>" method="POST" class="hidden-form">
-            <input type="hidden" name="id_capitulo" value="<?= $capitulo['id_capitulos'] ?>">
+        <form action="/arenaread/<?php echo $manga['link'] ?>/capitulo-<?php echo $capitulo['num_capitulo'] ?>" method="POST" class="hidden-form">
+            <input type="hidden" name="id_capitulo" value="<?php echo $capitulo['id_capitulos'] ?>">
                 <button type="submit" class="chapter-button <?php echo $classe_lido ?>">
-                    Capítulo <?= $capitulo['num_capitulo'] ?>
-                        <span class="chapter-date"><?= date('d M, Y', strtotime($capitulo['data_lancamento'])) ?></span>
+                    Capítulo <?php echo $capitulo['num_capitulo'] ?>
+                        <span class="chapter-date"><?php echo date('d M, Y', strtotime($capitulo['data_lancamento'])) ?></span>
                 </button>
         </form>
         <?php endwhile; ?>
