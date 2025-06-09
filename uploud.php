@@ -51,68 +51,55 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
     $totalArquivos = count($arquivos['name']);
 
     //Loop para enviar varios arquivos
-    for ($i = 0; $i < $totalArquivos; $i++) {
-        $nomeArquivo = basename($arquivos['name'][$i]);
-        $tempFile = $arquivos['tmp_name'][$i];
-
-        //Verifica se o arquivo é valido 
-        if (empty($nomeArquivo) || empty($tempFile)) {
-            $_SESSION['mensagem'] = "<p class='erro'> Upload cancelado! Arquivo inválido.</p>";
-        }
-
-        //Verifica a extensão é valida 
-        $extensao = pathinfo($nomeArquivo, PATHINFO_EXTENSION);
-        
-        if (empty($extensao)) {
-            $_SESSION['mensagem'] = "<p class='erro'> Upload cancelado! O arquivo '$nomeArquivo' não tem uma extensão válida</p>";
-        }
-        $extensao = strtolower($extensao);
-        //Extensões permitidas 
-        $extensoesPermitidas = ['jpg', 'jpeg', 'png', "webp","avif"];
-
-            if (!in_array($extensao, $extensoesPermitidas)) {
-                $_SESSION['mensagem'] = "<p class='erro'> Upload cancelado! Formato não permitido: '$nomeArquivo'</p>";
-        }
-
+  for ($i = 0; $i < $totalArquivos; $i++) {
     try {
+      $nomeArquivo = basename($arquivos['name'][$i]);
+      $tempFile = $arquivos['tmp_name'][$i];
+
+      if (empty($nomeArquivo) || empty($tempFile)) {
+        $_SESSION['mensagem'] = "<p class='erro'> Upload cancelado! Arquivo inválido.</p>";
+        continue;
+      }
+
+      $extensao = strtolower(pathinfo($nomeArquivo, PATHINFO_EXTENSION));
+      $extensoesPermitidas = ['jpg', 'jpeg', 'png', "webp", "avif"];
+
+      if (!in_array($extensao, $extensoesPermitidas)) {
+        $_SESSION['mensagem'] = "<p class='erro'> Upload cancelado! Formato não permitido: '$nomeArquivo'</p>";
+        continue;
+      }
+
       if (in_array($extensao, ['jpg', 'jpeg', 'png'])) {
         $temp_convertido = converte_webp($tempFile, $nomeArquivo, $extensao);
-
         if ($temp_convertido !== false) {
           $tempFile = $temp_convertido;
         }
 
-        // Mesmo que não tenha convertido, vai com "format" => "webp"
         $upload = $uploadApi->upload($tempFile, [
           "folder" => "mangas/$nomeManga/capitulo-$num_capitulo/",
           "format" => "webp"
         ]);
       } else {
-        // WebP ou AVIF já prontos
         $upload = $uploadApi->upload($tempFile, [
           "folder" => "mangas/$nomeManga/capitulo-$num_capitulo/"
         ]);
       }
 
       if (!isset($upload["secure_url"])) {
-        $_SESSION['mensagem'] = "<p class='erro'> Upload cancelado! Erro ao fazer upload para o Cloudinary: '$nomeArquivo'</p>";
+        $_SESSION['mensagem'] = "<p class='erro'> Upload cancelado! Erro no Cloudinary para '$nomeArquivo'</p>";
+        continue;
       }
 
       $caminhoArquivo = $upload["secure_url"];
-
-      $sql = "INSERT INTO paginas (id_manga, id_capitulos, caminho_pagina) VALUES (?, ?, ?)";
-      $stmt = $ligaDB->prepare($sql);
+      $stmt = $ligaDB->prepare("INSERT INTO paginas (id_manga, id_capitulos, caminho_pagina) VALUES (?, ?, ?)");
       $stmt->bind_param("iis", $id_manga, $id_capitulo, $caminhoArquivo);
-
-      if (!$stmt->execute()) {
-        $_SESSION['mensagem'] = "<p class='erro'> Upload cancelado! Erro ao salvar no banco de dados: '$nomeArquivo'</p>";
-      }
+      $stmt->execute();
     } catch (Exception $e) {
-      $_SESSION['mensagem'] = "<p class='erro'> Upload cancelado! Falha no upload de '$nomeArquivo': " . $e->getMessage() . "</p>";
+      $_SESSION['mensagem'] = "<p class='erro'> Upload cancelado! Erro: " . $e->getMessage() . "</p>";
     }
-
   }
-    $_SESSION['mensagem'] = "<p class='sucesso'>Todos os arquivos foram enviados com sucesso!</p>";
+
+  $_SESSION['mensagem'] = "<p class='sucesso'>Todos os arquivos foram enviados com sucesso!</p>";
     header("Location: uploud.php");
     exit();
 }

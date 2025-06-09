@@ -39,7 +39,7 @@ if($_SERVER['REQUEST_METHOD'] === "POST"){
             </head>
             <body>
                 <div class='email-box'>
-                <img src = 'https://res.cloudinary.com/dghfkjx36/image/upload/v1747516032/logo1_ixxyta.png' alt='ArenaRead logo' class='logo'>
+                <img src = 'https://res.cloudinary.com/dghfkjx36/image/upload/v1749142660/logo1_dc4amd_qhvcsr.png' alt='ArenaRead logo' class='logo'>
                 <h1>Recuperação da Password</h1>
                 <p>Recebemos o pedido de trocar a passoword no <strong>ArenaRead</strong>,</p>
                 <p>Para trocar a password, clique no link abaixo:
