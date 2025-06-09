@@ -312,4 +312,43 @@ body {
     cursor: not-allowed;
 }
 
-
+.barra-pesquisa {
+    width: 100%;
+    max-width: 300px;
+    margin: 15px auto;
+    padding: 8px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    display: block;
+  }
+  
+  .navegacao {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 10px;
+  }
+  
+  .navegacao button {
+    background: #7c4dff;
+    border: none;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .navegacao button :disabled,
+  .navegacao button.disabled-btn{
+    background-color: #444;
+    color: #888;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+  
+  .navegacao span {
+    color: white;
+    font-weight: bold;
+  }
+  

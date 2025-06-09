@@ -125,17 +125,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <form method="POST" id="form-eliminar">
     <input type="hidden" name="acao" id="acao" value="">
       <input type="hidden" name="id_manga" value="<?php echo $id_manga_selecionado ?>" required>
+      
 
       <h3>Selecione uma Obra</h3>
-      <div class="obras-grid">
+      <input type="text" id="filtro-obras" placeholder="Pesquisar obras" class="barra-pesquisa">
+      <div id="obras-container" class="obras-grid">
         <?php foreach ($obras as $obra): ?>
-          <label class="obra-card <?php echo ($id_manga_selecionado == $obra['id_manga']) ? 'selected' : '' ?>">
+          <label class="obra-card <?= $id_manga_selecionado == $obra['id_manga'] ? 'selected' : '' ?>" data-titulo="<?= strtolower($obra['titulo']) ?>" style="display: none;">
             <input type="radio" name="id_manga" value="<?php echo $obra['id_manga'] ?>" style="display: none">
             <img src="<?php echo $obra['capa'] ?>" alt="<?php echo $obra['titulo'] ?>">
             <span><?php echo $obra['titulo'] ?></span>
           </label>
         <?php endforeach; ?>
       </div>
+      <div class="navegacao">
+              <button type="button" id="anterior">&#8592;</button>
+              <span id="pagina-atual">1</span>
+              <button type="button" id="proximo">&#8594;</button>
+          </div>
 
       <?php if ($obra_sem_capitulos): ?>
         <div class="alert-info">Esta obra não tem capítulos disponíveis.</div>
@@ -186,6 +193,81 @@ let acaoConfirmar = false;
 function toggleDropdown() {
   document.getElementById('dropdown-capitulos').classList.toggle('active');
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+        const obras = Array.from(document.querySelectorAll(".obra-card"));
+        const obrasContainer = document.getElementById("obras-container");
+        const input = document.getElementById("filtro-obras");
+        const btnAnterior = document.getElementById("anterior");
+        const btnProximo = document.getElementById("proximo");
+        const spanPagina = document.getElementById("pagina-atual");
+
+        let pagina = 1;
+        const porPagina = 7;
+        let obrasFiltradas = obras;
+
+        function atualizarLista() {
+        const inicio = (pagina - 1) * porPagina;
+        const fim = inicio + porPagina;
+
+        // Oculta todos os cards
+        obras.forEach(card => card.style.display = "none");
+
+        // Mostra os da página atual
+        obrasFiltradas.slice(inicio, fim).forEach(card => card.style.display = "block");
+
+        // Atualiza número
+        spanPagina.textContent = pagina;
+
+        // Desabilita ou ativa os botões conforme necessário
+        btnAnterior.disabled = pagina === 1;
+        btnProximo.disabled = pagina * porPagina >= obrasFiltradas.length;
+
+        // Aplica/remover classe para visual desativado
+        btnAnterior.classList.toggle("disabled-btn", btnAnterior.disabled);
+        btnProximo.classList.toggle("disabled-btn", btnProximo.disabled);
+        }
+
+
+        function aplicarFiltro() {
+        const termo = input.value.toLowerCase();
+        obrasFiltradas = obras.filter(card => card.dataset.titulo.includes(termo));
+
+        // Verifica se há obra selecionada e posiciona na página correta
+        const selecionado = document.querySelector('.obra-card.selected');
+        if (selecionado) {
+            const indexSelecionado = obrasFiltradas.indexOf(selecionado);
+            if (indexSelecionado !== -1) {
+            pagina = Math.floor(indexSelecionado / porPagina) + 1;
+            } else {
+            pagina = 1; // Se a obra selecionada for excluída pelo filtro
+            }
+        } else {
+            pagina = 1;
+        }
+
+        atualizarLista();
+        }
+
+
+        btnAnterior.addEventListener("click", () => {
+            if (pagina > 1) {
+            pagina--;
+            atualizarLista();
+            }
+        });
+
+        btnProximo.addEventListener("click", () => {
+            if (pagina * porPagina < obrasFiltradas.length) {
+            pagina++;
+            atualizarLista();
+            }
+        });
+
+        input.addEventListener("input", aplicarFiltro);
+
+        aplicarFiltro(); // inicializa
+        });
 
 // Selecionar todos os capítulos
 function selecionarTodos(checkbox) {

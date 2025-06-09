@@ -104,7 +104,7 @@ while ($manga = $resultmangas->fetch_assoc()) {
 
     <div class="manga-grid" id="manga-list">
         <?php foreach ($mangas_com_capitulos as $index => $manga): ?>
-            <div class="manga-card" data-generos="<?php echo strtolower($manga['generos_string']); ?>" style="display: <?php echo $index < 14 ? 'block' : 'none'; ?>">
+            <div class="manga-card" data-generos="<?php echo strtolower($manga['generos_string']); ?>" style="display: <?php echo $index < 20 ? 'block' : 'none'; ?>">
                 <a href="/arenaread/<?php echo $manga['link']; ?>">
                     <img src="<?php echo $manga['capa']; ?>" alt="<?php echo $manga['titulo']; ?>">
                 </a>

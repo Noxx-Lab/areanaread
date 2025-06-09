@@ -5,7 +5,7 @@ include("config.php");
 $pesquisa = isset($_GET["pesquisa"]) ? $_GET["pesquisa"] :"";
 if(strlen($pesquisa) < 1) exit;
 
-$sql_pesquisa = "Select id_manga, titulo, capa, status from mangas where titulo like ?  limit 7";
+$sql_pesquisa = "Select id_manga, titulo, capa, status,link from mangas where titulo like ?  limit 7";
 $stmt_pesquisa = $ligaDB->prepare($sql_pesquisa);
 $pesquisa = "%$pesquisa%";
 $stmt_pesquisa->bind_param("s", $pesquisa);
@@ -18,7 +18,7 @@ if($result_pesquisa->num_rows == 0) {
 }       
 while($obra = $result_pesquisa->fetch_assoc()){
     $id_manga = $obra["id_manga"];
-    $contar = contar($ligaDB,$id_manga);
+    $contar = contar($ligaDB,$id_manga, "cap_por_obra");
 
 
     $generos = [];
@@ -28,8 +28,8 @@ while($obra = $result_pesquisa->fetch_assoc()){
     }
     $generos_str = implode(", ",$generos);
     ?>
-    <div class="search-item" onclick="window.location.href='capa.php?id=<?= $obra['id_manga'] ?>'">
-        <img src="<?= htmlspecialchars($obra['capa']) ?>" class="search-cover" alt="Capa">
+    <div class="search-item" onclick="window.location.href='/arenaread/<?php echo $obra['link']; ?>'">
+    <img src="<?= htmlspecialchars($obra['capa']) ?>" class="search-cover" alt="Capa">
         <div class="search-info">
             <div class="search-title"><?php echo htmlspecialchars($obra['titulo']) ?></div>
             <div class="search-status"><?php echo htmlspecialchars($obra['status']) ?> . Cap. <?php echo $contar ?></div>
