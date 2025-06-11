@@ -51,14 +51,14 @@
         <?php endif; ?>
         <div class="user-dropdown">
         <span class="user-name">Olá, <?php echo htmlspecialchars($_SESSION['nome']) ?></span>
-        <form action="logout.php" method="POST" class="logout-form">
+        <form action="/arenaread/logout.php" method="POST" class="logout-form">
             <button type="submit" class="nav-btn logout-btn">Logout</button>
         </form>
     </div>
     </div>
     <?php else: ?>
-        <a href="login.php" class="nav-btn">Login</a>
-        <a href="sign_up.php" class="nav-btn">Sign Up</a>
+        <a href="/arenaread/login.php" class="nav-btn">Login</a>
+        <a href="/arenaread/sign_up.php" class="nav-btn">Sign Up</a>
     <?php endif; ?>
     </div>
 

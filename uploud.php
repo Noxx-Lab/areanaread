@@ -69,21 +69,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
         continue;
       }
 
-      if (in_array($extensao, ['jpg', 'jpeg', 'png'])) {
-        $temp_convertido = converte_webp($tempFile, $nomeArquivo, $extensao);
-        if ($temp_convertido !== false) {
-          $tempFile = $temp_convertido;
-        }
-
-        $upload = $uploadApi->upload($tempFile, [
-          "folder" => "mangas/$nomeManga/capitulo-$num_capitulo/",
-          "format" => "webp"
-        ]);
-      } else {
         $upload = $uploadApi->upload($tempFile, [
           "folder" => "mangas/$nomeManga/capitulo-$num_capitulo/"
         ]);
-      }
 
       if (!isset($upload["secure_url"])) {
         $_SESSION['mensagem'] = "<p class='erro'> Upload cancelado! Erro no Cloudinary para '$nomeArquivo'</p>";
@@ -196,6 +184,80 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
 </div>
 
 <script>
+
+let submitButton = null;
+
+document.addEventListener("DOMContentLoaded", function () {
+  submitButton = document.getElementById("submit-btn");
+
+  document.getElementById('formUpload').addEventListener('submit', async function (event) {
+    event.preventDefault(); // Impede envio imediato
+    const input = document.getElementById('file-upload');
+    const files = input.files;
+
+    if (!files.length) return;
+
+    const dataTransfer = new DataTransfer(); // Novo conjunto de ficheiros
+
+    for (const file of files) {
+      const ext = file.name.split('.').pop().toLowerCase();
+
+      if (['jpg', 'jpeg', 'png'].includes(ext)) {
+        const converted = await convertToWebP(file);
+        if (converted) {
+          dataTransfer.items.add(converted);
+        } else {
+          dataTransfer.items.add(file); // fallback
+        }
+      } else {
+        dataTransfer.items.add(file);
+      }
+    }
+
+    input.files = dataTransfer.files;
+
+    // Espera curta para garantir DOM atualizado
+    setTimeout(() => {
+      submitButton.disabled = true;
+      this.submit();
+    }, 100);
+  });
+});
+
+async function convertToWebP(file) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const img = new Image();
+      img.onload = function () {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+
+        canvas.toBlob((blob) => {
+          if (!blob) {
+            console.warn('Falha ao converter para WebP:', file.name);
+            resolve(null);
+            return;
+          }
+          const webpFile = new File([blob], file.name.split('.')[0] + '.webp', {
+            type: 'image/webp'
+          });
+          resolve(webpFile);
+        }, 'image/webp', 1);
+      };
+      img.onerror = () => {
+        console.warn('Erro ao carregar imagem:', file.name);
+        resolve(null);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   const obras = Array.from(document.querySelectorAll(".obra-card"));
   const obrasContainer = document.getElementById("obras-container");
@@ -349,7 +411,6 @@ if (selecionado) {
     atualizarLista();
   }
 }
-
 
 </script>
 
