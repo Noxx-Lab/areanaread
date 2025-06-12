@@ -111,7 +111,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             <form action="adicionar_capitulo.php?id_manga=<?php echo $id_manga; ?>" method="post">
                 <input type="hidden" name="id_manga" value="<?php echo $id_manga; ?>">
-                <input type="number" name="num_capitulo" placeholder="Número do Capítulo Ex: 1, 2, 3..." required>
+                <input type="number" name="num_capitulo" min="0" placeholder="Número do Capítulo Ex: 1, 2, 3" required>
                 <button type="submit">Adicionar Capítulo</button>
             </form>
         </div>

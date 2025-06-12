@@ -28,6 +28,8 @@ $obra_sem_capitulos = $id_manga_selecionado && empty($capitulos);
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id_manga = intval($_POST['id_manga'] ?? 0);
 
+    $link = buscar_obra_mais($ligaDB, $id_manga)["link"]; 
+
     // Eliminar obra completa
     if (isset($_POST["acao"]) && $_POST["acao"] === "eliminar_obra") {
         
@@ -45,18 +47,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($result_capa){
           $public_ids[] =  extrairPublicId($result_capa, "capa");
         }
-        
-        //Elimina do Cloudinary a capa e as páginas da obra selecionada
-        if(!empty($public_ids)) {
-          try {
-            $adminApi->deleteAssets($public_ids);
+
+        // Elimina do Cloudinary a capa e as páginas da obra selecionada
+        try {
+          // 1. Deletar páginas por prefixo da obra
+          $prefixoPaginas = "mangas/$link"; // Ex: mangas/solo-leveling
+          $adminApi->deleteAssetsByPrefix($prefixoPaginas, [
+            "resource_type" => "image"
+          ]);
+
+          // 2. Deletar capa da pasta "capas" (se for organizada assim)
+          if (!empty($result_capa)) {
+            $publicIdCapa = extrairPublicId($result_capa, "capa");
+            if ($publicIdCapa) {
+              $adminApi->deleteAssets([$publicIdCapa], [
+                "resource_type" => "image"
+              ]);
+            }
           }
-          catch (Exception $e) {
-            error_log("Erro ao apagar assets: ".$e->getMessage());
-          }
+        } catch (Exception $e) {
+          error_log("Erro ao apagar assets com prefixo: " . $e->getMessage());
         }
 
-        $delete = eliminar($ligaDB,$id_manga, "obra");
+
+
+    $delete = eliminar($ligaDB,$id_manga, "obra");
         if ($delete === true) {
             $_SESSION['mensagem'] = "<p class = 'sucesso'> Obra eliminada com sucesso!";
         } else {
@@ -75,21 +90,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             //Busca todas as páginas da obra
             $result_imgs = buscar_pagina($ligaDB,null,$id_capitulo,"array");
     
-            $public_ids = [];
-            foreach($result_imgs as $paginas){
-              $public_ids[] = extrairPublicId($paginas["caminho_pagina"]);
+            $prefixos = [];
+            foreach ($result_imgs as $paginas) {
+              $prefixo = extrairPublicId($paginas["caminho_pagina"]);
+              if (!in_array($prefixo, $prefixos)) {
+                $prefixos[] = $prefixo;
+              }
             }
-            
-            foreach ($public_ids as $prefixo) {
-                $recursos = $adminApi->assets([
-                    "type" => "upload",
-                    "prefix" => $prefixo
+
+
+      foreach ($prefixos as $prefixo) {
+              try {
+                $adminApi->deleteAssetsByPrefix($prefixo, [
+                    "resource_type" => "image"
                 ]);
-                $publics = array_map(fn($r) => $r['public_id'], $recursos['resources']);
-                if (!empty($publics)) {
-                    $adminApi->deleteAssets($publics);
-                }
+            } catch (Exception $e) {
+                error_log("Erro ao apagar prefixo $prefixo: " . $e->getMessage());
             }
+        }
     
             $delete_capitulo = eliminar($ligaDB,$id_capitulo,"capitulo");
     

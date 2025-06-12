@@ -57,10 +57,9 @@ function extrairPublicId($url, $modo = 'pagina') {
         return $semVersao; // ex: capas/php52FC
     }
 
-    // Remove "vXXXXXX/" (a versão do cloudinary)
     $semVersao = preg_replace('#^v\d+/#', '', $semUpload);
-    // Remove extensão (.jpg, .webp, .png, ...)
-    $semVersao = preg_replace('/\.[a-zA-Z0-9]+$/', '', $semVersao);
+    $semVersao = preg_replace('#/[^/]+$#', '', $semVersao); // remove filename
+
 
     return $semVersao;
 }

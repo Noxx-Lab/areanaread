@@ -43,10 +43,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
     $num_capitulo = buscar_capitulos_manga($ligaDB,null, $id_capitulo, 'normal')["num_capitulo"];
 
     // Buscar o nome do mangá no banco de dados
-    $buscar_titulo = buscar_obra_mais($ligaDB,$id_manga)["titulo"];    
+    $link = buscar_obra_mais($ligaDB,$id_manga)["link"];    
 
     // Formatar o nome do mangá para URL para a Cloudinary  
-    $nomeManga = strtolower(str_replace(' ', '-', preg_replace('/[^A-Za-z0-9 ]/', '', $buscar_titulo)));
+    
     $arquivos = $_FILES['files']; 
     $totalArquivos = count($arquivos['name']);
 
@@ -70,7 +70,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
       }
 
         $upload = $uploadApi->upload($tempFile, [
-          "folder" => "mangas/$nomeManga/capitulo-$num_capitulo/"
+          "folder" => "mangas/$link/capitulo-$num_capitulo/"
         ]);
 
       if (!isset($upload["secure_url"])) {
@@ -185,78 +185,86 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
 
 <script>
 
-let submitButton = null;
-
 document.addEventListener("DOMContentLoaded", function () {
-  submitButton = document.getElementById("submit-btn");
+  const formulario = document.getElementById("formUpload");
+  const inputFicheiros = document.getElementById("file-upload");
+  const botaoEnviar = document.getElementById("submit-btn");
 
-  document.getElementById('formUpload').addEventListener('submit', async function (event) {
-    event.preventDefault(); // Impede envio imediato
-    const input = document.getElementById('file-upload');
-    const files = input.files;
+  formulario.addEventListener("submit", async function (evento) {
+    evento.preventDefault(); // Impede o envio imediato do formulário
 
-    if (!files.length) return;
+    const ficheirosOriginais = Array.from(inputFicheiros.files);
+    if (ficheirosOriginais.length === 0) return;//Se não tiver nenhum ficheiro bloqueia
 
-    const dataTransfer = new DataTransfer(); // Novo conjunto de ficheiros
+    const novoConjunto = new DataTransfer(); // Novo conjunto de ficheiros
 
-    for (const file of files) {
-      const ext = file.name.split('.').pop().toLowerCase();
+    // Converte todos os ficheiros em paralelo (lote)
+    const ficheirosConvertidos = await Promise.all(
+      ficheirosOriginais.map(async (ficheiro) => {
+        const extensao = ficheiro.name.split(".").pop().toLowerCase();
 
-      if (['jpg', 'jpeg', 'png'].includes(ext)) {
-        const converted = await convertToWebP(file);
-        if (converted) {
-          dataTransfer.items.add(converted);
-        } else {
-          dataTransfer.items.add(file); // fallback
+        if (["jpg", "jpeg", "png"].includes(extensao)) {
+          const convertido = await converterParaWebP(ficheiro);
+          return convertido || ficheiro; // Usa o convertido ou mantém original
         }
-      } else {
-        dataTransfer.items.add(file);
-      }
-    }
 
-    input.files = dataTransfer.files;
+        return ficheiro; // Outros formatos mantêm-se
+      })
+    );
 
-    // Espera curta para garantir DOM atualizado
+    // Adiciona ao novo input
+    ficheirosConvertidos.forEach(f => novoConjunto.items.add(f));
+    inputFicheiros.files = novoConjunto.files;
+
+    // Envia o formulário após pequena espera
     setTimeout(() => {
-      submitButton.disabled = true;
-      this.submit();
+      botaoEnviar.disabled = true;
+      formulario.submit();
     }, 100);
   });
 });
 
-async function convertToWebP(file) {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      const img = new Image();
-      img.onload = function () {
-        const canvas = document.createElement('canvas');
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
+// Função para converter uma imagem para WebP
+async function converterParaWebP(ficheiro) {
+  return new Promise((resolver) => {
+    const leitor = new FileReader();
+
+    leitor.onload = function (evento) {
+      const imagem = new Image();
+
+      imagem.onload = function () {
+        const canvas = document.createElement("canvas");
+        canvas.width = imagem.width;
+        canvas.height = imagem.height;
+
+        const contexto = canvas.getContext("2d");
+        contexto.drawImage(imagem, 0, 0);
 
         canvas.toBlob((blob) => {
           if (!blob) {
-            console.warn('Falha ao converter para WebP:', file.name);
-            resolve(null);
+            console.warn("Erro ao converter:", ficheiro.name);
+            resolver(null);
             return;
           }
-          const webpFile = new File([blob], file.name.split('.')[0] + '.webp', {
-            type: 'image/webp'
-          });
-          resolve(webpFile);
-        }, 'image/webp', 1);
+
+          const nomeBase = ficheiro.name.split(".")[0];
+          const ficheiroWebP = new File([blob], nomeBase + ".webp", { type: "image/webp" });
+          resolver(ficheiroWebP);
+        }, "image/webp", 0.9);
       };
-      img.onerror = () => {
-        console.warn('Erro ao carregar imagem:', file.name);
-        resolve(null);
+
+      imagem.onerror = () => {
+        console.warn("Erro ao carregar imagem:", ficheiro.name);
+        resolver(null);
       };
-      img.src = e.target.result;
+
+      imagem.src = evento.target.result;
     };
-    reader.readAsDataURL(file);
+
+    leitor.readAsDataURL(ficheiro);
   });
 }
+
 
 document.addEventListener("DOMContentLoaded", function () {
   const obras = Array.from(document.querySelectorAll(".obra-card"));

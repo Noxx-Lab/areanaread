@@ -68,14 +68,14 @@ $sqlCapitulo = "SELECT c.id_capitulos, c.num_capitulo, c.id_manga, m.titulo
 
 
 // Busca capítulos anterior e próximo
-$sqlAnterior = "SELECT id_capitulos, num_capitulo FROM capitulos WHERE id_manga = ? AND num_capitulo < ? ORDER BY num_capitulo DESC LIMIT 1";
+$sqlAnterior = "SELECT c.id_capitulos, c.num_capitulo from capitulos c inner join paginas p on c.id_capitulos = p.id_capitulos  where c.id_manga = ? and c.num_capitulo < ? order by c.num_capitulo DESC LIMIT 1";
 $stmtAnterior = $ligaDB->prepare($sqlAnterior);
 $stmtAnterior->bind_param("ii", $id_manga, $num_capitulo);
 $stmtAnterior->execute();
 $resultAnterior = $stmtAnterior->get_result();
 $capitulo_anterior = $resultAnterior->fetch_assoc();
 
-$sqlProximo = "SELECT id_capitulos, num_capitulo FROM capitulos WHERE id_manga = ? AND num_capitulo > ? ORDER BY num_capitulo ASC LIMIT 1";
+$sqlProximo = "SELECT c.id_capitulos, c.num_capitulo from capitulos c inner join paginas p on c.id_capitulos = p.id_capitulos where c.id_manga = ? and c.num_capitulo > ? order by c.num_capitulo ASC LIMIT 1";
 $stmtProximo = $ligaDB->prepare($sqlProximo);
 $stmtProximo->bind_param("ii", $id_manga, $num_capitulo);
 $stmtProximo->execute();
@@ -83,7 +83,7 @@ $resultProximo = $stmtProximo->get_result();
 $capitulo_proximo = $resultProximo->fetch_assoc();
 
 // Lista de todos os capítulos (para select)
-$sqlCapitulos = "SELECT id_capitulos, num_capitulo FROM capitulos WHERE id_manga = ? Order by num_capitulo DESC";
+$sqlCapitulos = "SELECT DISTINCT c.id_capitulos, c.num_capitulo from capitulos c inner join paginas p on c.id_capitulos = p.id_capitulos where c.id_manga = ? order by c.num_capitulo DESC";
 $stmtCapitulos = $ligaDB->prepare($sqlCapitulos);
 $stmtCapitulos->bind_param("i", $id_manga);
 $stmtCapitulos->execute();
@@ -148,14 +148,14 @@ $total_paginas = count($paginas);
             <?php endforeach; ?>
         </select>    
         <?php if (!empty($capitulo_anterior)): ?>
-            <form action="/arenaread/<?php echo $manga['link'];?>/capitulo-<?php echo $capitulo_anterior['num_capitulo']; ?>" method="post">
+            <form id="form-anterior-capitulo" action="/arenaread/<?php echo $manga['link'];?>/capitulo-<?php echo $capitulo_anterior['num_capitulo']; ?>" method="post">
                 <input type="hidden" name="id_capitulo" value="<?php echo $capitulo_anterior ['id_capitulos'] ?>">
                 <button type="submit" class="nav-button">< Anterior</button>
             </form>
         <?php endif; ?>
 
         <?php if (!empty($capitulo_proximo)): ?>
-            <form action="/arenaread/<?php echo $manga['link'];?>/capitulo-<?php echo $capitulo_proximo['num_capitulo']; ?>" method="post">
+            <form id="form-proximo-capitulo" action="/arenaread/<?php echo $manga['link'];?>/capitulo-<?php echo $capitulo_proximo['num_capitulo']; ?>" method="post">
                 <input type="hidden" name="id_capitulo" value="<?php echo $capitulo_proximo['id_capitulos'] ?>">
                 <button type="submit" class="nav-button">Próximo ></button>
             </form>
@@ -196,7 +196,7 @@ $total_paginas = count($paginas);
     <!-- Botões ao lado direito -->
     <div class="reader-footer-nav">
         <?php if (!empty($capitulo_anterior)): ?>
-            <form action="/arenaread/<?php echo $manga['link'];?>/capitulo-<?php echo $capitulo_anterior['num_capitulo']; ?>" method="post">
+            <form id="form-anterior-capitulo" action="/arenaread/<?php echo $manga['link'];?>/capitulo-<?php echo $capitulo_anterior['num_capitulo']; ?>" method="post">
                 <input type="hidden" name="id_capitulo" value="<?php echo $capitulo_anterior['id_capitulos'] ?>">
                 <button type="submit" class="nav-button">< Anterior</button>
             </form>
@@ -216,6 +216,7 @@ $total_paginas = count($paginas);
 </div>
 
 <script>
+
 function trocarCapitulo(url) {
     window.location.href = url;
 }
@@ -226,6 +227,17 @@ function scrollParaPagina(select) {
         element.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 }
+document.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowLeft") {
+        const formAnterior = document.getElementById("form-anterior-capitulo");
+        if (formAnterior) formAnterior.submit();
+    }
+
+    if (e.key === "ArrowRight") {
+        const formProximo = document.getElementById("form-proximo-capitulo");
+        if (formProximo) formProximo.submit();
+    }
+});
 
 document.addEventListener("DOMContentLoaded", function () {
     // --- Progresso LocalStorage ---

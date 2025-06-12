@@ -50,7 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file']) && !empty($_F
     }
 
     $extensao = strtolower($extensao);
-    $extensoesPermitidas = ['jpg', 'png'];
+    $extensoesPermitidas = ['jpg', 'png',"webp","avif","gif"];
 
     if (!in_array($extensao, $extensoesPermitidas)) {
         die("<p class = 'erro'>❌ Upload cancelado! Formato não permitido: '$nomeArquivo'.</p>");

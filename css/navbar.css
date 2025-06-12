@@ -128,7 +128,7 @@ body {
 .nav-right {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 7px;
     flex: 0 0 auto;
     margin-left: auto; /* força encostar à direita */
 }

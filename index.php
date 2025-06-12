@@ -2,9 +2,6 @@
 include 'config.php';
 include 'navbar.php';
 
-
-
-
 $sql_manga = "SELECT id_manga, titulo, link, sinopse, capa from mangas order by RAND() Desc limit 10";
 $result_manga = $ligaDB->query($sql_manga);
 
@@ -13,15 +10,14 @@ $mangas_carrossel = [];
 $ultimos_mangas = [];
 
 
-$sql_ultimos = "SELECT m.id_manga, m.titulo, m.link, m.capa, m.sinopse from mangas m join capitulos c on m.id_manga = c.id_manga
-group by m.id_manga ORDER BY MAX(c.data_lancamento) Desc limit 10";
+$sql_ultimos = "SELECT m.id_manga, m.titulo, m.link, m.capa, m.sinopse from mangas m join capitulos c on m.id_manga = c.id_manga join paginas p on c.id_capitulos = p.id_capitulos group by m.id_manga order by MAX(c.data_lancamento) DESC LIMIT 15";
 
 $result_ultimos = $ligaDB->query($sql_ultimos);
 
 while ($manga = $result_ultimos->fetch_assoc()){
     $id_manga = $manga['id_manga'];
 
-    $stmt_ultimo = "SELECT DISTINCT c.id_capitulos, c.num_capitulo, c.data_lancamento from capitulos c inner join paginas p on c.id_capitulos = p.id_capitulos where c.id_manga = ? order by c.data_lancamento Desc limit 3";
+    $stmt_ultimo = "SELECT DISTINCT c.id_capitulos, c.num_capitulo, c.data_lancamento from capitulos c inner join paginas p on c.id_capitulos = p.id_capitulos where c.id_manga = ? order by c.data_lancamento DESC, c.num_capitulo ASC limit 3";
     $stmt_capitulo= $ligaDB ->prepare($stmt_ultimo);
     $stmt_capitulo -> bind_param("i", $id_manga);
     $stmt_capitulo -> execute();
@@ -48,12 +44,6 @@ while ($manga = $result_ultimos->fetch_assoc()){
     }
 
     $manga['generos'] = $generos;
-
-
-    $capitulos = [];
-    while ($cap = $capitulos_result->fetch_assoc()) {
-        $capitulos[] = $cap;
-    }
 
     
     $manga['total_capitulos'] = contar($ligaDB, $id_manga,"cap_por_obra");

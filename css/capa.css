@@ -156,8 +156,3 @@ body {
     transition: background 0.3s;
 }
 
-.genero-tag:hover {
-    background-color: #6a5acd;
-    color: #111;
-}
-
