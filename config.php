@@ -184,12 +184,20 @@ function contar ($ligaDB, $id = null, $modo){
         $result_count = $stmt_count->get_result();
         return $capitulos = $result_count->fetch_assoc()['total'];}
     if($modo === 'pag_por_cap'){
+        //para verificar se o capitulo tem páginas para o utilizador não ver capitulos vazios
         $sql_count_pag = "SELECT COUNT(*) as total from paginas where id_capitulos = ?";
         $stmt_count_pag = $ligaDB->prepare($sql_count_pag);
         $stmt_count_pag->bind_param("i", $id);
         $stmt_count_pag->execute();
         $result = $stmt_count_pag->get_result();
         return $result->fetch_assoc()['total'] > 0; // true se tem páginas
+    }
+    if($modo === "obra_com_pag"){
+        //Conta quantar obras têm páginas 
+        $sql_total = "SELECT count(DISTINCT m.id_manga) as total from mangas m join capitulos c on m.id_manga = c.id_manga join paginas p on c.id_capitulos = p.id_capitulos";
+        $stmt_total = $ligaDB->prepare($sql_total);
+        $stmt_total->execute();
+        return $result_total = $stmt_total->get_result()->fetch_assoc()["total"];
     }
 }
 
