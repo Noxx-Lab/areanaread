@@ -129,7 +129,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["editar"])) {
         }
     }
     $_SESSION["mensagem"] = "<p class='sucesso'>Obra atualizado com sucesso! </p>";
-    header("Location: editar.php?id_manga=$id_manga");
+    header("Location: editar.php");
     exit;
 }
 ?>
@@ -147,34 +147,32 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["editar"])) {
 
 <body>
     <div class="container">
+        <h2 class="titulo-pagina"> Editar Obra</h2>
         <?php if ($mensagem): ?>
-            <div class="mensagem"><?php echo $mensagem; ?></div>
+        <div class="mensagem"><?php echo $mensagem; ?></div>
         <?php endif; ?>
 
-        <h2 class="titulo-pagina"> Editar Obra</h2>
+        <h3>Selecione uma Obra</h3>
+        <form method="POST" id="selecionar-obra-form" action="">
+        <input type="text" id="filtro-obras" placeholder="Pesquisar obras" class="barra-pesquisa">
 
-            <!-- Mangas para seleção -->
-            <h3>Selecione uma Obra</h3>
-            <form method="post" id="selecionar-obra-form">
-            <input type="text" id="filtro-obras" placeholder="Pesquisar obras" class="barra-pesquisa">
-                <div id="obras-container" class="obras-grid">
-                    <?php foreach ($obras as $obra): ?>
-                        <label class="obra-card <?= $id_manga_selecionado == $obra['id_manga'] ? 'selected' : '' ?>"
-                            data-titulo="<?= strtolower($obra['titulo']) ?>" style="display: none;">
-                            <input type="radio" name="id_manga" value="<?php echo $obra['id_manga'] ?>" style="display: none"
-                                <?php if ($id_manga_selecionado == $obra['id_manga']) echo "checked"; ?>
-                                onchange="document.getElementById('selecionar-obra-form').submit();">
-                            <img src="<?php echo htmlspecialchars($obra['capa']) ?>"alt="<?php echo htmlspecialchars($obra['titulo']) ?>">
-                            <span><?php echo htmlspecialchars($obra['titulo']) ?></span>
-                        </label>
-                    <?php endforeach; ?>
-                </div>
-                <div class="navegacao">
-                    <button type="button" id="anterior">&#8592;</button>
-                    <span id="pagina-atual">1</span>
-                    <button type="button" id="proximo">&#8594;</button>
-                </div>
-            </form>
+        <div id="obras-container" class="obras-grid">
+            <?php foreach ($obras as $obra): ?>
+                    <label class="obra-card <?= $id_manga_selecionado == $obra['id_manga'] ? 'selected' : '' ?>"
+                        data-titulo="<?= strtolower($obra['titulo']) ?>" style="display: none;">
+                        <input type="radio" name="id_manga" value="<?= $obra['id_manga'] ?>" style="display: none">
+                        <img src="<?= $obra['capa'] ?>" alt="<?= htmlspecialchars($obra['titulo']) ?>">
+                        <span><?= htmlspecialchars($obra['titulo']) ?></span>
+                    </label>
+                <?php endforeach; ?>
+            </div>
+        
+            <div class="navegacao">
+                <button type="button" id="anterior">&#8592;</button>
+                <span id="pagina-atual">1</span>
+                <button type="button" id="proximo">&#8594;</button>
+            </div>
+        </form>
 
         <!-- Formulario e a capa da obra selecionada ao lado -->
         <?php if ($campos_obra): ?>
@@ -182,7 +180,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["editar"])) {
                 <div class="capa-editar">
                     <img src="<?php echo $campos_obra["capa"] ?>" alt="Capa atual do manga">
                 </div>
-                <form class="edit-form" method="post" enctype="multipart/form-data">
+                <form id="edit-form" class="edit-form" method="post" enctype="multipart/form-data">
                     <input type="hidden" name="id_manga" value="<?php echo $campos_obra["id_manga"] ?>">
                     <input type="hidden" name="capa_antiga" value="<?php echo htmlspecialchars($campos_obra["capa"]) ?>">
 
@@ -267,87 +265,102 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["editar"])) {
                             Capa</span>
                     </label>
                     <input type="file" name="nova_capa" id="file-upload">
-
-                    <button type="submit" name="editar" class="btn-editar">Guardar Alterações</button>
+                    <button type="submit" id="submit-btn" name="editar" class="btn-editar">Guardar Alterações</button>
+                    <div class="loading-spinner" id="loading-spinner" style="display: none;"></div>
                 </form>
+
             </div>
         <?php endif; ?>
     </div>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-        const obras = Array.from(document.querySelectorAll(".obra-card"));
-        const obrasContainer = document.getElementById("obras-container");
-        const input = document.getElementById("filtro-obras");
-        const btnAnterior = document.getElementById("anterior");
-        const btnProximo = document.getElementById("proximo");
-        const spanPagina = document.getElementById("pagina-atual");
+<script>
+//O que faz o loading
+document.addEventListener("DOMContentLoaded", function () {
+            let formUpload = document.getElementById("edit-form");
+            let submitButton = document.getElementById("submit-btn");
+            let loadingSpinner = document.getElementById("loading-spinner");
+            let mensagemDiv = document.querySelector(".mensagem");
 
-        let pagina = 1;
-        const porPagina = 7;
-        let obrasFiltradas = obras;
+            formUpload.addEventListener("submit", function(event) {
+                // Oculta mensagens anteriores
+                mensagemDiv.innerHTML = "";
 
-        function atualizarLista() {
-        const inicio = (pagina - 1) * porPagina;
-        const fim = inicio + porPagina;
-
-        // Oculta todos os cards
-        obras.forEach(card => card.style.display = "none");
-
-        // Mostra os da página atual
-        obrasFiltradas.slice(inicio, fim).forEach(card => card.style.display = "block");
-
-        // Atualiza número
-        spanPagina.textContent = pagina;
-
-        // Desabilita ou ativa os botões conforme necessário
-        btnAnterior.disabled = pagina === 1;
-        btnProximo.disabled = pagina * porPagina >= obrasFiltradas.length;
-
-        // Aplica/remover classe para visual desativado
-        btnAnterior.classList.toggle("disabled-btn", btnAnterior.disabled);
-        btnProximo.classList.toggle("disabled-btn", btnProximo.disabled);
-        }
-
-
-        function aplicarFiltro() {
-        const termo = input.value.toLowerCase();
-        obrasFiltradas = obras.filter(card => card.dataset.titulo.includes(termo));
-
-        // Verifica se há obra selecionada e posiciona na página correta
-        const selecionado = document.querySelector('.obra-card.selected');
-        if (selecionado) {
-            const indexSelecionado = obrasFiltradas.indexOf(selecionado);
-            if (indexSelecionado !== -1) {
-            pagina = Math.floor(indexSelecionado / porPagina) + 1;
-            } else {
-            pagina = 1; // Se a obra selecionada for excluída pelo filtro
-            }
-        } else {
-            pagina = 1;
-        }
-
-        atualizarLista();
-        }
-
-
-        btnAnterior.addEventListener("click", () => {
-            if (pagina > 1) {
-            pagina--;
-            atualizarLista();
-            }
+                // Desativa o botão de envio
+                submitButton.disabled = true;
+                submitButton.innerHTML = "Editando...";
+                
+                // Exibe o spinner de loading
+                loadingSpinner.style.display = "block";
+            });
         });
+document.addEventListener("DOMContentLoaded", function () {
+  const obras = Array.from(document.querySelectorAll(".obra-card"));
+  const obrasContainer = document.getElementById("obras-container");
+  const input = document.getElementById("filtro-obras");
+  const btnAnterior = document.getElementById("anterior");
+  const btnProximo = document.getElementById("proximo");
+  const spanPagina = document.getElementById("pagina-atual");
 
-        btnProximo.addEventListener("click", () => {
-            if (pagina * porPagina < obrasFiltradas.length) {
-            pagina++;
-            atualizarLista();
-            }
-        });
+  let pagina = 1;
+  const porPagina = 7;
+  let obrasFiltradas = obras;
 
-        input.addEventListener("input", aplicarFiltro);
+  function atualizarLista() {
+    const inicio = (pagina - 1) * porPagina;
+    const fim = inicio + porPagina;
 
-        aplicarFiltro(); // inicializa
-        });
+    obras.forEach(card => card.style.display = "none");
+    obrasFiltradas.slice(inicio, fim).forEach(card => card.style.display = "block");
+
+    spanPagina.textContent = pagina;
+
+    btnAnterior.disabled = pagina === 1;
+    btnProximo.disabled = pagina * porPagina >= obrasFiltradas.length;
+
+    btnAnterior.classList.toggle("disabled-btn", btnAnterior.disabled);
+    btnProximo.classList.toggle("disabled-btn", btnProximo.disabled);
+  }
+
+  function aplicarFiltro() {
+    const termo = input.value.toLowerCase();
+    obrasFiltradas = obras.filter(card => card.dataset.titulo.includes(termo));
+
+    const selecionado = document.querySelector('.obra-card.selected');
+    if (selecionado) {
+      const indexSelecionado = obrasFiltradas.indexOf(selecionado);
+      pagina = indexSelecionado !== -1 ? Math.floor(indexSelecionado / porPagina) + 1 : 1;
+    } else {
+      pagina = 1;
+    }
+
+    atualizarLista();
+  }
+
+  btnAnterior.addEventListener("click", () => {
+    if (pagina > 1) {
+      pagina--;
+      atualizarLista();
+    }
+  });
+
+  btnProximo.addEventListener("click", () => {
+    if (pagina * porPagina < obrasFiltradas.length) {
+      pagina++;
+      atualizarLista();
+    }
+  });
+
+  input.addEventListener("input", aplicarFiltro);
+  aplicarFiltro();
+
+  // Ao mudar a obra, submete imediatamente com POST
+  document.querySelectorAll('input[name="id_manga"]').forEach(radio => {
+    radio.addEventListener('change', function () {
+      document.getElementById('selecionar-obra-form').submit();
+    });
+  });
+});
+
+
         // Atualiza o texto do botão ao selecionar um arquivo
         document.getElementById('file-upload').addEventListener('change', function () {
             let fileName = this.files[0] ? this.files[0].name : 'Nenhum ficheiro selecionado';
@@ -408,7 +421,26 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["editar"])) {
                 item.style.display = texto.includes(termo) ? "flex" : "none";
             });
         });
-    </script>
+        function selecionarObra(id) {
+            // Cria um campo hidden com o novo id_manga
+            const form = document.getElementById('selecionar-obra-form');
+
+            // Remove o antigo campo id_manga se existir
+            let antigo = form.querySelector('input[name="id_manga"]');
+            if (antigo) antigo.remove();
+
+            // Cria e adiciona o novo campo id_manga
+            let input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "id_manga";
+            input.value = id;
+            form.appendChild(input);
+
+            // Submete o formulário
+            form.submit();
+        }
+
+</script>
 </body>
 
 </html>

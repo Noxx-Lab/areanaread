@@ -128,17 +128,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
 
 <div id="obras-container" class="obras-grid">
   <?php foreach ($obras as $obra): ?>
-    <label class="obra-card <?= $id_manga_selecionado == $obra['id_manga'] ? 'selected' : '' ?>"
-      data-titulo="<?= strtolower($obra['titulo']) ?>" style="display: none;">
+    <label class="obra-card <?php echo $id_manga_selecionado == $obra['id_manga'] ? 'selected' : '' ?>"
+      data-titulo="<?php echo strtolower($obra['titulo']) ?>" style="display: none;">
 
-      <input type="radio" name="id_manga" value="<?= $obra['id_manga'] ?>" style="display:none"
-        <?= ($id_manga_selecionado == $obra['id_manga']) ? 'checked' : '' ?>
+      <input type="radio" name="id_manga" value="<?php echo $obra['id_manga'] ?>" style="display:none"
+        <?php echo ($id_manga_selecionado == $obra['id_manga']) ? 'checked' : '' ?>
         onchange="this.form.submit();">
-      <img src="<?= htmlspecialchars($obra['capa']) ?>" alt="<?= htmlspecialchars($obra['titulo']) ?>">
-      <span><?= htmlspecialchars($obra['titulo']) ?></span>
+      <img src="<?php echo htmlspecialchars($obra['capa']) ?>" alt="<?php echo htmlspecialchars($obra['titulo']) ?>">
+      <span><?php echo htmlspecialchars($obra['titulo']) ?></span>
     </label>
   <?php endforeach; ?>
-
 </div>
 
 <div class="navegacao">
