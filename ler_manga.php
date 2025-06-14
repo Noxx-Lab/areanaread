@@ -215,6 +215,12 @@ $total_paginas = count($paginas);
     </button>
 </div>
 
+<footer class="footer">
+  <p><a href="termos.php">Termos e Condições</a> | 
+     <a href="privacidade.php">Política de Privacidade</a></p>
+  <p>Contacto: arenaread.devv@gmail.com</a></p>
+</footer>
+
 <script>
 
 function trocarCapitulo(url) {

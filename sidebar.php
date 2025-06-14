@@ -27,9 +27,6 @@ $pagina_atual = $pagina_atual ?? "";
             <a href="eliminar.php" class="<?php echo $pagina_atual === "eliminar" ? "active" : "" ?>">Eliminar</a>
         <?php endif; ?>
 
-        <?php if (isset($_SESSION['rank']) && $_SESSION['rank'] === 'admin'): ?>
-            <a href="conta.php" class="<?php echo $pagina_atual === "conta" ? "active" : "" ?>">Conta</a>
-        <?php endif; ?>
     </div>
 </div>
     

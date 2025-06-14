@@ -160,6 +160,11 @@ while ($manga = $result_ultimos->fetch_assoc()){
   <?php endif; ?>
 </div>
 
+<footer class="footer">
+  <p><a href="termos.php">Termos e Condições</a> | 
+     <a href="privacidade.php">Política de Privacidade</a></p>
+  <p>Contacto: arenaread.devv@gmail.com</a></p>
+</footer>
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {

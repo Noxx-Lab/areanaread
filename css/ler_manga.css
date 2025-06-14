@@ -186,6 +186,25 @@ body {
     opacity: 1;
 }
 
+.footer {
+    text-align: center;
+    padding: 15px;
+    font-size: 14px;
+    background-color: #2e2e2e;
+    color: #c5c4c4;
+  }
+  
+  .footer a {
+    color: #a8a8a8;
+    text-decoration: none;
+    margin: 0 5px;
+  }
+  
+  .footer a:hover {
+    text-decoration: underline;
+  }
+  
+
 @media (max-width: 768px) {
     .reader-header h1 {
         font-size: 28px;

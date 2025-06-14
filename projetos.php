@@ -119,6 +119,12 @@ while ($manga = $resultmangas->fetch_assoc()) {
     <div id="linha-divisoria" class="linha-divisoria" style="display: none;"></div>
     <button id="carregarMais" class="botao-carregar">CARREGUE MAIS</button>
 
+    <footer class="footer">
+  <p><a href="termos.php">Termos e Condições</a> | 
+     <a href="privacidade.php">Política de Privacidade</a></p>
+  <p>Contacto: arenaread.devv@gmail.com</a></p>
+</footer>
+
     <script>
 document.addEventListener("DOMContentLoaded", function () {
     const cards = document.querySelectorAll('.manga-card');

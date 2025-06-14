@@ -158,3 +158,21 @@ body {
     margin-right: 5px;
 }
 
+.footer {
+    text-align: center;
+    padding: 15px;
+    font-size: 14px;
+    background-color: #2e2e2e;
+    color: #c5c4c4;
+  }
+  
+  .footer a {
+    color: #a8a8a8;
+    text-decoration: none;
+    margin: 0 5px;
+  }
+  
+  .footer a:hover {
+    text-decoration: underline;
+  }
+  
