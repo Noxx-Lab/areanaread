@@ -6,13 +6,13 @@ $link = $_GET["manga"] ?? null;
 $generos = [];
 $lidos = [];
 
-// Busca os dados do mangá pelo link amigável
-$consulta = "SELECT * from mangas where link = ?";
-$stmt = $ligaDB->prepare($consulta);
-$stmt->bind_param("s", $link);
-$stmt->execute();
-$result = $stmt->get_result();
-$manga = $result->fetch_assoc();
+// Busca os dados do mangá pelo link
+$manga = buscar_obra_mais($ligaDB,null,$link);
+
+if(!$manga){
+    header("Location:/arenaread/404.php");
+    exit;
+}
 
 // Se o mangá for encontrado, pega o ID
 if ($manga) {
@@ -28,10 +28,7 @@ $stmt_capitulos->execute();
 $result_capitulos = $stmt_capitulos->get_result();
 
 // Busca os géneros do mangá
-$consulta_generos = "SELECT g.nome_genero 
-                     FROM manga_generos mg 
-                     JOIN generos g ON mg.id_genero = g.id_genero 
-                     WHERE mg.id_manga = ?";
+$consulta_generos = "SELECT g.nome_genero from manga_generos mg join generos g ON mg.id_genero = g.id_genero  where mg.id_manga = ?";
 $stmt_generos = $ligaDB->prepare($consulta_generos);
 $stmt_generos->bind_param("i", $id_manga);
 $stmt_generos->execute();

@@ -81,6 +81,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="manga-info">
                 <?php if ($manga): ?>
                 <img src="<?php echo $manga['capa']; ?>" alt="Capa do Mangá">
+                <p><strong>Titulo:</strong> <?php echo $manga['titulo']; ?></p>
                 <p><strong>Tipo:</strong> <?php echo $manga['tipo']; ?></p>
                 <?php endif; ?>
             </div>

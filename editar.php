@@ -158,19 +158,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["editar"])) {
 
         <div id="obras-container" class="obras-grid">
             <?php foreach ($obras as $obra): ?>
-                    <label class="obra-card <?= $id_manga_selecionado == $obra['id_manga'] ? 'selected' : '' ?>"
-                        data-titulo="<?= strtolower($obra['titulo']) ?>" style="display: none;">
-                        <input type="radio" name="id_manga" value="<?= $obra['id_manga'] ?>" style="display: none">
-                        <img src="<?= $obra['capa'] ?>" alt="<?= htmlspecialchars($obra['titulo']) ?>">
-                        <span><?= htmlspecialchars($obra['titulo']) ?></span>
+                    <label class="obra-card <?php echo $id_manga_selecionado == $obra['id_manga'] ? 'selected' : '' ?>"
+                        data-titulo="<?php echo strtolower($obra['titulo']) ?>" style="display: none;">
+                        <input type="radio" name="id_manga" value="<?php echo $obra['id_manga'] ?>" style="display: none">
+                        <img src="<?php echo $obra['capa'] ?>" alt="<?php echo htmlspecialchars($obra['titulo']) ?>">
+                        <span><?php echo htmlspecialchars($obra['titulo']) ?></span>
                     </label>
                 <?php endforeach; ?>
             </div>
         
             <div class="navegacao">
-                <button type="button" id="anterior">&#8592;</button>
+                <button type="button" id="anterior"><i class="bi bi-arrow-left"></i></button>
                 <span id="pagina-atual">1</span>
-                <button type="button" id="proximo">&#8594;</button>
+                <button type="button" id="proximo"><i class="bi bi-arrow-right"></i></button>
             </div>
         </form>
 

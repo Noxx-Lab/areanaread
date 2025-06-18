@@ -89,8 +89,8 @@ while ($manga = $result_ultimos->fetch_assoc()){
         <div class="carousel" id="carousel">
             <?php foreach ($mangas_carrossel as $manga): ?>
                 <div class="carousel-item">
-                    <div class="carousel-content">
-                        <div class="carousel-text">
+                    <div class="carousel-conteudo">
+                        <div class="carousel-texto">
                             <span class="capitulo">Capítulo: <?php echo $manga['total_capitulos']; ?> </span>
                             <h2><?php echo htmlspecialchars($manga['titulo']); ?></h2>
                             <p><?php echo htmlspecialchars($manga['sinopse']); ?></p>
@@ -99,9 +99,9 @@ while ($manga = $result_ultimos->fetch_assoc()){
                                 <span class="genero-tag"><?= htmlspecialchars($genero) ?></span>
                                 <?php endforeach; ?>
                             </div>
-                            <a href="/arenaread/<?php echo $manga['link']; ?>" class="read-button">Leia agora</a>
+                            <a href="/arenaread/<?php echo $manga['link']; ?>" class="botao-ler">Leia agora</a>
                         </div>
-                        <div class="carousel-image">
+                        <div class="carousel-imagem">
                             <img src="<?php echo $manga['capa']; ?>" alt="<?php echo htmlspecialchars($manga['titulo']); ?>">
                         </div>
                     </div>
@@ -109,7 +109,7 @@ while ($manga = $result_ultimos->fetch_assoc()){
             <?php endforeach; ?>
         </div>
     </div>
-    <div class="carousel-indicators" id="carousel-indicators"></div>
+    <div class="carousel-indicadores" id="carousel-indicadores"></div>
 </div>
 <section class="atualizacoes-container">
     <h2 class="titulo-atualizacoes">Últimas Atualizações</h2>
@@ -126,7 +126,7 @@ while ($manga = $result_ultimos->fetch_assoc()){
                     <img src="<?php echo $manga['capa']; ?>" alt="<?php echo htmlspecialchars($manga['titulo']); ?>">
                 </a>
                 <h3 class="titulo-manga" title="<?php echo htmlspecialchars($manga['titulo']) ?>">
-                    <?= htmlspecialchars($manga['titulo']) ?>
+                    <?php echo htmlspecialchars($manga['titulo']) ?>
                 </h3>
                 <ul class="capitulos-lista">
                     <?php foreach ($manga['capitulos'] as $cap): ?>
@@ -170,10 +170,10 @@ while ($manga = $result_ultimos->fetch_assoc()){
 document.addEventListener("DOMContentLoaded", function () {
     const carousel = document.getElementById("carousel");
     const items = document.querySelectorAll(".carousel-item");
-    const indicators = document.getElementById("carousel-indicators");
+    const indicadores = document.getElementById("carousel-indicadores");
     let index = 0;
     const total = items.length;
-    let interval;
+    let intervalo;
 
     carousel.style.width = `${total * 100}%`;
     items.forEach(item => item.style.flex = `0 0 ${100 / total}%`);
@@ -187,7 +187,7 @@ document.addEventListener("DOMContentLoaded", function () {
             updateCarousel();
             resetAutoplay();
         });
-        indicators.appendChild(dot);
+        indicadores.appendChild(dot);
     }
 
     function updateCarousel() {
@@ -204,11 +204,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function resetAutoplay() {
-        clearInterval(interval);
-        interval = setInterval(autoplay, 6000);
+        clearInterval(intervalo);
+        intervalo = setInterval(autoplay, 6000);
     }
 
-    interval = setInterval(autoplay, 6000);
+    intervalo = setInterval(autoplay, 6000);
 
     let startX = 0;
     let endX = 0;
@@ -259,8 +259,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
-
-
 
 </script>
 

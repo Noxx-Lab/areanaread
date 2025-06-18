@@ -20,13 +20,13 @@ unset($_SESSION['mensagem']);
 
 $obras = buscar_obra($ligaDB);
 
-// Verifica se um mangá foi selecionado para buscar os capítulos
+// Verifica se uma obra foi selecionado para buscar os capítulos
 $id_manga_selecionado = isset($_GET['id_manga']) ? $_GET['id_manga'] : (isset($_POST['id_manga']) ? $_POST['id_manga'] : null);
 
 
 $capitulos = [];
 
-// Se houver um mangá selecionado, busca os capítulos desse mangá
+// Se houver uma obra selecionado, busca os capítulos desse obra
 if ($id_manga_selecionado) {
     $capitulos = buscar_capitulos_manga($ligaDB,$id_manga_selecionado,null,'array');
 }
@@ -38,14 +38,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
     $id_capitulo = $_POST["id_capitulo"];
 
     
-
-    
     $num_capitulo = buscar_capitulos_manga($ligaDB,null, $id_capitulo, 'normal')["num_capitulo"];
 
-    // Buscar o nome do mangá no banco de dados
+    // Buscar o nome da obra no banco de dados
     $link = buscar_obra_mais($ligaDB,$id_manga)["link"];    
-
-    // Formatar o nome do mangá para URL para a Cloudinary  
+  
     
     $arquivos = $_FILES['files']; 
     $totalArquivos = count($arquivos['name']);
@@ -70,7 +67,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
       }
 
         $upload = $uploadApi->upload($tempFile, [
-          "folder" => "mangas/$link/capitulo-$num_capitulo/"
+          "folder" => "mangas/$link/capitulo-$num_capitulo/",
+          "resource_type" => "image"
         ]);
 
       if (!isset($upload["secure_url"])) {
@@ -141,9 +139,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
 </div>
 
 <div class="navegacao">
-  <button type="button" id="anterior">&#8592;</button>
+  <button type="button" id="anterior"><i class="bi bi-arrow-left"></i></button>
   <span id="pagina-atual">1</span>
-  <button type="button" id="proximo">&#8594;</button>
+  <button type="button" id="proximo"><i class="bi bi-arrow-right"></i></button>
 </div>
 
   <?php if ($id_manga_selecionado): ?>
@@ -185,19 +183,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
 <script>
 
 document.addEventListener("DOMContentLoaded", function () {
+  //Vai buscar o formulario do upload
   const formulario = document.getElementById("formUpload");
+  //O campo dos ficheros selecionados
   const inputFicheiros = document.getElementById("file-upload");
+  //O botão de enviar os ficheiros
   const botaoEnviar = document.getElementById("submit-btn");
-
+  //Quando alguém tentar enviar o formulário, impede o envio automático para poder tratar as imagens primeiro.
   formulario.addEventListener("submit", async function (evento) {
-    evento.preventDefault(); // Impede o envio imediato do formulário
-
+    evento.preventDefault(); 
+    // Guarda os ficheiros escolhidos pelo utilizador
     const ficheirosOriginais = Array.from(inputFicheiros.files);
     if (ficheirosOriginais.length === 0) return;//Se não tiver nenhum ficheiro bloqueia
 
-    const novoConjunto = new DataTransfer(); // Novo conjunto de ficheiros
+    //Cria um novo "conjunto" onde vão ficar as imagens já convertidas.
+    const novoConjunto = new DataTransfer();
 
-    // Converte todos os ficheiros em paralelo (lote)
+    // Converte todos os ficheiros .jpg, .jpeg ou .png, tenta convertê-la para .webp em paralelo (lote).
     const ficheirosConvertidos = await Promise.all(
       ficheirosOriginais.map(async (ficheiro) => {
         const extensao = ficheiro.name.split(".").pop().toLowerCase();
@@ -211,11 +213,11 @@ document.addEventListener("DOMContentLoaded", function () {
       })
     );
 
-    // Adiciona ao novo input
+    // Substitui os ficheiros antigos pelos novos (convertidos) no campo de upload.
     ficheirosConvertidos.forEach(f => novoConjunto.items.add(f));
     inputFicheiros.files = novoConjunto.files;
 
-    // Envia o formulário após pequena espera
+    // Depois de uma pequena pausa, envia o formulário normalmente e desativa o botão para evitar duplo clique.
     setTimeout(() => {
       botaoEnviar.disabled = true;
       formulario.submit();
@@ -228,6 +230,7 @@ async function converterParaWebP(ficheiro) {
   return new Promise((resolver) => {
     const leitor = new FileReader();
 
+    // Cria um "quadro" virtual (canvas), desenha a imagem original nesse quadro.
     leitor.onload = function (evento) {
       const imagem = new Image();
 
@@ -239,6 +242,7 @@ async function converterParaWebP(ficheiro) {
         const contexto = canvas.getContext("2d");
         contexto.drawImage(imagem, 0, 0);
 
+        // Tenta converter essa imagem desenhada para .webp. Se falhar, mostra um aviso e devolve null.
         canvas.toBlob((blob) => {
           if (!blob) {
             console.warn("Erro ao converter:", ficheiro.name);
@@ -246,12 +250,13 @@ async function converterParaWebP(ficheiro) {
             return;
           }
 
+          // Se conseguir, cria um novo ficheiro com o mesmo nome mas extensão .webp.
           const nomeBase = ficheiro.name.split(".")[0];
           const ficheiroWebP = new File([blob], nomeBase + ".webp", { type: "image/webp" });
           resolver(ficheiroWebP);
         }, "image/webp", 0.9);
       };
-
+      //Garante que a imagem foi carregada corretamente antes da conversão. Lê a imagem como URL temporário para poder ser processada no browser.
       imagem.onerror = () => {
         console.warn("Erro ao carregar imagem:", ficheiro.name);
         resolver(null);

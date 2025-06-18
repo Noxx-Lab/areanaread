@@ -48,8 +48,6 @@ foreach($obra_genero as $genero_obra){
     $total_genero [] = $genero_obra["total"];
 }
 
-//Informação das contas de todos os utilizadores 
-$user_info = $ligaDB->query("SELECT email, rank from users group by rank")->fetch_all(MYSQLI_ASSOC);
 
 //Quantidade total de utilizadores registados no site
 $total_users = $ligaDB->query("SELECT count(*) as total from users")->fetch_assoc();

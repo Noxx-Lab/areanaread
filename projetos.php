@@ -130,12 +130,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const cards = document.querySelectorAll('.manga-card');
     const btn = document.getElementById('carregarMais');
     const linha = document.getElementById('linha-divisoria');
-    let visiveis = 14;
+    let visiveis = 20;
 
     // Botão "Carregar mais"
     btn.addEventListener('click', function () {
         let mostrados = 0;
-        for (let i = visiveis; i < cards.length && mostrados < 14; i++) {
+        for (let i = visiveis; i < cards.length && mostrados < 20; i++) {
             cards[i].style.display = 'block';
             mostrados++;
         }

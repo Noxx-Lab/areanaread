@@ -42,7 +42,7 @@ body {
 }
 
 /* Card do carrossel */
-.carousel-content {
+.carousel-conteudo {
     background-color: #12111c;
     display: flex;
     border-radius: 12px;
@@ -54,7 +54,7 @@ body {
 }
 
 /* Texto do carrossel */
-.carousel-text {
+.carousel-texto {
     flex: 1;
     padding: 30px;
     display: flex;
@@ -63,7 +63,7 @@ body {
 }
 
 /* Detalhes do texto */
-.carousel-text .capitulo {
+.carousel-texto .capitulo {
     color: #888;
     text-transform: uppercase;
     font-size: 14px;
@@ -71,25 +71,26 @@ body {
     letter-spacing: 1px;
 }
 
-.carousel-text h2 {
+.carousel-texto h2 {
     font-size: 26px;
     font-weight: bold;
     margin-bottom: 15px;
     line-height: 1.2;
 }
 
-.carousel-text p {
+.carousel-texto p {
     font-size: 15px;
     line-height: 1.6;
     margin-bottom: 20px;
     display: -webkit-box;
     -webkit-box-orient: vertical;
+    max-height: 6em;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 /* Botão */
-.read-button {
+.botao-ler {
     background-color: #000;
     color: #fff;
     padding: 10px 22px;
@@ -100,12 +101,12 @@ body {
     width: fit-content;
 }
 
-.read-button:hover {
+.botao-ler:hover {
     background-color: #333;
 }
 
 /* Imagem da capa */
-.carousel-image {
+.carousel-imagem {
     flex: 0 0 240px;
     display: flex;
     align-items: center;
@@ -114,7 +115,7 @@ body {
     background-color: transparent;
 }
 
-.carousel-image img {
+.carousel-imagem img {
     width: 100%;
     height: auto;
     object-fit: cover;
@@ -122,12 +123,12 @@ body {
 }
 
 /* Indicadores */
-.carousel-indicators {
+.carousel-indicadores {
     display: flex;
     justify-content: center;
-    margin-top: 15px;
+    margin-bottom: 10px;
 }
-.carousel-indicators .dot {
+.carousel-indicadores .dot {
     height: 10px;
     width: 10px;
     background-color: #888;
@@ -136,10 +137,11 @@ body {
     cursor: pointer;
     transition: 0.3s ease;
 }
-.carousel-indicators .dot.active {
+.carousel-indicadores .dot.active {
     background-color: #6a5acd;
     transform: scale(1.2);
 }
+
 
 .carousel-generos {
     display: flex;

@@ -45,23 +45,15 @@ function buscar_obra_mais($ligaDB, $id_manga= null, $link=null):mixed{
     return $stmt_obras->get_result()->fetch_assoc();
 }
 
-function extrairPublicId($url, $modo = 'pagina') {
+function extrairPublicId($url, $modo = 'capa') {
     $path = parse_url($url, PHP_URL_PATH);
     $semUpload = explode('/upload/', $path)[1] ?? '';
-
-    if ($modo === 'capa') {
-         // Remove "v123456789/"
-        $semVersao = preg_replace('#^v\d+/#', '', $semUpload);
-        // Remove extensão (.jpg, .png, etc.)
-        $semVersao = preg_replace('/\.[a-zA-Z0-9]+$/', '', $semVersao);
-        return $semVersao; // ex: capas/php52FC
-    }
-
+    // Remove "v123456789/"
     $semVersao = preg_replace('#^v\d+/#', '', $semUpload);
-    $semVersao = preg_replace('#/[^/]+$#', '', $semVersao); // remove filename
+    // Remove extensão (.jpg, .png, etc.)
+    $semVersao = preg_replace('/\.[a-zA-Z0-9]+$/', '', $semVersao);
+    return $semVersao; // ex: capas/php52FC
 
-
-    return $semVersao;
 }
 
 function buscar_capitulos_manga($ligaDB,$id_manga=null,$id_capitulos=null, $modo = 'normal') {
@@ -76,27 +68,6 @@ function buscar_capitulos_manga($ligaDB,$id_manga=null,$id_capitulos=null, $modo
         return $result = $stmt_capitulos->get_result()->fetch_assoc();
 }
 
-function converte_webp($tempFile,$nomeArquivo,$extensao){
-    // Converte para WebP
-    $novoArquivoWebP = sys_get_temp_dir() . '/' . pathinfo($nomeArquivo, PATHINFO_FILENAME) . ".webp";
-
-    if(in_array($extensao,['jpg','jpeg'])){
-        $image = imagecreatefromjpeg($tempFile);
-    }
-    elseif($extensao === 'png'){
-        $image = imagecreatefrompng($tempFile);
-        error_reporting(E_ERROR | E_PARSE);
-    }
-    else{
-        return false;}
-    if($image){
-        imagewebp($image, $novoArquivoWebP, 100); // Qualidade 100%
-        imagedestroy($image);
-        $tempFile = $novoArquivoWebP; // Substituir pelo WebP
-        return $novoArquivoWebP;
-    }
-    return false;
-}
 
 function buscar_pagina ($ligaDB,$id_manga = null,$id_capitulos = null, $modo = 'normal'){
     $sql_pagina = "SELECT * from paginas where id_manga = ? or id_capitulos = ?";

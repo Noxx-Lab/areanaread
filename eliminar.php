@@ -35,18 +35,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         //Busca todas as páginas da obra
         $result_imgs = buscar_pagina($ligaDB,$id_manga,null,"array");
-
-        $public_ids = [];
-        foreach ($result_imgs as $paginas) {
-            $public_ids[] =  extrairPublicId($paginas['caminho_pagina']);
-          }
         
         //Busca a capa da obra se existir
         $result_capa = buscar_obra_mais($ligaDB,$id_manga)["capa"];  
-
-        if ($result_capa){
-          $public_ids[] =  extrairPublicId($result_capa, "capa");
-        }
 
         // Elimina do Cloudinary a capa e as páginas da obra selecionada
         try {
@@ -56,7 +47,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             "resource_type" => "image"
           ]);
 
-          // 2. Deletar capa da pasta "capas" (se for organizada assim)
           if (!empty($result_capa)) {
             $publicIdCapa = extrairPublicId($result_capa, "capa");
             if ($publicIdCapa) {
@@ -86,28 +76,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     elseif (isset($_POST["acao"]) && $_POST["acao"] === "eliminar_capitulos") {
         foreach ($_POST['capitulos'] as $id_capitulo) {
             $id_capitulo = intval($id_capitulo);
-            
-            //Busca todas as páginas da obra
-            $result_imgs = buscar_pagina($ligaDB,null,$id_capitulo,"array");
-    
-            $prefixos = [];
-            foreach ($result_imgs as $paginas) {
-              $prefixo = extrairPublicId($paginas["caminho_pagina"]);
-              if (!in_array($prefixo, $prefixos)) {
-                $prefixos[] = $prefixo;
-              }
-            }
 
-
-      foreach ($prefixos as $prefixo) {
+            $num_capitulo = buscar_capitulos_manga($ligaDB, null, $id_capitulo, 'normal')["num_capitulo"];
+            $link = buscar_obra_mais($ligaDB, $id_manga_selecionado)["link"];
+          
               try {
+                $prefixo = "mangas/$link/capitulo-$num_capitulo/";
                 $adminApi->deleteAssetsByPrefix($prefixo, [
                     "resource_type" => "image"
                 ]);
             } catch (Exception $e) {
                 error_log("Erro ao apagar prefixo $prefixo: " . $e->getMessage());
             }
-        }
     
             $delete_capitulo = eliminar($ligaDB,$id_capitulo,"capitulo");
     
@@ -157,9 +137,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endforeach; ?>
       </div>
       <div class="navegacao">
-              <button type="button" id="anterior">&#8592;</button>
+              <button type="button" id="anterior"><i class="bi bi-arrow-left"></i></button>
               <span id="pagina-atual">1</span>
-              <button type="button" id="proximo">&#8594;</button>
+              <button type="button" id="proximo"><i class="bi bi-arrow-right"></i></button>
           </div>
 
       <?php if ($obra_sem_capitulos): ?>

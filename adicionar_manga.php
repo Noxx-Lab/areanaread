@@ -30,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file']) && !empty($_F
 
     // Verificar se o ano é válido
     if ($ano_lancado < 1900 || $ano_lancado > date('Y')) {
-        $_SESSION['mensagem'] = "<p class='erro'>❌ Ano de lançamento inválido.</p>";
+        $_SESSION['mensagem'] = "<p class='erro'>Ano de lançamento inválido.</p>";
     }
 
     // Formatar o nome do mangá para URL (removendo caracteres especiais e espaços)
@@ -40,20 +40,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file']) && !empty($_F
     $tempFile = $_FILES['file']['tmp_name'];
 
     if (empty($nomeArquivo) || empty($tempFile)) {
-        $_SESSION['mensagem'] = "<p class = 'erro'>❌ Upload cancelado! Arquivo inválido.</p>";
+        $_SESSION['mensagem'] = "<p class = 'erro'>Upload cancelado! Arquivo inválido.</p>";
     }
 
     $extensao = pathinfo($nomeArquivo, PATHINFO_EXTENSION);
 
     if (empty($extensao)) {
-        $_SESSION['mensagem'] = "<p class = 'erro'>❌ Upload cancelado! O arquivo '$nomeArquivo' não tem uma extensão válida.</p>";
+        $_SESSION['mensagem'] = "<p class = 'erro'>Upload cancelado! O arquivo '$nomeArquivo' não tem uma extensão válida.</p>";
     }
 
     $extensao = strtolower($extensao);
     $extensoesPermitidas = ['jpg', 'png',"webp","avif","gif"];
 
     if (!in_array($extensao, $extensoesPermitidas)) {
-        die("<p class = 'erro'>❌ Upload cancelado! Formato não permitido: '$nomeArquivo'.</p>");
+        die("<p class = 'erro'>Upload cancelado! Formato não permitido: '$nomeArquivo'.</p>");
     }
 
     try {
@@ -65,7 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file']) && !empty($_F
         ]);
 
         if (!isset($upload["secure_url"])) {
-            $_SESSION['mensagem'] = "<p class = 'erro'>❌ Upload cancelado! Erro ao enviar para o Cloudinary: '$nomeArquivo'.</p>";
+            $_SESSION['mensagem'] = "<p class = 'erro'>Upload cancelado! Erro ao enviar para o Cloudinary: '$nomeArquivo'.</p>";
         }
 
         // Define a capa do mangá com o link do Cloudinary
@@ -108,7 +108,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file']) && !empty($_F
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adicionar Manga</title>
+    <title>Adicionar Obra</title>
     <link rel="stylesheet" href="css/adicionar_manga.css">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
@@ -119,7 +119,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file']) && !empty($_F
         <a href="uploud.php" class="btn-voltar">
             <i class="bi bi-arrow-left-square"></i> Voltar
         </a>
-        <h2><i class="bi bi-plus-circle"></i> Adicionar Novo Mangá</h2>
+        <h2><i class="bi bi-plus-circle"></i> Adicionar Novo Obra</h2>
     </div>
 
 

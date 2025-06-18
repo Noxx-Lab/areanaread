@@ -4,35 +4,31 @@ include "navbar.php";
 
 $mensagem = "";
 
-// Define id_capitulo a partir do POST
-$id_capitulo = isset($_POST['id_capitulo']) ? intval($_POST['id_capitulo']) : null;
-
-// Se ainda não foi passado via POST, tenta buscar via GET
-if (!$id_capitulo && isset($_GET['manga']) && isset($_GET['num_capitulo'])) {
+//Verifica se recebeu o link e o numero do capitulo
+if (($_GET['manga']) && isset($_GET['num_capitulo'])) {
     $link = $_GET['manga'];
     $num_capitulo = intval($_GET['num_capitulo']);
 
-    $sql_id = "SELECT c.id_capitulos 
-               FROM capitulos c 
-               JOIN mangas m ON c.id_manga = m.id_manga 
-               WHERE m.link = ? AND c.num_capitulo = ?";
+    //Pesquisa o id do capitulo selecionado usando o link e o num capitulo
+    $sql_id = "SELECT c.id_capitulos from capitulos c join mangas m on c.id_manga = m.id_manga where m.link = ? and c.num_capitulo = ?";
     $stmt_id = $ligaDB->prepare($sql_id);
-    $stmt_id->bind_param("si", $link, $num_capitulo);
+    $stmt_id->bind_param("si", $link, $num_capitulo); // "si" = string (link), int (capítulo)
     $stmt_id->execute();
-    $stmt_id->bind_result($id_capitulo);
-    $stmt_id->fetch();
-    $stmt_id->close();
-}
-// Pega informações básicas do capítulo e do mangá
-$sqlCapitulo = "SELECT c.id_capitulos, c.num_capitulo, c.id_manga, m.titulo 
-                    FROM capitulos c
-                    JOIN mangas m ON c.id_manga = m.id_manga
-                    WHERE c.id_capitulos = ?";
+    // Associa o id_capitulo resultado a variável
+    $id_capitulo = $stmt_id->get_result()->fetch_column();
+
+    // Pega informações básicas do capítulo e do mangá
+    $sqlCapitulo = "SELECT c.id_capitulos, c.num_capitulo, c.id_manga, m.titulo FROM capitulos c JOIN mangas m ON c.id_manga = m.id_manga WHERE c.id_capitulos = ?";
     $stmt = $ligaDB->prepare($sqlCapitulo);
     $stmt->bind_param("i", $id_capitulo);
     $stmt->execute();
     $resultCapitulo = $stmt->get_result();
     $capitulo = $resultCapitulo->fetch_assoc();
+    
+    if(!$capitulo){
+        header("Location: /arenaread/404.php");
+        exit;
+    }
 
     if ($capitulo) {
         $id_manga = $capitulo['id_manga'];
@@ -43,13 +39,7 @@ $sqlCapitulo = "SELECT c.id_capitulos, c.num_capitulo, c.id_manga, m.titulo
             user_progress($ligaDB, $_SESSION["iduser"], $id_manga, $id_capitulo);
         }
 
-        // buscar info do manga
-        $sql_manga = "SELECT * FROM mangas WHERE id_manga = ?";
-        $stmt_manga = $ligaDB->prepare($sql_manga);
-        $stmt_manga->bind_param("i", $id_manga);
-        $stmt_manga->execute();
-        $resulta_manga = $stmt_manga->get_result();
-        $manga = $resulta_manga->fetch_assoc();
+        $manga = buscar_obra_mais($ligaDB,$id_manga);
 
         $link = $manga['link'];
 
@@ -96,6 +86,7 @@ $resultCapitulos = $stmtCapitulos->get_result();
 $total_paginas = count($paginas);
 
 }
+}
 ?>
 
 <!DOCTYPE html>
@@ -112,11 +103,13 @@ $total_paginas = count($paginas);
 <div class="reader-header">
     <h1><?php echo $titulo_manga; ?></h1>
     <h1>Capítulo <?php echo $num_capitulo ?></h1>
-    <p class="breadcrumbs"><a href="/arenaread/index.php">Home</a>>
-    <a href="/arenaread/<?php echo $manga["link"];?>">
+    <div class="subtitulo">
+    <p><a class="link" href="/arenaread/index.php">Home</a> >
+    <a class="link" href="/arenaread/<?php echo $manga["link"];?>">
      <?php echo htmlspecialchars($titulo_manga); ?> 
     </a>>
     <strong> Capítulo <?php echo $num_capitulo; ?></strong></p> 
+    </div>
 
 
 <!-- Barra de navegação superior -->
@@ -244,7 +237,7 @@ document.addEventListener("keydown", function (e) {
         if (formProximo) formProximo.submit();
     }
 });
-
+//É para guardar que página daquele capítulo ele ficou inutil por agora
 document.addEventListener("DOMContentLoaded", function () {
     // --- Progresso LocalStorage ---
     const imagens = document.querySelectorAll(".manga-page");
