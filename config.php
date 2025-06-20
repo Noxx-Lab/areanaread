@@ -45,7 +45,7 @@ function buscar_obra_mais($ligaDB, $id_manga= null, $link=null):mixed{
     return $stmt_obras->get_result()->fetch_assoc();
 }
 
-function extrairPublicId($url, $modo = 'capa') {
+function extrairPublicId($url) {
     $path = parse_url($url, PHP_URL_PATH);
     $semUpload = explode('/upload/', $path)[1] ?? '';
     // Remove "v123456789/"
@@ -90,11 +90,11 @@ function eliminar ($ligaDB, $id, $modo){
         $stmt_eliminar_pagina->bind_param("i", $id);
         $stmt_eliminar_pagina->execute();
 
-        // Apagar progressos desse capítulo
+        /* Apagar progressos desse capítulo
         $sql_del_progress = "DELETE FROM user_progress WHERE id_manga = ?";
         $stmt_del = $ligaDB->prepare($sql_del_progress);
         $stmt_del->bind_param("i", $id);
-        $stmt_del->execute();
+        $stmt_del->execute(); */
 
 
         //Elimina todos os capitulos dessa obra
@@ -116,11 +116,11 @@ function eliminar ($ligaDB, $id, $modo){
         $stmt_eliminar_pagina->bind_param("i", $id);
         $stmt_eliminar_pagina->execute();
 
-        // Apagar progressos desse capítulo
+        /* Apagar progressos desse capítulo
         $sql_del_progress = "DELETE FROM user_progress WHERE id_capitulo = ?";
         $stmt_del = $ligaDB->prepare($sql_del_progress);
         $stmt_del->bind_param("i", $id);
-        $stmt_del->execute();
+        $stmt_del->execute();*/
 
         //Elimina o(s) capitulo(S) selecionados
         $sql_eliminar_capitulos = "DELETE from capitulos where id_capitulos = ?";
@@ -194,24 +194,29 @@ function tempoDecorrido($data) {
     return 'Agora mesmo';
 }
 
-function user_progress($ligaDB, $id_user, $id_manga, $id_capitulo ){
-    $sql_progress = "INSERT into user_progress (id_user, id_manga, id_capitulo, data_leitura)
-    VALUES (?,?,?, NOW()) on duplicate key UPDATE data_leitura = NOW()";
-    $stmt_progress = $ligaDB->prepare($sql_progress);
-    $stmt_progress->bind_param("iii", $id_user, $id_manga, $id_capitulo);
-    $stmt_progress->execute();
+function capitulos_lidos($ligaDB, $iduser, $link){
+    $sql_lidos = "SELECT capitulos_lidos from user_progress where iduser = ? and link_manga = ?";
+    $stmt_lidos = $ligaDB->prepare($sql_lidos);
+    $stmt_lidos ->bind_param("is", $iduser, $link);
+    $stmt_lidos -> execute();
+    $result_lidos = $stmt_lidos-> get_result();
+
+    if($cap_lidos = $result_lidos -> fetch_assoc()){
+        $capitulos_lidos = json_decode($cap_lidos['capitulos_lidos'], true);
+        if (is_array($capitulos_lidos)) {
+            return $capitulos_lidos; // devolve array dos capítulos lidos
+        }
+    }
+
 }
 
-function capitulos_lidos($ligaDB, $id_user, $id_manga){
-    $sql_lido = "SELECT id_capitulo from user_progress where id_user = ? and id_manga = ?";
-    $stmt_lido = $ligaDB->prepare($sql_lido);
-    $stmt_lido->bind_param("ii", $id_user, $id_manga);
-    $stmt_lido->execute();
+function verificar_link ($ligaDB, $link){
+    $sql_verifica = "SELECT id_manga FROM mangas WHERE link = ?";
+    $stmt_verifica = $ligaDB->prepare($sql_verifica);
+    $stmt_verifica->bind_param("s", $link);
+    $stmt_verifica->execute();
+    $result_verifica = $stmt_verifica->get_result();
 
-    $res = $stmt_lido->get_result();
-    $capitulosLido = [];
-    while ($row = $res->fetch_assoc()) {
-        $capitulosLido[] = $row["id_capitulo"];
-    }
-    return $capitulosLido;
+    return ($result_verifica == 0);
+
 }

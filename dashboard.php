@@ -29,12 +29,8 @@ FROM (
 
 
 //Obra mais lida
-$mais_lido = $ligaDB->query(" SELECT m.titulo, COUNT(DISTINCT up.id_user) AS leitures
-    FROM mangas m
-    JOIN user_progress up ON m.id_manga = up.id_manga
-    GROUP BY m.id_manga
-    ORDER BY leitures DESC
-    LIMIT 1")->fetch_assoc();
+$mais_lido = $ligaDB->query(" SELECT m.titulo, COUNT(DISTINCT up.iduser) as leitores from mangas m join user_progress up on m.link = up.link_manga group by m.id_manga order by leitores DESC LIMIT 1")->fetch_assoc();
+
 
 
 //Obtas por genero
@@ -80,7 +76,7 @@ $total_users = $ligaDB->query("SELECT count(*) as total from users")->fetch_asso
             <span class="dashboard-card-titulo-obra">A Obras mais Lida: </span>
             <span class="dashboard-card-valor-obra"><?php echo $mais_lido["titulo"]; ?></span>
             </div>
-            <span class="dashboard-card-total">Total de leitores: <?php echo $mais_lido["leitures"]; ?></span>
+            <span class="dashboard-card-total">Total de leitores: <?php echo $mais_lido["leitores"]; ?></span>
 
         </div>
         <div class="dashboard-card">

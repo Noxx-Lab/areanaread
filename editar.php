@@ -57,14 +57,31 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["editar"])) {
     $ano = $_POST["ano_lancado"];
     $capa_antiga = $_POST["capa_antiga"];
 
+    $sql_verifica = "SELECT COUNT(*) FROM mangas WHERE link = ? AND id_manga != ?";
+    $stmt_verifica = $ligaDB->prepare($sql_verifica);
+    $stmt_verifica->bind_param("si", $link, $id_manga);
+    $stmt_verifica->execute();
+    $stmt_verifica->bind_result($total);
+    $stmt_verifica->fetch();
+    $stmt_verifica->close();
+
+    if ($total > 0) {
+        die("Já existe outra obra com este link.");
+    }
+
+
     $nova_capa_url = $capa_antiga;
     if (isset($_FILES["nova_capa"]) && !empty($_FILES["nova_capa"]["name"])) {
 
-        $publicId = extrairPublicId($capa_antiga, "capa");
+        if ($_FILES['nova_capa']['size'] > 5 * 1024 * 1024) {
+            die("Ficheiro demasiado grande");
+        }
+    
+        $publicId = extrairPublicId($capa_antiga);
+
+        //delete capa antiga 
         $AdminApi->deleteAssets($publicId);
 
-        // Formatar o nome do mangá para URL (removendo caracteres especiais e espaços)
-        $nomeManga = strtolower(str_replace(' ', '-', preg_replace('/[^A-Za-z0-9 ]/', '', $titulo)));
 
         $nomeArquivo = basename($_FILES['nova_capa']['name']);
         $tempFile = $_FILES['nova_capa']['tmp_name'];
@@ -95,6 +112,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["editar"])) {
 
             if (!isset($upload["secure_url"])) {
                 $_SESSION['mensagem'] = "<p class = 'erro'>Upload cancelado! Erro ao enviar para o Cloudinary: '$nomeArquivo'.</p>";
+                die("Erro ao enviar a imagem para o Cloudinary");
             }
 
             // Define a capa do mangá com o link do Cloudinary
@@ -188,7 +206,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["editar"])) {
                     <input type="text" name="titulo" id="titulo" oninput="gerar_link()"
                         value="<?php echo htmlspecialchars($campos_obra["titulo"]) ?>" required>
 
-                    <label>Link</label>
+                    <label>Link (O link será gerado automaticamente com base no título)</label>
                     <input type="text" name="link" id="link" value="<?php echo htmlspecialchars($campos_obra["link"]) ?>"
                         placeholder="<?php echo htmlspecialchars($campos_obra["link"]) ?>" readonly>
 

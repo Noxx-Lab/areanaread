@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           ]);
 
           if (!empty($result_capa)) {
-            $publicIdCapa = extrairPublicId($result_capa, "capa");
+            $publicIdCapa = extrairPublicId($result_capa);
             if ($publicIdCapa) {
               $adminApi->deleteAssets([$publicIdCapa], [
                 "resource_type" => "image"

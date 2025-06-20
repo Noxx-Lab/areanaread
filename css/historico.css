@@ -50,7 +50,7 @@ body {
     margin-bottom: 22px;
     padding: 16px 22px;
     box-shadow: 0 3px 18px #0002;
-    width: 650px;             /* <-- largura fixa para todos iguais */
+    width: 850px;             /* <-- largura fixa para todos iguais */
     min-height: 160px;        /* altura mínima opcional */
     transition: box-shadow 0.2s;
 }
@@ -100,6 +100,7 @@ body {
     color: #a67ae9;
     font-size: 0.95em;
     margin-left: 8px;
+    margin-top: 50px;
 }
 
 .footer {
@@ -108,15 +109,15 @@ body {
     font-size: 14px;
     background-color: #2e2e2e;
     color: #c5c4c4;
-  }
-  
-  .footer a {
+    margin-top: auto; /* Isto empurra o footer para o fundo */
+}
+
+.footer a {
     color: #a8a8a8;
     text-decoration: none;
     margin: 0 5px;
-  }
-  
-  .footer a:hover {
+}
+
+.footer a:hover {
     text-decoration: underline;
-  }
-  
+}

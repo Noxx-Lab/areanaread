@@ -28,10 +28,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file']) && !empty($_F
 
     
 
-    // Verificar se o ano é válido
-    if ($ano_lancado < 1900 || $ano_lancado > date('Y')) {
-        $_SESSION['mensagem'] = "<p class='erro'>Ano de lançamento inválido.</p>";
+ 
+    $verifica_link = verificar_link($ligaDB, $link);
+    if ($verifica_link == true){
+        $_SESSION['mensagem'] = "<p class='erro'>Já existe uma obra com este link.</p>";
+        header("Location: adicionar_manga.php");
+        exit();
     }
+
+    if ($_FILES['file']['size'] > 5 * 1024 * 1024) { // 5MB por exemplo
+        die("Ficheiro demasiado grande");
+    }
+
 
     // Formatar o nome do mangá para URL (removendo caracteres especiais e espaços)
     $nomeManga = strtolower(str_replace(' ', '-', preg_replace('/[^A-Za-z0-9 ]/', '', $titulo)));
@@ -61,7 +69,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file']) && !empty($_F
         $upload = $uploadApi->upload($tempFile, [
             "folder" => "capas/",
             "use_filename" => true,
-            "unique_filename" => false
+            "unique_filename" => true
         ]);
 
         if (!isset($upload["secure_url"])) {
@@ -125,7 +133,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file']) && !empty($_F
 
         <form id="formUpload" action="adicionar_manga.php" method="POST" enctype="multipart/form-data">
         <input type="text" name="titulo" id="titulo" placeholder="Título" oninput="gerar_link()" required>
-        <input type="text" name="link" id="link" placeholder="Link" readonly required>
+        <input type="text" name="link" id="link" placeholder="O link será gerado automaticamente com base no título" readonly required>
             <select name="tipo" required>
                 <option value="">Tipo</option>
                 <option value="Manga">Manga</option>
@@ -218,11 +226,12 @@ function gerar_link() {
     // Remover acentos
     link = link.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-    // Substituir espaços por "-"
-    link = link.replace(/\s+/g, "-");
 
     // Remover caracteres especiais, mantendo apenas letras, números e hífens
-    link = link.replace(/[^a-z0-9-]/g, "");
+    link = link.replace(/[^a-z0-9]/g," ");
+
+    // Substituir espaços por "-"
+     link = link.replace(/\s+/g, "-");
 
     // Atualizar o campo de link
     linkInput.value = link;

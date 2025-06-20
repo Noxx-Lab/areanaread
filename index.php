@@ -18,6 +18,7 @@ $result_manga = $ligaDB->query($sql_manga);
 while ($mangas = $result_manga->fetch_assoc()){
     $id_manga = $mangas["id_manga"];
 
+
     $sql_generos = "SELECT nome_genero from generos inner join manga_generos on generos.id_genero = manga_generos.id_genero
                     where manga_generos.id_manga = ?";
     $stmt_generos = $ligaDB->prepare($sql_generos);
@@ -118,7 +119,7 @@ while ($manga = $result_ultimos->fetch_assoc()){
             <?php
             $lidos = [];
             if (isset($_SESSION["iduser"])) {
-            $lidos = capitulos_lidos($ligaDB, $_SESSION["iduser"], $manga["id_manga"]);
+            $lidos = capitulos_lidos($ligaDB, $_SESSION["iduser"], $manga["link"]);
             }
             ?>
             <div class="card-atualizacao">
@@ -132,9 +133,10 @@ while ($manga = $result_ultimos->fetch_assoc()){
                     <?php foreach ($manga['capitulos'] as $cap): ?>
                         <?php
                             $classe_lido = '';
-                            if (isset($_SESSION['iduser']) && in_array((int) $cap['id_capitulos'], $lidos)) {
+                            if (isset($_SESSION['iduser']) && in_array((int) $cap['num_capitulo'], $lidos)) {
                                 $classe_lido = 'capitulo-lido';
                             }
+
                         ?>
                         <li>
                             <a href="/arenaread/<?php echo $manga['link']; ?>/capitulo-<?php echo $cap['num_capitulo']; ?>" class = "<?php echo $classe_lido ?>">

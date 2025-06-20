@@ -39,8 +39,9 @@ while ($row = $result_generos->fetch_assoc()) {
     $generos[] = $row['nome_genero'];
 }
 
-if (isset($_SESSION["iduser"])){
-$lidos = capitulos_lidos($ligaDB,$_SESSION["iduser"], $id_manga);
+$lidos = [];
+if (isset($_SESSION["iduser"])) {
+$lidos = capitulos_lidos($ligaDB, $_SESSION["iduser"], $manga["link"]);
 }
 ?>
 
@@ -89,8 +90,8 @@ $lidos = capitulos_lidos($ligaDB,$_SESSION["iduser"], $id_manga);
         <?php while ($capitulo = $result_capitulos->fetch_assoc()): ?>
             <?php
                 $classe_lido = '';
-                if (isset($_SESSION['iduser']) && in_array((int)$capitulo['id_capitulos'],$lidos)) {
-                $classe_lido = 'capitulo-lido';
+                if (isset($_SESSION['iduser']) && in_array((int) $capitulo['num_capitulo'], $lidos)) {
+                    $classe_lido = 'capitulo-lido';
                 }
             ?>
         <form action="/arenaread/<?php echo $manga['link'] ?>/capitulo-<?php echo $capitulo['num_capitulo'] ?>" method="POST" class="hidden-form">

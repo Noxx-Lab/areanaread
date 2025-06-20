@@ -8,6 +8,7 @@ $mensagem = "";
 if (($_GET['manga']) && isset($_GET['num_capitulo'])) {
     $link = $_GET['manga'];
     $num_capitulo = intval($_GET['num_capitulo']);
+    $iduser = $_SESSION["iduser"];
 
     //Pesquisa o id do capitulo selecionado usando o link e o num capitulo
     $sql_id = "SELECT c.id_capitulos from capitulos c join mangas m on c.id_manga = m.id_manga where m.link = ? and c.num_capitulo = ?";
@@ -35,13 +36,9 @@ if (($_GET['manga']) && isset($_GET['num_capitulo'])) {
         $titulo_manga = $capitulo['titulo'];
         $num_capitulo = $capitulo['num_capitulo'];
 
-        if(isset($_SESSION['iduser']) && !isset($_GET['preload']) && !isset($_POST['preload'])) {
-            user_progress($ligaDB, $_SESSION["iduser"], $id_manga, $id_capitulo);
-        }
 
         $manga = buscar_obra_mais($ligaDB,$id_manga);
 
-        $link = $manga['link'];
 
         // Buscar páginas do capítulo
         $sqlPaginas = "SELECT caminho_pagina FROM paginas WHERE id_capitulos = ? and id_manga = ? ORDER BY id_pagina ASC";
@@ -215,48 +212,30 @@ $total_paginas = count($paginas);
 </footer>
 
 <script>
+document.addEventListener("DOMContentLoaded", function(){
+    const manga_link = <?php echo json_encode($manga["link"]); ?>;
+    const num_capitulo = <?php echo $num_capitulo; ?>;
+    const chave = "progresso_" + manga_link;
+    
+    // --- Progresso ---
+    let progresso = JSON.parse(localStorage.getItem(chave)) || [];
+    if(!progresso.includes(num_capitulo)){
+        progresso.push(num_capitulo);
+        localStorage.setItem(chave, JSON.stringify(progresso));
 
-function trocarCapitulo(url) {
-    window.location.href = url;
-}
-function scrollParaPagina(select) {
-    const selectedPage = select.value;
-    const element = document.getElementById(selectedPage);
-    if (element) {
-        element.scrollIntoView({ behavior: "smooth", block: "start" });
+        fetch("/arenaread/progresso.php", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                link_manga: manga_link,
+                capitulos_lidos: progresso
+            })
+        })
+        .then(res => res.text())
+        .then(data => console.log("Resposta do servidor:", data))
+        .catch(err => console.error("Erro no fetch:", err));
     }
-}
-document.addEventListener("keydown", function (e) {
-    if (e.key === "ArrowLeft") {
-        const formAnterior = document.getElementById("form-anterior-capitulo");
-        if (formAnterior) formAnterior.submit();
-    }
 
-    if (e.key === "ArrowRight") {
-        const formProximo = document.getElementById("form-proximo-capitulo");
-        if (formProximo) formProximo.submit();
-    }
-});
-//É para guardar que página daquele capítulo ele ficou inutil por agora
-document.addEventListener("DOMContentLoaded", function () {
-    // --- Progresso LocalStorage ---
-    const imagens = document.querySelectorAll(".manga-page");
-    const selects = document.querySelectorAll(".page-select");
-    const mangaKey = window.location.pathname;
-
-    const observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const paginaId = entry.target.id;
-                selects.forEach(select => { select.value = paginaId; });
-                localStorage.setItem("progresso_" + mangaKey, paginaId);
-            }
-        });
-    }, { threshold: 0.6, rootMargin: "0px" });
-    imagens.forEach(img => observer.observe(img));
-});
-
-document.addEventListener("DOMContentLoaded", () => {
     // --- Botão Voltar ao Topo ---
     const voltaTopoBtn = document.getElementById("volta_topo");
     window.addEventListener("scroll", () => {
@@ -264,14 +243,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     window.scrollparatopo = () => { window.scrollTo({ top: 0, behavior: "smooth" }); };
 
-    // --- Evita reenvio de formulário ao dar F5 ---
+    // --- Evitar reenvio de formulário ao dar F5 ---
     if (window.history.replaceState) {
         window.history.replaceState(null, null, window.location.href);
     }
-});
 
-// --- Pré-carregamento inteligente do próximo capítulo ---
-document.addEventListener("DOMContentLoaded", function () {
+    // --- Pré-carregamento inteligente do próximo capítulo ---
     const imagens = document.querySelectorAll(".manga-page");
     if (imagens.length < 2) return;
 
@@ -310,8 +287,33 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
-</script>
 
+function trocarCapitulo(url) {
+    window.location.href = url;
+}
+function scrollParaPagina(select) {
+    const selectedPage = select.value;
+    const element = document.getElementById(selectedPage);
+    if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+}
+document.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowLeft") {
+        const formAnterior = document.getElementById("form-anterior-capitulo");
+        if (formAnterior) formAnterior.submit();
+    }
+
+    if (e.key === "ArrowRight") {
+        const formProximo = document.getElementById("form-proximo-capitulo");
+        if (formProximo) formProximo.submit();
+    }
+});
+
+
+
+
+</script>
 
 </body>
 </html>

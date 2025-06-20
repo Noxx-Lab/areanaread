@@ -34,8 +34,12 @@ if ($id_manga_selecionado) {
 
 // VERIFICA SE O UPLOAD ESTÁ SENDO FEITO (APENAS SE TIVER ARQUIVOS)
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_FILES['files']['name']) > 0 && !empty($_FILES['files']['name'][0])) {
-    $id_manga = $_POST["id_manga"];
+
+
+  $id_manga = $_POST["id_manga"];
     $id_capitulo = $_POST["id_capitulo"];
+
+
 
     
     $num_capitulo = buscar_capitulos_manga($ligaDB,null, $id_capitulo, 'normal')["num_capitulo"];
@@ -55,7 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
 
       if (empty($nomeArquivo) || empty($tempFile)) {
         $_SESSION['mensagem'] = "<p class='erro'> Upload cancelado! Arquivo inválido.</p>";
-        continue;
+        exit();
       }
 
       $extensao = strtolower(pathinfo($nomeArquivo, PATHINFO_EXTENSION));
@@ -63,7 +67,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
 
       if (!in_array($extensao, $extensoesPermitidas)) {
         $_SESSION['mensagem'] = "<p class='erro'> Upload cancelado! Formato não permitido: '$nomeArquivo'</p>";
-        continue;
+        exit();
       }
 
         $upload = $uploadApi->upload($tempFile, [
@@ -73,7 +77,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
 
       if (!isset($upload["secure_url"])) {
         $_SESSION['mensagem'] = "<p class='erro'> Upload cancelado! Erro no Cloudinary para '$nomeArquivo'</p>";
-        continue;
+        exit();
       }
 
       $caminhoArquivo = $upload["secure_url"];
@@ -120,6 +124,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
 </div>
 
 <form id="formUpload" action="uploud.php" method="POST" enctype="multipart/form-data">
+    <div class="mensagem" id="mensagem">
+      <?php echo $mensagem; ?>
+    </div>
   <h2 class="titulo-pagina"> Upload Páginas</h2>
   <h3>Selecione uma Obra</h3>
   <input type="text" id="filtro-obras" placeholder="Pesquisar obras..." class="barra-pesquisa">
@@ -172,9 +179,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
       <i class="bi bi-upload"></i> Enviar Arquivos
     </button>
     <div class="loading-spinner" id="loading-spinner" style="display: none;"></div>
-    <div class="mensagem" id="mensagem">
-      <?php echo $mensagem; ?>
-    </div>
+  
   <?php endif; ?>
 </form>
 
@@ -189,12 +194,30 @@ document.addEventListener("DOMContentLoaded", function () {
   const inputFicheiros = document.getElementById("file-upload");
   //O botão de enviar os ficheiros
   const botaoEnviar = document.getElementById("submit-btn");
+  let loadingSpinner = document.getElementById("loading-spinner");
+  let mensagemDiv = document.getElementById("mensagem");
   //Quando alguém tentar enviar o formulário, impede o envio automático para poder tratar as imagens primeiro.
   formulario.addEventListener("submit", async function (evento) {
     evento.preventDefault(); 
+
+       // Verificar se algum capítulo foi selecionado
+      const capituloSelecionado = document.querySelector('input[name="id_capitulo"]:checked');
+      if (!capituloSelecionado) {
+        alert("Por favor selecione um capítulo antes de enviar os ficheiros.");
+        return; 
+    }
+
     // Guarda os ficheiros escolhidos pelo utilizador
     const ficheirosOriginais = Array.from(inputFicheiros.files);
     if (ficheirosOriginais.length === 0) return;//Se não tiver nenhum ficheiro bloqueia
+
+
+        // Desativa o botão de envio
+        submitButton.disabled = true;
+        submitButton.innerHTML = "Enviando...";
+        
+        // Exibe o spinner de loading
+        loadingSpinner.style.display = "block";
 
     //Cria um novo "conjunto" onde vão ficar as imagens já convertidas.
     const novoConjunto = new DataTransfer();
@@ -357,25 +380,6 @@ document.getElementById("file-upload").addEventListener("change", function() {
     }
 });
 
-//O que faz o loading
-document.addEventListener("DOMContentLoaded", function () {
-    let formUpload = document.getElementById("formUpload");
-    let submitButton = document.getElementById("submit-btn");
-    let loadingSpinner = document.getElementById("loading-spinner");
-    let mensagemDiv = document.getElementById("mensagem");
-
-    formUpload.addEventListener("submit", function(event) {
-        // Oculta mensagens anteriores
-        mensagemDiv.innerHTML = "";
-
-        // Desativa o botão de envio
-        submitButton.disabled = true;
-        submitButton.innerHTML = "Enviando...";
-        
-        // Exibe o spinner de loading
-        loadingSpinner.style.display = "block";
-    });
-});
 
 function selecionarObra(radio) {
   // Remover seleção anterior
