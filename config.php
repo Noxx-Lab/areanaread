@@ -217,6 +217,7 @@ function verificar_link ($ligaDB, $link){
     $stmt_verifica->execute();
     $result_verifica = $stmt_verifica->get_result();
 
-    return ($result_verifica == 0);
+    return $result_verifica->num_rows > 0;
 
+    
 }

@@ -24,12 +24,13 @@ body {
     margin-bottom: 10px;
 }
 
+
 .dropdown-button {
     padding: 12px;
     background-color: #1a1a1a;
     cursor: pointer;
-    color: #eee;
-    font-size: 14px;
+    color: #ffffff;
+    font-size: 18px;
     border-bottom: 1px solid #a678f1;
     position: relative;
     width: 100%;
@@ -93,6 +94,8 @@ body {
     margin-bottom: 15px;
 }
 
+
+
 /* Estilo unificado para os botões */
 .add-manga, .add-capitulo {
     flex: 1; /* Ambos ocupam o mesmo espaço */
@@ -117,6 +120,8 @@ body {
     background-color: #6a5acd;
 }
 
+
+
 /* Botão Inicialmente Desativado */
 .add-capitulo {
     background-color: #555;
@@ -136,6 +141,8 @@ body {
 .add-capitulo.enabled:hover {
     background-color: #6a5acd;
 }
+
+
 /* Container do Upload */
 .upload-container {
     max-width:  1200px; /* Aumenta a largura para parecer com a lista de projetos */
@@ -182,7 +189,25 @@ body {
     line-height: 1.2;
     margin-top: 6px;
   }
+  /* Bloqueia os cards durante upload */
+  .obra-card input:disabled + img {
+    opacity: 0.5;
+    filter: grayscale(100%);
+    pointer-events: not-allowed;
+}
 
+
+
+.upload-btn:disabled {
+    background-color: #888;
+    cursor: not-allowed;
+}
+
+
+.custom-file-upload:disabled{
+    background-color: #888;
+    cursor: not-allowed;
+}
   
 /* Mensagens de sucesso e erro */
 .mensagem {
@@ -306,11 +331,6 @@ body {
     100% { transform: rotate(360deg); }
 }
 
-/* Desativa o botão */
-.upload-btn:disabled {
-    background-color: #888;
-    cursor: not-allowed;
-}
 
 .barra-pesquisa {
     width: 100%;

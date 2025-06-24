@@ -66,7 +66,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["editar"])) {
     $stmt_verifica->close();
 
     if ($total > 0) {
-        die("Já existe outra obra com este link.");
+        $_SESSION["mensagem"] = "<p class='erro'>Já existe outra obra com esse link! </p>";
+        header("Location: editar.php");
+        exit;
     }
 
 
@@ -74,7 +76,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["editar"])) {
     if (isset($_FILES["nova_capa"]) && !empty($_FILES["nova_capa"]["name"])) {
 
         if ($_FILES['nova_capa']['size'] > 5 * 1024 * 1024) {
-            die("Ficheiro demasiado grande");
+            $_SESSION["mensagem"] = "<p class='erro'>Ficheiro demasiado grande! </p>";
+            header("Location: editar.php");
+            exit;
         }
     
         $publicId = extrairPublicId($capa_antiga);
@@ -88,19 +92,25 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["editar"])) {
 
         if (empty($nomeArquivo) || empty($tempFile)) {
             $_SESSION['mensagem'] = "<p class = 'erro'>Upload cancelado! Arquivo inválido.</p>";
+            header("Location: editar.php");
+            exit;
         }
 
         $extensao = pathinfo($nomeArquivo, PATHINFO_EXTENSION);
 
         if (empty($extensao)) {
             $_SESSION['mensagem'] = "<p class = 'erro'>Upload cancelado! O arquivo '$nomeArquivo' não tem uma extensão válida.</p>";
+            header("Location: editar.php");
+            exit;
         }
 
         $extensao = strtolower($extensao);
         $extensoesPermitidas = ['jpg', 'png', "webp", "avif"];
 
         if (!in_array($extensao, $extensoesPermitidas)) {
-            die("<p class = 'erro'>Upload cancelado! Formato não permitido: '$nomeArquivo'.</p>");
+            $_SESSION["mensagem"] = "<p class = 'erro'>Upload cancelado! Formato não permitido: '$nomeArquivo'.</p>";
+            header("Location: editar.php");
+            exit;
         }
 
         try {
@@ -112,7 +122,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["editar"])) {
 
             if (!isset($upload["secure_url"])) {
                 $_SESSION['mensagem'] = "<p class = 'erro'>Upload cancelado! Erro ao enviar para o Cloudinary: '$nomeArquivo'.</p>";
-                die("Erro ao enviar a imagem para o Cloudinary");
+                header("Location: editar.php");
+                exit;
             }
 
             // Define a capa do mangá com o link do Cloudinary
@@ -120,6 +131,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["editar"])) {
 
         } catch (Exception $e) {
             $_SESSION['mensagem'] = "<p class = 'erro'> Upload cancelado! Erro: " . $e->getMessage() . "</p>";
+            header("Location: editar.php");
+            exit;
         }
     }
 

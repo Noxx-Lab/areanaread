@@ -1,4 +1,4 @@
-<?php
+<?php 
 include 'config.php';
 include "navbar.php";
 include "cloudinary.php";
@@ -31,18 +31,13 @@ if ($id_manga_selecionado) {
     $capitulos = buscar_capitulos_manga($ligaDB,$id_manga_selecionado,null,'array');
 }
 
-
 // VERIFICA SE O UPLOAD ESTÁ SENDO FEITO (APENAS SE TIVER ARQUIVOS)
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_FILES['files']['name']) > 0 && !empty($_FILES['files']['name'][0])) {
-
-
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit-btn'])) {
+  $id_capitulo = isset($_POST["id_capitulo"]) ? $_POST["id_capitulo"] : null;
   $id_manga = $_POST["id_manga"];
-    $id_capitulo = $_POST["id_capitulo"];
 
 
-
-    
-    $num_capitulo = buscar_capitulos_manga($ligaDB,null, $id_capitulo, 'normal')["num_capitulo"];
+  $num_capitulo = buscar_capitulos_manga($ligaDB,null, $id_capitulo, 'normal')["num_capitulo"];
 
     // Buscar o nome da obra no banco de dados
     $link = buscar_obra_mais($ligaDB,$id_manga)["link"];    
@@ -59,6 +54,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
 
       if (empty($nomeArquivo) || empty($tempFile)) {
         $_SESSION['mensagem'] = "<p class='erro'> Upload cancelado! Arquivo inválido.</p>";
+        header("Location: uploud.php?id_manga=$id_manga");
         exit();
       }
 
@@ -67,6 +63,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
 
       if (!in_array($extensao, $extensoesPermitidas)) {
         $_SESSION['mensagem'] = "<p class='erro'> Upload cancelado! Formato não permitido: '$nomeArquivo'</p>";
+        header("Location: uploud.php");
         exit();
       }
 
@@ -77,6 +74,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
 
       if (!isset($upload["secure_url"])) {
         $_SESSION['mensagem'] = "<p class='erro'> Upload cancelado! Erro no Cloudinary para '$nomeArquivo'</p>";
+        header("Location: uploud.php");
         exit();
       }
 
@@ -86,13 +84,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
       $stmt->execute();
     } catch (Exception $e) {
       $_SESSION['mensagem'] = "<p class='erro'> Upload cancelado! Erro: " . $e->getMessage() . "</p>";
+      header("Location: uploud.php");
+      exit();
     }
+
   }
 
   $_SESSION['mensagem'] = "<p class='sucesso'>Todos os arquivos foram enviados com sucesso!</p>";
     header("Location: uploud.php");
     exit();
-}
+    }
+
+
 ?>
 
 <!DOCTYPE html>
@@ -110,7 +113,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
 
 <div class="button-group">
     <!-- Botão para adicionar novo mangá -->
-    <a href="adicionar_manga.php" class="add-manga" title="Adicionar uma obra nova">
+    <a href="adicionar_manga.php" id="add-manga" class="add-manga" title="Adicionar uma obra nova">
         <i class="bi bi-journal-plus"></i> Adicionar Obra
     </a> 
 
@@ -124,9 +127,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
 </div>
 
 <form id="formUpload" action="uploud.php" method="POST" enctype="multipart/form-data">
-    <div class="mensagem" id="mensagem">
-      <?php echo $mensagem; ?>
-    </div>
+    <input type="hidden" name="id_manga" value="<?php echo $id_manga_selecionado; ?>">
   <h2 class="titulo-pagina"> Upload Páginas</h2>
   <h3>Selecione uma Obra</h3>
   <input type="text" id="filtro-obras" placeholder="Pesquisar obras..." class="barra-pesquisa">
@@ -159,7 +160,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
   <?php foreach ($capitulos as $cap): ?>
   <?php $capitulo_tem_paginas = contar($ligaDB, $cap['id_capitulos'], 'pag_por_cap'); ?>
   <label class="capitulo-label<?php echo $capitulo_tem_paginas ? ' disabled-capitulo' : '' ?>">
-    <input type="radio" name="id_capitulo" value="<?php echo $cap['id_capitulos'] ?>" <?php echo $capitulo_tem_paginas ? 'disabled' : '' ?> required>
+    <input type="radio" name="id_capitulo" value="<?php echo $cap['id_capitulos'] ?>" <?php echo $capitulo_tem_paginas ? 'disabled' : '' ?> >
     <span>
       Capítulo <?php echo $cap['num_capitulo'] ?> <?php echo $capitulo_tem_paginas ? '(Já tem páginas)' : '' ?>
     </span>
@@ -167,134 +168,161 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['files']) && count($_F
 <?php endforeach; ?>
   </div>
 </div>
-
     <!-- Upload de arquivos -->
     <label for="file-upload" class="custom-file-upload">
       <i class="bi bi-file-earmark-arrow-up"></i> <span id="file-label">Escolher Arquivos</span>
     </label>
-    <input type="file" name="files[]" id="file-upload" multiple required>
-    
+    <input type="file" name="files[]" id="file-upload" multiple>
+
     <!-- Botão de envio -->
-    <button type="submit" class="upload-btn" id="submit-btn">
+    <button type="submit" name="submit-btn" class="upload-btn" id="submit-btn">
       <i class="bi bi-upload"></i> Enviar Arquivos
     </button>
     <div class="loading-spinner" id="loading-spinner" style="display: none;"></div>
-  
+    <div class="mensagem" id="mensagem">
+      <?php echo $mensagem; ?>
+    </div>
   <?php endif; ?>
 </form>
 
 </div>
 
 <script>
+document.querySelectorAll('.obra-card input[type="radio"]').forEach(radio => {
+    radio.addEventListener('change', function () {
+        limparFicheiros(); // Limpa os ficheiros ao trocar de obra
 
-document.addEventListener("DOMContentLoaded", function () {
-  //Vai buscar o formulario do upload
-  const formulario = document.getElementById("formUpload");
-  //O campo dos ficheros selecionados
-  const inputFicheiros = document.getElementById("file-upload");
-  //O botão de enviar os ficheiros
-  const botaoEnviar = document.getElementById("submit-btn");
-  let loadingSpinner = document.getElementById("loading-spinner");
-  let mensagemDiv = document.getElementById("mensagem");
-  //Quando alguém tentar enviar o formulário, impede o envio automático para poder tratar as imagens primeiro.
-  formulario.addEventListener("submit", async function (evento) {
-    evento.preventDefault(); 
-
-       // Verificar se algum capítulo foi selecionado
-      const capituloSelecionado = document.querySelector('input[name="id_capitulo"]:checked');
-      if (!capituloSelecionado) {
-        alert("Por favor selecione um capítulo antes de enviar os ficheiros.");
-        return; 
-    }
-
-    // Guarda os ficheiros escolhidos pelo utilizador
-    const ficheirosOriginais = Array.from(inputFicheiros.files);
-    if (ficheirosOriginais.length === 0) return;//Se não tiver nenhum ficheiro bloqueia
-
-
-        // Desativa o botão de envio
-        submitButton.disabled = true;
-        submitButton.innerHTML = "Enviando...";
-        
-        // Exibe o spinner de loading
-        loadingSpinner.style.display = "block";
-
-    //Cria um novo "conjunto" onde vão ficar as imagens já convertidas.
-    const novoConjunto = new DataTransfer();
-
-    // Converte todos os ficheiros .jpg, .jpeg ou .png, tenta convertê-la para .webp em paralelo (lote).
-    const ficheirosConvertidos = await Promise.all(
-      ficheirosOriginais.map(async (ficheiro) => {
-        const extensao = ficheiro.name.split(".").pop().toLowerCase();
-
-        if (["jpg", "jpeg", "png"].includes(extensao)) {
-          const convertido = await converterParaWebP(ficheiro);
-          return convertido || ficheiro; // Usa o convertido ou mantém original
-        }
-
-        return ficheiro; // Outros formatos mantêm-se
-      })
-    );
-
-    // Substitui os ficheiros antigos pelos novos (convertidos) no campo de upload.
-    ficheirosConvertidos.forEach(f => novoConjunto.items.add(f));
-    inputFicheiros.files = novoConjunto.files;
-
-    // Depois de uma pequena pausa, envia o formulário normalmente e desativa o botão para evitar duplo clique.
-    setTimeout(() => {
-      botaoEnviar.disabled = true;
-      formulario.submit();
-    }, 100);
-  });
+        // Faz submit da obra nova
+        const formulario = document.getElementById("formUpload");
+        formulario.submit();
+    });
 });
 
-// Função para converter uma imagem para WebP
-async function converterParaWebP(ficheiro) {
-  return new Promise((resolver) => {
-    const leitor = new FileReader();
-
-    // Cria um "quadro" virtual (canvas), desenha a imagem original nesse quadro.
-    leitor.onload = function (evento) {
-      const imagem = new Image();
-
-      imagem.onload = function () {
-        const canvas = document.createElement("canvas");
-        canvas.width = imagem.width;
-        canvas.height = imagem.height;
-
-        const contexto = canvas.getContext("2d");
-        contexto.drawImage(imagem, 0, 0);
-
-        // Tenta converter essa imagem desenhada para .webp. Se falhar, mostra um aviso e devolve null.
-        canvas.toBlob((blob) => {
-          if (!blob) {
-            console.warn("Erro ao converter:", ficheiro.name);
-            resolver(null);
-            return;
-          }
-
-          // Se conseguir, cria um novo ficheiro com o mesmo nome mas extensão .webp.
-          const nomeBase = ficheiro.name.split(".")[0];
-          const ficheiroWebP = new File([blob], nomeBase + ".webp", { type: "image/webp" });
-          resolver(ficheiroWebP);
-        }, "image/webp", 0.9);
-      };
-      //Garante que a imagem foi carregada corretamente antes da conversão. Lê a imagem como URL temporário para poder ser processada no browser.
-      imagem.onerror = () => {
-        console.warn("Erro ao carregar imagem:", ficheiro.name);
-        resolver(null);
-      };
-
-      imagem.src = evento.target.result;
-    };
-
-    leitor.readAsDataURL(ficheiro);
-  });
+function limparFicheiros() {
+    const inputFicheiros = document.getElementById("file-upload");
+    inputFicheiros.value = "";
+    document.getElementById("file-label").textContent = "Escolher Arquivos";
 }
 
+    const formulario = document.getElementById("formUpload");
+    const inputFicheiros = document.getElementById("file-upload");
+    const botaoEnviar = document.getElementById("submit-btn");
+    const loadingSpinner = document.getElementById("loading-spinner");
 
-document.addEventListener("DOMContentLoaded", function () {
-  const obras = Array.from(document.querySelectorAll(".obra-card"));
+    formulario.addEventListener("submit", async function (evento) {
+        evento.preventDefault();  // Impede o envio inicial
+
+        const capSelecionado = document.querySelector("input[name='id_capitulo']:checked");
+        if (!capSelecionado) {
+          alert("Por favor, selecione o capítulo.");
+          return;
+        }
+
+        if (inputFicheiros.files.length === 0) {
+          alert("Por favor, selecione os ficheiros.");
+          return;
+        }
+
+           // Mostra loading enquanto converte
+        botaoEnviar.disabled = true;
+        inputFicheiros.disabled = true;
+        botaoEnviar.innerHTML = "A enviar as imagens...";
+        loadingSpinner.style.display = "block";
+        document.body.style.cursor = "wait";
+        document.querySelectorAll('.obra-card input[type="radio"]').forEach(input => {
+        input.disabled = true;
+    });
+
+        const ficheirosOriginais = Array.from(inputFicheiros.files);
+        const ficheirosConvertidos = await Promise.all(
+            ficheirosOriginais.map(async (ficheiro) => {
+                const extensao = ficheiro.name.split(".").pop().toLowerCase();
+                if (["jpg", "jpeg", "png"].includes(extensao)) {
+                    const convertido = await converterParaWebP(ficheiro);
+                    return convertido || ficheiro;
+                }
+                return ficheiro;
+            })
+        );
+
+        // Agora vamos montar o FormData manualmente
+        const formData = new FormData();
+
+        // Adiciona todos os outros campos do formulário
+        new FormData(formulario).forEach((value, key) => {
+            if (key !== "files[]") {
+                formData.append(key, value);
+            }
+        });
+
+        // Adiciona os ficheiros convertidos
+        ficheirosConvertidos.forEach(file => {
+            formData.append("files[]", file, file.name);
+        });
+
+        // Adiciona o campo submit-btn para o PHP reconhecer
+        formData.append("submit-btn", "1");
+
+
+        try {
+            const resposta = await fetch("uploud.php", {
+                method: "POST",
+                body: formData
+            });
+
+            if (resposta.redirected) {
+                window.location.href = resposta.url; // Redireciona normalmente
+            } else {
+                const respostaTexto = await resposta.text();
+                console.error("Resposta inesperada:", respostaTexto);
+                alert("Ocorreu um problema no upload.");
+            }
+        } catch (erro) {
+            console.error("Erro ao enviar:", erro);
+            alert("Falha na ligação ao servidor.");
+        } finally {
+            document.body.style.cursor = "default";
+            loadingSpinner.style.display = "none";
+            botaoEnviar.disabled = false;
+            inputFicheiros.disabled = false;
+            botaoEnviar.innerHTML = '<i class="bi bi-upload"></i> Enviar Arquivos';
+        }
+    });
+
+    // Função de conversão
+    async function converterParaWebP(ficheiro) {
+        return new Promise((resolver) => {
+            const leitor = new FileReader();
+            leitor.onload = function (evento) {
+                const imagem = new Image();
+                imagem.onload = function () {
+                    const canvas = document.createElement("canvas");
+                    canvas.width = imagem.width;
+                    canvas.height = imagem.height;
+                    const contexto = canvas.getContext("2d");
+                    contexto.drawImage(imagem, 0, 0);
+                    canvas.toBlob((blob) => {
+                        if (!blob) {
+                            console.warn("Erro ao converter:", ficheiro.name);
+                            resolver(null);
+                            return;
+                        }
+                        const nomeBase = ficheiro.name.split(".")[0];
+                        const ficheiroWebP = new File([blob], nomeBase + ".webp", { type: "image/webp" });
+                        resolver(ficheiroWebP);
+                    }, "image/webp", 0.9);
+                };
+                imagem.onerror = () => {
+                    console.warn("Erro ao carregar imagem:", ficheiro.name);
+                    resolver(null);
+                };
+                imagem.src = evento.target.result;
+            };
+            leitor.readAsDataURL(ficheiro);
+        });
+    }
+
+    const obras = Array.from(document.querySelectorAll(".obra-card"));
   const obrasContainer = document.getElementById("obras-container");
   const input = document.getElementById("filtro-obras");
   const btnAnterior = document.getElementById("anterior");
@@ -366,7 +394,15 @@ document.addEventListener("DOMContentLoaded", function () {
   input.addEventListener("input", aplicarFiltro);
 
   aplicarFiltro(); // inicializa
-});
+
+  document.querySelectorAll('.dropdown-list input[type="radio"]').forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            const label = this.parentNode.textContent.trim();
+            document.querySelector('.dropdown-button').textContent = label;
+            document.getElementById('dropdown-capitulos').classList.remove('active');
+        });
+    });
+
 
 //O que conta e diz quantos ficheiros foram selecionados
 document.getElementById("file-upload").addEventListener("change", function() {
@@ -408,16 +444,6 @@ document.addEventListener('click', function(event) {
     }
 });
 
-// Atualiza texto do botão ao selecionar
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.dropdown-list input[type="radio"]').forEach(function(radio) {
-        radio.addEventListener('change', function() {
-            const label = this.parentNode.textContent.trim();
-            document.querySelector('.dropdown-button').textContent = label;
-            document.getElementById('dropdown-capitulos').classList.remove('active');
-        });
-    });
-});
 // Após aplicar o filtro, garante que a obra selecionada esteja visível
 const selecionado = document.querySelector('.obra-card.selected');
 if (selecionado) {
@@ -427,6 +453,8 @@ if (selecionado) {
     atualizarLista();
   }
 }
+
+
 
 </script>
 

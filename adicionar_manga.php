@@ -30,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file']) && !empty($_F
 
  
     $verifica_link = verificar_link($ligaDB, $link);
-    if ($verifica_link == true){
+    if ($verifica_link){
         $_SESSION['mensagem'] = "<p class='erro'>Já existe uma obra com este link.</p>";
         header("Location: adicionar_manga.php");
         exit();
