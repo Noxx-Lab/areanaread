@@ -338,8 +338,20 @@ if (($_GET['manga']) && isset($_GET['num_capitulo'])) {
                 }
             });
 
+            let ultimoScrollY = window.scrollY;
+            const navbar = document.getElementById("navbar");
 
+            window.addEventListener("scroll", () => {
+                if (!navbar) return;
 
+                if (window.scrollY > ultimoScrollY) {
+                    navbar.classList.add("ocultar");  // esconder ao descer
+                } else {
+                    navbar.classList.remove("ocultar"); // mostrar ao subir
+                }
+
+                ultimoScrollY = window.scrollY;
+            });
 
         </script>
 

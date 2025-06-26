@@ -18,7 +18,7 @@
 <body>
 
 <!-- Início da barra de navegação -->
-<div class="navbar">
+<div class="navbar" id="navbar">
 
     <!-- Seção esquerda da navbar (logo + links principais) -->
     <div class="nav-left">
