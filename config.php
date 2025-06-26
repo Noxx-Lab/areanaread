@@ -56,6 +56,36 @@ function extrairPublicId($url) {
 
 }
 
+function eliminar_user_progress($ligaDB, $id)
+{
+    $sql_link = "SELECT m.link, c.num_capitulo from mangas m join capitulos c on c.id_manga = m.id_manga where c.id_capitulos = ? ";
+    $stmt_link = $ligaDB->prepare($sql_link);
+    $stmt_link->bind_param("i", $id);
+    $stmt_link->execute();
+    $result_link = $stmt_link->get_result()->fetch_assoc();
+    $link = $result_link["link"];
+    $num_capitulo = $result_link["num_capitulo"];
+
+    $sql_progress = "SELECT * from user_progress where link_manga = ? ";
+    $stmt_progress = $ligaDB->prepare($sql_progress);
+    $stmt_progress->bind_param("s", $link);
+    $stmt_progress->execute();
+    $result_progress = $stmt_progress->get_result()->fetch_all(MYSQLI_ASSOC);
+
+    foreach ($result_progress as $progresso) {
+        $capitulos_lidos = json_decode($progresso["capitulos_lidos"], true);
+        $capitulos_lidos = array_filter($capitulos_lidos, function ($num) use ($num_capitulo) {
+            return $num != $num_capitulo;
+        });
+
+        $novo_progresso = json_encode(array_values($capitulos_lidos));
+        $sql_update = "UPDATE user_progress set capitulos_lidos = ? where iduser = ? and link_manga = ?";
+        $stmt_update = $ligaDB->prepare($sql_update);
+        $stmt_update->bind_param("sis", $novo_progresso, $progresso["iduser"], $link);
+        return $stmt_update->execute();
+    }
+}
+
 function buscar_capitulos_manga($ligaDB,$id_manga=null,$id_capitulos=null, $modo = 'normal') {
         $sql_capitulos = "SELECT * from capitulos where id_manga = ? or id_capitulos = ? order by num_capitulo ASC ";
         $stmt_capitulos = $ligaDB->prepare($sql_capitulos);
@@ -90,13 +120,6 @@ function eliminar ($ligaDB, $id, $modo){
         $stmt_eliminar_pagina->bind_param("i", $id);
         $stmt_eliminar_pagina->execute();
 
-        /* Apagar progressos desse capítulo
-        $sql_del_progress = "DELETE FROM user_progress WHERE id_manga = ?";
-        $stmt_del = $ligaDB->prepare($sql_del_progress);
-        $stmt_del->bind_param("i", $id);
-        $stmt_del->execute(); */
-
-
         //Elimina todos os capitulos dessa obra
         $sql_eliminar_capitulos = "DELETE from capitulos where id_manga = ?";
         $stmt_eliminar_capitulos = $ligaDB->prepare($sql_eliminar_capitulos);
@@ -116,11 +139,9 @@ function eliminar ($ligaDB, $id, $modo){
         $stmt_eliminar_pagina->bind_param("i", $id);
         $stmt_eliminar_pagina->execute();
 
-        /* Apagar progressos desse capítulo
-        $sql_del_progress = "DELETE FROM user_progress WHERE id_capitulo = ?";
-        $stmt_del = $ligaDB->prepare($sql_del_progress);
-        $stmt_del->bind_param("i", $id);
-        $stmt_del->execute();*/
+        // Apagar o(s) capitulo(s) do user_progress
+        $eliminar_user_progress = eliminar_user_progress($ligaDB, $id);
+        
 
         //Elimina o(s) capitulo(S) selecionados
         $sql_eliminar_capitulos = "DELETE from capitulos where id_capitulos = ?";
@@ -221,3 +242,4 @@ function verificar_link ($ligaDB, $link){
 
     
 }
+

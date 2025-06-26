@@ -133,10 +133,11 @@ while ($manga = $result_ultimos->fetch_assoc()){
                     <?php foreach ($manga['capitulos'] as $cap): ?>
                         <?php
                             $classe_lido = '';
-                            if (isset($_SESSION['iduser']) && in_array((int) $cap['num_capitulo'], $lidos)) {
-                                $classe_lido = 'capitulo-lido';
+                            if(!empty($lidos)){
+                                if (isset($_SESSION['iduser']) && in_array((int) $cap['num_capitulo'], $lidos)) {
+                                    $classe_lido = 'capitulo-lido';
+                                }
                             }
-
                         ?>
                         <li>
                             <a href="/arenaread/<?php echo $manga['link']; ?>/capitulo-<?php echo $cap['num_capitulo']; ?>" class = "<?php echo $classe_lido ?>">

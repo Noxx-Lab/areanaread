@@ -2,17 +2,11 @@
 session_start();
 include "config.php";
 
-
 $progresso = json_decode(file_get_contents("php://input"), true);
 
 $iduser = $_SESSION["iduser"];
 $link_manga = $progresso["link_manga"];
 $capitulos_lidos  = $progresso["capitulos_lidos"]; //Guardamos em JSON
-
-if (count($capitulos_lidos) > 1000) {
-    http_response_code(400);
-    exit("Limite de capítulos ultrapassado.");
-}
 
 
 $sql_verifica_user = "SELECT * from users where iduser = ?";
@@ -53,10 +47,26 @@ $result_progresso = $stmt_progresso -> get_result();
 
 $cap_validos = json_encode($capitulos_lidos);
 if ($result_progresso->num_rows > 0){
+    // Já existe registo -> buscar o que já está na BD
+    $row = $result_progresso->fetch_assoc();
+    $capitulos_bd = json_decode($row['capitulos_lidos'], true);
+
+    if (!is_array($capitulos_bd)) {
+        $capitulos_bd = [];
+    }
+
+    // Fundir os dois arrays e eliminar duplicados
+    $todos_capitulos = array_unique(array_merge($capitulos_bd, $capitulos_lidos));
+    sort($todos_capitulos); // ordena opcionalmente
+
+    $cap_validos = json_encode($todos_capitulos);
+
+    // Atualiza com o array fundido
     $sql_atualizar = "UPDATE user_progress set capitulos_lidos = ? where iduser = ? and link_manga = ?";
     $stmt_atualizar = $ligaDB->prepare($sql_atualizar);
-    $stmt_atualizar -> bind_param("sis", $cap_validos, $iduser, $link_manga);
+    $stmt_atualizar->bind_param("sis", $cap_validos, $iduser, $link_manga);
     $stmt_atualizar->execute();
+    
 }
 else{
     $sql_insert = "INSERT into user_progress (iduser, link_manga, capitulos_lidos) values (?, ?, ?)";
@@ -68,9 +78,9 @@ else{
 // No final do progresso.php, após o INSERT ou UPDATE
 echo json_encode([
     'status' => 'ok',
+    "limpar_localStorage" => true,
     'rows_affected' => $ligaDB->affected_rows
+
 ]);
-
-
 
 ?>
