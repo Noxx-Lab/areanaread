@@ -105,7 +105,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["editar"])) {
         }
 
         $extensao = strtolower($extensao);
-        $extensoesPermitidas = ['jpg', 'png', "webp", "avif"];
+        $extensoesPermitidas = ['jpg', 'png', "webp", "avif", "gif"];
 
         if (!in_array($extensao, $extensoesPermitidas)) {
             $_SESSION["mensagem"] = "<p class = 'erro'>Upload cancelado! Formato não permitido: '$nomeArquivo'.</p>";

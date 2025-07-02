@@ -91,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
             $delete_capitulo = eliminar($ligaDB,$id_capitulo,"capitulo");
     
-            $_SESSION['mensagem'] = "<p class = 'sucesso'>Capítulo $id_capitulo eliminado com sucesso.</p>";
+            $_SESSION['mensagem'] = "<p class = 'sucesso'>Capítulo(s) eliminado(s) com sucesso.</p>";
         }
         header("Location: eliminar.php");
         exit;

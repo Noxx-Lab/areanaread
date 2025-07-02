@@ -73,12 +73,14 @@ function eliminar_user_progress($ligaDB, $id)
     $result_progress = $stmt_progress->get_result()->fetch_all(MYSQLI_ASSOC);
 
     foreach ($result_progress as $progresso) {
-        $capitulos_lidos = json_decode($progresso["capitulos_lidos"], true);
-        $capitulos_lidos = array_filter($capitulos_lidos, function ($num) use ($num_capitulo) {
-            return $num != $num_capitulo;
-        });
+        $capitulos_lidos = array_filter(
+            explode(",", $progresso["capitulos_lidos"]),
+            function ($num) use ($num_capitulo) {
+                return intval($num) !== intval($num_capitulo);
+            }
+        );
 
-        $novo_progresso = json_encode(array_values($capitulos_lidos));
+        $novo_progresso = implode(",", $capitulos_lidos);
         $sql_update = "UPDATE user_progress set capitulos_lidos = ? where iduser = ? and link_manga = ?";
         $stmt_update = $ligaDB->prepare($sql_update);
         $stmt_update->bind_param("sis", $novo_progresso, $progresso["iduser"], $link);
@@ -223,7 +225,8 @@ function capitulos_lidos($ligaDB, $iduser, $link){
     $result_lidos = $stmt_lidos-> get_result();
 
     if($cap_lidos = $result_lidos -> fetch_assoc()){
-        $capitulos_lidos = json_decode($cap_lidos['capitulos_lidos'], true);
+        $capitulos_lidos = explode(",", $cap_lidos['capitulos_lidos']);
+        $capitulos_lidos = array_map("intval", $capitulos_lidos);
         if (is_array($capitulos_lidos)) {
             return $capitulos_lidos; // devolve array dos capítulos lidos
         }

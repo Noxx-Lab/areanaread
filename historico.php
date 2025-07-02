@@ -15,7 +15,8 @@ $result_historico = $stmt_historico->get_result();
 
 $obras = [];
 while ($linha = $result_historico->fetch_assoc()) {
-    $capitulos = json_decode($linha['capitulos_lidos'], true);
+    $capitulos = explode(",", $linha['capitulos_lidos']);
+    $capitulos = array_map("intval", $capitulos);
     if (is_array($capitulos) && count($capitulos) > 0) {
         rsort($capitulos); // Ordena decrescente
         $linha['capitulos_recentes'] = array_reverse(array_slice($capitulos, 0, 3));

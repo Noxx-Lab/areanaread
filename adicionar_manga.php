@@ -177,7 +177,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['file']) && !empty($_F
             <label for="file-upload" class="custom-file-upload">
                 <i class="bi bi-file-earmark-arrow-up"></i> <span id="file-label">Escolher Arquivo para a Capa</span>
             </label>
-            <input type="file" name="file" id="file-upload" required>
+            <input type="file" name="file" id="file-upload" >
 
             <button type="submit" class="upload-btn" id="submit-btn">Adicionar</button>
 
@@ -264,9 +264,16 @@ document.addEventListener("DOMContentLoaded", function () {
     let submitButton = document.getElementById("submit-btn");
     let loadingSpinner = document.getElementById("loading-spinner");
     let mensagemDiv = document.getElementById("mensagem");
+    const inputFicheiros = document.getElementById("file-upload");
 
     formUpload.addEventListener("submit", function(event) {
-        // Oculta mensagens anteriores
+
+        if (inputFicheiros.files.length === 0) {
+        event.preventDefault(); 
+        alert("Por favor, selecione os ficheiros.");
+        return; // impede a continuação do código
+    }
+    
         mensagemDiv.innerHTML = "";
 
         // Desativa o botão de envio

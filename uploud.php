@@ -310,7 +310,7 @@ function limparFicheiros() {
                         const nomeBase = ficheiro.name.split(".")[0];
                         const ficheiroWebP = new File([blob], nomeBase + ".webp", { type: "image/webp" });
                         resolver(ficheiroWebP);
-                    }, "image/webp", 0.9);
+                    }, "image/webp", 1);
                 };
                 imagem.onerror = () => {
                     console.warn("Erro ao carregar imagem:", ficheiro.name);
