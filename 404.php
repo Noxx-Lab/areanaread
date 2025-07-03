@@ -8,6 +8,6 @@
     <link rel="stylesheet" href="/arenaread/css/erro.css">
 </head>
 <body>
-    <img src="https://res.cloudinary.com/dghfkjx36/image/upload/v1750257150/404_erro_ykswbb.png" alt="404 File Not Found" class="imagem-404">
+    <img src="https://res.cloudinary.com/dqn5ieptf/image/upload/v1751535820/404_erro_ykswbb_ptie1n.png" alt="404 File Not Found" class="imagem-404">
 </body>
 </html>
