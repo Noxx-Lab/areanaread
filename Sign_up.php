@@ -106,6 +106,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label>Confirmar Senha</label>
             <input type="password" name="confirmar" pattern="^(?=.*[A-Za-z])(?=.*\d).+$" minlength="6" required>
 
+            <label class="checkbox-termos"><input type="checkbox" required>  Aceita os <a href="termos.php">Termos e condições</a></label>
+
             <button type="submit">Registar</button>
 
             <a href="login.php" class="btn-voltar">Já tem uma conta? Entrar</a>

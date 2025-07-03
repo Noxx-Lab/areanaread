@@ -129,7 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <input type="text" id="filtro-obras" placeholder="Pesquisar obras" class="barra-pesquisa">
       <div id="obras-container" class="obras-grid">
         <?php foreach ($obras as $obra): ?>
-          <label class="obra-card <?= $id_manga_selecionado == $obra['id_manga'] ? 'selected' : '' ?>" data-titulo="<?= strtolower($obra['titulo']) ?>" style="display: none;">
+          <label class="obra-card <?php echo $id_manga_selecionado == $obra['id_manga'] ? 'selected' : '' ?>" data-titulo="<?php echo strtolower($obra['titulo']) ?>" style="display: none;">
             <input type="radio" name="id_manga" value="<?php echo $obra['id_manga'] ?>" style="display: none">
             <img src="<?php echo $obra['capa'] ?>" alt="<?php echo $obra['titulo'] ?>">
             <span><?php echo $obra['titulo'] ?></span>

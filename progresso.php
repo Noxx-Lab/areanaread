@@ -54,7 +54,6 @@ if ($result_progresso->num_rows > 0) {
 
     // Fundir e remover duplicados
     $todos_capitulos = array_unique(array_merge($capitulos_bd, $capitulos_lidos));
-    sort($todos_capitulos);
     $cap_validos = implode(",", $todos_capitulos);
 
     $sql_atualizar = "UPDATE user_progress SET capitulos_lidos = ? WHERE iduser = ? AND link_manga = ?";

@@ -149,3 +149,20 @@ body {
     color: #70ff95;
     margin-top: 15px;
 }
+
+.checkbox-termos {
+    display: flex;
+    align-items: left;
+    gap: 8px;
+    color: white; /* ou a cor que estás a usar no texto */
+    font-size: 14px;
+  }
+
+.checkbox-termos a{
+    text-decoration: none;
+    color: #6a5acd;
+}
+
+.checkbox-termos a:hover{
+    color:#8775ff ;
+}
