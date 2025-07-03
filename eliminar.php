@@ -28,7 +28,7 @@ $obra_sem_capitulos = $id_manga_selecionado && empty($capitulos);
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id_manga = intval($_POST['id_manga'] ?? 0);
 
-    $link = buscar_obra_mais($ligaDB, $id_manga)["link"]; 
+    $link = buscar_obra_mais($ligaDB, $id_manga)["link"] ?? null; 
 
     // Eliminar obra completa
     if (isset($_POST["acao"]) && $_POST["acao"] === "eliminar_obra") {

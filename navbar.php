@@ -24,7 +24,7 @@
     <div class="nav-left">
         <!-- Logo clicável que redireciona para a homepage -->
         <a href="/arenaread/index.php" class="logo-link">
-            <img src="https://res.cloudinary.com/dghfkjx36/image/upload/v1749142660/logo1_dc4amd_qhvcsr.png" alt="ArenaRead" class="logo">
+            <img src="https://res.cloudinary.com/dqn5ieptf/image/upload/v1751535819/logo1_dc4amd_qhvcsr_vfurof.png" alt="ArenaRead" class="logo">
         </a>
 
         <!-- Links de navegação -->

@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </head>
                 <body>
                     <div class='email-box'>
-                        <img src= 'https://res.cloudinary.com/dghfkjx36/image/upload/v1744680702/logo1_nbbqav.png' alt='ArenaRead Logo' class='logo'>
+                        <img src= 'https://res.cloudinary.com/dqn5ieptf/image/upload/v1751535819/logo1_dc4amd_qhvcsr_vfurof.png' alt='ArenaRead Logo' class='logo'>
                         <h1>Bem-vindo, $username!</h1>
                         <p>Obrigado por se registar no <strong>ArenaRead</strong>. Agora podes explorar e acompanhar as tuas obras favoritas!</p>
                         <p>Aproveita e começa a tua leitura!</p>
