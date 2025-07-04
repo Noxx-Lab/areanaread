@@ -1,4 +1,3 @@
-/* Reset básico */
 * {
     margin: 0;
     padding: 0;
@@ -6,12 +5,11 @@
     font-family: Arial, sans-serif;
 }
 
-/* Fundo escuro */
 body {
-    background-color: #111;
-    color: #fff;
-    padding: 20px;
-    padding-top: 95px;
+  background: #121212;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  color: #fff;
+  margin: 0;
 }
 .dropdown-container {
     margin-top: 30px;
