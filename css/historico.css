@@ -13,6 +13,9 @@ body {
     padding: 20px;
     padding-top: 125px; 
 }
+a{
+    text-decoration: none;
+}
 
 .titulo {
     text-align: center;

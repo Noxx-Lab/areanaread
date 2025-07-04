@@ -52,9 +52,11 @@ if ($result_progresso->num_rows > 0) {
         $capitulos_bd = [];
     }
 
-    // Fundir e remover duplicados
-    $todos_capitulos = array_unique(array_merge($capitulos_bd, $capitulos_lidos));
-    $cap_validos = implode(",", $todos_capitulos);
+    foreach ($capitulos_lidos as $cap) {
+        $capitulos_bd = array_filter($capitulos_bd, fn($c) => $c != $cap); // remove anteriores
+        $capitulos_bd[] = $cap; // adiciona no fim
+    }
+    $cap_validos = implode(",", $capitulos_bd);
 
     $sql_atualizar = "UPDATE user_progress SET capitulos_lidos = ? WHERE iduser = ? AND link_manga = ?";
     $stmt_atualizar = $ligaDB->prepare($sql_atualizar);

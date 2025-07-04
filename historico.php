@@ -18,9 +18,9 @@ while ($linha = $result_historico->fetch_assoc()) {
     $capitulos = explode(",", $linha['capitulos_lidos']);
     $capitulos = array_map("intval", $capitulos);
     if (is_array($capitulos) && count($capitulos) > 0) {
-        asort($capitulos); // Ordena decrescente
-        $linha['capitulos_recentes'] = array_slice($capitulos, 0, 3);
+        $linha['capitulos_recentes'] = array_slice($capitulos, -3, 3);
         $linha['data_leitura'] = date("d/m/Y H:i", strtotime($linha['data_update']));
+        $linha['mais_recente'] = end($capitulos); // esta linha foi movida para cá
         $obras[] = $linha;
     }
 }
@@ -42,6 +42,7 @@ while ($linha = $result_historico->fetch_assoc()) {
     <div class="historico-lista">
         <?php foreach ($obras as $obra): ?>
             <div class="historico-card">
+            <a href="/arenaread/<?php echo $obra['link']; ?>">
                 <img src="<?php echo htmlspecialchars($obra['capa']) ?>" alt="Capa" class="historico-capa">
                 <div class="historico-info">
                     <div class="historico-titulo"><?php echo htmlspecialchars($obra['titulo']) ?></div>
@@ -50,6 +51,9 @@ while ($linha = $result_historico->fetch_assoc()) {
                         <?php foreach ($obra['capitulos_recentes'] as $cap): ?>
                             <a class="historico-cap" href="/arenaread/<?php echo $obra['link'] ?>/capitulo-<?php echo $cap ?>">
                                 Capítulo <?php echo $cap ?>
+                                <?php if ($cap === $obra['mais_recente']): ?>
+                                (mais recente)
+                                <?php endif; ?>
                             </a>
                         <?php endforeach; ?>
                     </div>

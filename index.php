@@ -9,6 +9,15 @@ $pagina_atual = isset($_GET['pagina']) ? max(1, intval($_GET['pagina'])) : '1';
 
 $offset = ($pagina_atual - 1) * $por_pagina;
 
+$total_obras = contar($ligaDB, null, "obra_com_pag");
+$total_paginas = min($total_obras, $limite_total);
+$total_paginas = ceil($total_obras / $por_pagina);
+
+if ($pagina_atual > $total_paginas && $total_paginas > 0) {
+    header("Location: index.php?pagina=$total_paginas");
+    exit;
+}
+
 $mangas_carrossel = [];
 $sql_manga = "SELECT m.id_manga, m.titulo, m.link, m.sinopse, m.capa FROM mangas m JOIN capitulos c ON m.id_manga = c.id_manga JOIN paginas p ON c.id_capitulos = p.id_capitulos GROUP BY m.id_manga ORDER BY MAX(c.data_lancamento) DESC LIMIT 5";
 
@@ -42,9 +51,7 @@ while ($mangas = $result_manga->fetch_assoc()){
 
 $ultimos_mangas = [];
 
-$total_obras = contar($ligaDB, null,"obra_com_pag");
-$total_paginas = min($total_obras, $limite_total);
-$total_paginas = ceil($total_obras / $por_pagina);
+
 
 $sql_ultimos = "SELECT m.id_manga, m.titulo, m.link, m.capa, m.sinopse from mangas m join capitulos c on m.id_manga = c.id_manga join paginas p on c.id_capitulos = p.id_capitulos group by m.id_manga order by MAX(c.data_lancamento) DESC LIMIT $por_pagina offset $offset";
 
